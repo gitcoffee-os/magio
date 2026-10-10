@@ -12,8 +12,8 @@ they are reproduced below and continue to apply to the portions of this product
 that derive from OpenChamber.
 
 This notice covers every package in this repository, including packages/vscode
-whose LICENSE file it replaces. packages/sdk carries its own copy so the notice
-travels with the published npm package.
+and packages/sdk. Both carry their own copy so the notice travels with the
+VS Code extension and with the published npm package.
 
 Vendored third-party components under packages/ui/src/lib/ghostty/ keep their
 own license files beside their code.

@@ -19,8 +19,8 @@
     "magio",
     "cli"
   ],
-  "author": "Bohdan Triapitsyn",
-  "license": "Apache-2.0",
+  "author": "GitCoffee Team",
+  "license": "SEE LICENSE IN LICENSE",
   "scripts": {
     "dev": "node ./scripts/dev-web-hmr.mjs",
     "mg-dev": "node scripts/mg-dev.mjs",
@@ -43,6 +43,7 @@
     "lint:mobile": "bun run --cwd packages/mobile lint",
     "lint:anti-slop": "oxlint",
     "check:changed": "node scripts/check-changed.mjs",
+    "merge:detect": "node scripts/merge-detect.mjs",
     "test": "node scripts/run-isolated-tests.mjs scripts && bun run --cwd packages/sdk test && bun run --cwd packages/ui test && bun run --cwd packages/vscode test && bun run --cwd packages/electron test && bun run --cwd packages/web test",
     "clean": "node scripts/clean.mjs",
     "changelog-card": "node scripts/changelog-card/generate.mjs",

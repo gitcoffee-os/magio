@@ -91,5 +91,5 @@ Install locally: `code --install-extension packages/vscode/magio-*.vsix`
 ## License
 
 GitCoffee Open Source License, Apache 2.0 with additional conditions. The full
-text is in [LICENSE](LICENSE), and [NOTICE](../../NOTICE) carries the upstream
+text is in [LICENSE](LICENSE), and [NOTICE](NOTICE) carries the upstream
 MIT notice.

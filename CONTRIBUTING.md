@@ -357,6 +357,15 @@ packages/
 
 See [AGENTS.md](./AGENTS.md) for detailed architecture reference.
 
+## License
+
+Contributions land under the GitCoffee Open Source License, the Apache License,
+Version 2.0 with the additional conditions in [LICENSE](LICENSE). Opening a
+pull request means agreeing to LICENSE section 2: the Magio maintainers may
+change the license terms, and contributed code may be used for commercial
+purposes, including hosted operations. Code that derives from OpenChamber stays
+under the MIT License, whose notices live in [NOTICE](NOTICE).
+
 ## Not a developer?
 
 You can still help:

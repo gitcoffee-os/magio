@@ -1,4 +1,4 @@
-# <picture><source media="(prefers-color-scheme: dark)" srcset="docs/references/badges/magio-logo-dark.svg"><img src="docs/references/badges/magio-logo-light.svg" width="32" height="32" align="absmiddle" /></picture> Magio
+# <img src="docs/references/badges/magio-logo-color.svg" width="32" height="32" align="absmiddle" /> Magio
 
 [![GitHub stars](https://img.shields.io/github/stars/gitcoffee-os/magio?style=flat&labelColor=100F0F&color=66800B)](https://github.com/gitcoffee-os/magio/stargazers)
 [![GitHub release](https://img.shields.io/github/v/release/gitcoffee-os/magio?style=flat&labelColor=100F0F&color=205EA6)](https://github.com/gitcoffee-os/magio/releases/latest)
@@ -6,6 +6,8 @@
 [![Support the project](https://img.shields.io/badge/Support-Project-black?style=flat&labelColor=100F0F&color=EC8B49&logo=patreon&logoColor=FFFCF0)](https://www.patreon.com/magio)
 
 <a href="https://www.blacksmith.sh/"><picture><source media="(prefers-color-scheme: dark)" srcset="docs/references/badges/blacksmith-dark.svg"><img src="docs/references/badges/blacksmith-light.svg" height="28" alt="CI powered by Blacksmith" /></picture></a>
+
+> Forked from [openchamber/openchamber](https://github.com/openchamber/openchamber) (MIT). The OpenChamber-derived code stays under the MIT License, reproduced in [NOTICE](NOTICE). Magio's own code is under the [GitCoffee Open Source License](LICENSE).
 
 ## Run agent work. Keep control. Ship from anywhere.
 
@@ -142,7 +144,7 @@ Magio uses [OpenCode](https://opencode.ai) to run coding agents. We chose it bec
 
 Magio handles the rest of the workflow. You can decide what to try, keep the agent on track, review the result, connect from another device, and ship the change.
 
-Magio is an independent project and is not affiliated with the OpenCode team.
+Magio is an independent project and is not affiliated with the OpenCode or OpenChamber teams.
 
 ## Contributing
 
@@ -162,8 +164,10 @@ Special thanks to:
 
 ## License
 
-Magio uses the GitCoffee Open Source License, Apache 2.0 with additional
-conditions. See [LICENSE](LICENSE).
+Magio uses the GitCoffee Open Source License: the Apache License, Version 2.0
+with additional conditions, so it is not plain Apache 2.0. The conditions, and
+what they cover, are in [LICENSE](LICENSE).
 
-Magio derives from OpenChamber, which is published under the MIT License.
-[NOTICE](NOTICE) reproduces that notice, as the MIT terms require.
+Magio is a fork of [OpenChamber](https://github.com/openchamber/openchamber),
+published under the MIT License. [NOTICE](NOTICE) reproduces that notice, as
+the MIT terms require, and the OpenChamber-derived code stays under MIT.

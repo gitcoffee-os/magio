@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Contract for Magio guests: manifest parse and iframe host bridge.",
   "private": false,
-  "license": "Apache-2.0",
+  "license": "SEE LICENSE IN LICENSE",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/gitcoffee-os/magio.git",

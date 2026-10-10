@@ -202,6 +202,17 @@
 
 GitCoffee Open Source License
 
+Magio is distributed under the GitCoffee Open Source License: the Apache
+License, Version 2.0 together with the additional conditions below. It is not
+the Apache License, Version 2.0 by itself; the additional conditions apply on
+top of it.
+
+Scope: this license covers the code Magio writes. Portions of this repository
+derive from OpenChamber, written by Bohdan Triapitsyn and the OpenChamber
+contributors and published under the MIT License. Those portions remain under
+the MIT License. Its permission notice and copyright notices are reproduced in
+NOTICE and continue to apply to the OpenChamber-derived code.
+
 Magio is licensed under a modified version of the Apache License 2.0, with the following additional conditions:
 
 1. Magio may be utilized commercially, including as a backend service for other applications or as an application development platform for enterprises. Should the conditions below be met, a commercial license must be obtained from the producer:
@@ -218,6 +229,7 @@ b. Your contributed code may be used for commercial purposes, including but not 
 
 Apart from the specific conditions mentioned above, all other rights and restrictions follow the Apache License 2.0. Detailed information about the Apache License 2.0 can be found at http://www.apache.org/licenses/LICENSE-2.0.
 
-The interactive design of this product is protected by appearance patent.
-
-Copyright (c) 2026 GitCoffee All Rights Reserved.
+Copyright (c) 2026 GitCoffee All Rights Reserved. Portions of this work
+derive from OpenChamber and remain Copyright (c) 2025 Bohdan Triapitsyn and
+Copyright (c) 2024 OpenChamber contributors, under the MIT License (see
+NOTICE).
