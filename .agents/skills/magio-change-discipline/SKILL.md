@@ -72,6 +72,7 @@ Do not hide a required architectural migration behind a local heuristic. Do not 
 | Dependency or lockfile | Workspace-wide checks and affected builds |
 | Added, renamed, or removed `packages/*` workspace | Mirror it in the Dockerfile `deps` stage, which copies those manifests by name, then run `docker build .`: a `COPY` of a missing workspace fails the build, and a workspace another one depends on fails the frozen install when absent. CI does not build the image. |
 | Generated asset | Regeneration check plus consumer build/test |
+| Upstream sync into the rebrand baseline | `scripts/rebrand-deviations.test.mjs` holds the values this fork keeps against upstream and runs with `test`; after the merge, `bun run merge:detect --base <pre-merge rev> --upstream <the release --base derives from>` reports rows the merge reverted or dropped — the previous merge's tag, not the one just merged, or every newly added upstream row reads as reverted. The four-stage rename pipeline cannot reach either kind: they carry no brand string, and a row overwritten rather than removed is invisible to loss detection |
 | Docs-only or isolated config | Narrow syntax/schema/link validation; do not run unrelated full suites |
 | Platform/runtime behavior | Relevant runtime build or manual/integration check; static checks are insufficient |
 | Desktop update or quit/install sequence | A real update run; read `references/updater-testing.md` first, because a run done the obvious way completes the update and reports success while testing nothing |
