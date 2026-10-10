@@ -503,7 +503,7 @@ export const TextSelectionMenu: React.FC<TextSelectionMenuProps> = ({ containerR
     addMarkdownToChat(selectedTextMarkdown);
   }, [addMarkdownToChat, selectedTextMarkdown]);
 
-  const handleAskOpenChamber = React.useCallback(() => {
+  const handleAskMagio = React.useCallback(() => {
     if (!currentSessionId || !selectedTextMarkdown) return;
     requestBtwComposer({
       parentSessionId: currentSessionId,
@@ -692,7 +692,7 @@ export const TextSelectionMenu: React.FC<TextSelectionMenuProps> = ({ containerR
         {commentRects.map((rect, index) => (
           <div
             key={index}
-            className="oc-chat-comment-rect absolute"
+            className="mg-chat-comment-rect absolute"
             style={{ left: rect.left, top: rect.top, width: rect.width, height: rect.height }}
           />
         ))}
@@ -704,7 +704,7 @@ export const TextSelectionMenu: React.FC<TextSelectionMenuProps> = ({ containerR
   const commentInput = (
     <div
       className={cn(
-        'oc-glass-popover relative flex items-end gap-2 rounded-3xl border border-[var(--interactive-border)]',
+        'mg-glass-popover relative flex items-end gap-2 rounded-3xl border border-[var(--interactive-border)]',
         'pl-4 shadow-[0_4px_16px_-4px_rgb(0_0_0_/_0.12)]',
         'py-1 pr-1',
         'transition-[opacity,transform] duration-200 ease-out',
@@ -753,7 +753,7 @@ export const TextSelectionMenu: React.FC<TextSelectionMenuProps> = ({ containerR
         ref={menuRef}
         className={cn(
           'fixed left-3 right-3 bottom-0 z-50 mx-auto max-w-[420px]',
-          'oc-glass-popover rounded-2xl border border-[var(--interactive-border)]',
+          'mg-glass-popover rounded-2xl border border-[var(--interactive-border)]',
           'p-2 shadow-[0_4px_16px_-4px_rgb(0_0_0_/_0.12)]',
           'safe-area-bottom',
           'transition-[opacity,transform] duration-200 ease-out will-change-[opacity,transform]',
@@ -824,7 +824,7 @@ export const TextSelectionMenu: React.FC<TextSelectionMenuProps> = ({ containerR
           <div className="grid grid-cols-2 gap-2">
             {currentSessionId ? (
               <button
-                onClick={handleAskOpenChamber}
+                onClick={handleAskMagio}
                 className={cn(
                   'flex min-w-0 items-center gap-2 rounded-xl px-3 py-2.5 text-left',
                   'text-sm font-medium leading-tight',
@@ -832,11 +832,11 @@ export const TextSelectionMenu: React.FC<TextSelectionMenuProps> = ({ containerR
                   'active:opacity-80',
                   'transition-opacity duration-150'
                 )}
-                title={t('chat.textSelection.title.askOpenChamber')}
+                title={t('chat.textSelection.title.askMagio')}
                 type="button"
               >
                 <Icon name="chat-ai-3" className="h-5 w-5 flex-shrink-0" />
-                <span className="min-w-0 whitespace-normal">{t('chat.textSelection.actions.askOpenChamber')}</span>
+                <span className="min-w-0 whitespace-normal">{t('chat.textSelection.actions.askMagio')}</span>
               </button>
             ) : null}
 
@@ -880,7 +880,7 @@ export const TextSelectionMenu: React.FC<TextSelectionMenuProps> = ({ containerR
         <div
           className={cn(
             'flex items-center whitespace-nowrap',
-            'oc-glass-popover rounded-full border border-[var(--interactive-border)]',
+            'mg-glass-popover rounded-full border border-[var(--interactive-border)]',
             'shadow-[0_4px_16px_-4px_rgb(0_0_0_/_0.12)]',
             'p-1',
             'transition-[opacity,transform] duration-200 ease-out',
@@ -906,7 +906,7 @@ export const TextSelectionMenu: React.FC<TextSelectionMenuProps> = ({ containerR
             <>
               <div className="mx-0.5 h-5 w-px shrink-0 bg-[var(--interactive-border)]" />
               <button
-                onClick={handleAskOpenChamber}
+                onClick={handleAskMagio}
                 className={cn(
                   'px-3.5 py-1.5 rounded-full',
                   'text-sm font-medium',
@@ -914,10 +914,10 @@ export const TextSelectionMenu: React.FC<TextSelectionMenuProps> = ({ containerR
                   'hover:bg-[var(--interactive-hover)]',
                   'transition-colors duration-150'
                 )}
-                title={t('chat.textSelection.title.askOpenChamber')}
+                title={t('chat.textSelection.title.askMagio')}
                 type="button"
               >
-                {t('chat.textSelection.actions.askOpenChamber')}
+                {t('chat.textSelection.actions.askMagio')}
               </button>
             </>
           ) : null}

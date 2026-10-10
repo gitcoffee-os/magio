@@ -85,7 +85,7 @@ export function getWebviewHtml(options: WebviewHtmlOptions): string {
   // Use VS Code CSS variables for proper theme integration
   // These variables are automatically provided by VS Code to webviews
   // 
-  // Logo geometry matches OpenChamberLogo.tsx:
+  // Logo geometry matches MagioLogo.tsx:
   // edge=48, cos30=0.866, sin30=0.5, centerY=50
   // top=(50, 2), left=(8.432, 26), right=(91.568, 26), center=(50, 50)
   // bottomLeft=(8.432, 74), bottomRight=(91.568, 74), bottom=(50, 98)
@@ -122,16 +122,16 @@ export function getWebviewHtml(options: WebviewHtmlOptions): string {
       opacity: 0;
       pointer-events: none;
     }
-    /* Glow pulse on the OpenCode mark on the cube's top face — signals loading without text. */
-    @keyframes oc-logo-glow {
+    /* Glow pulse on the Magio mark — signals loading without text. */
+    @keyframes mg-logo-glow {
       0%, 100% { filter: drop-shadow(0 0 0 transparent); }
       50% { filter: drop-shadow(0 0 4px var(--vscode-foreground)); }
     }
-    #initial-loading .logo-inner {
-      animation: oc-logo-glow 1.8s ease-in-out infinite;
+    #initial-loading .logo {
+      animation: mg-logo-glow 1.8s ease-in-out infinite;
     }
     @media (prefers-reduced-motion: reduce) {
-      #initial-loading .logo-inner { animation: none; }
+      #initial-loading .logo { animation: none; }
     }
     /* Logo colors use VS Code foreground color */
     #initial-loading .logo-stroke {
@@ -140,9 +140,6 @@ export function getWebviewHtml(options: WebviewHtmlOptions): string {
     #initial-loading .logo-fill {
       fill: var(--vscode-foreground);
       opacity: 0.15;
-    }
-    #initial-loading .logo-fill-solid {
-      fill: var(--vscode-foreground);
     }
     #initial-loading .logo-fill-dim {
       fill: var(--vscode-foreground);
@@ -160,24 +157,18 @@ export function getWebviewHtml(options: WebviewHtmlOptions): string {
       max-width: 280px;
     }
   </style>
-  <title>OpenChamber</title>
+  <title>Magio</title>
 </head>
 <body>
-  <!-- Initial loading screen with simplified OpenChamber logo -->
+  <!-- Initial loading screen with simplified Magio logo -->
   <div id="initial-loading">
-    <svg class="logo" width="70" height="70" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <!-- Left face -->
-      <path class="logo-fill logo-stroke" d="M50 50 L8.432 26 L8.432 74 L50 98 Z" stroke-width="2" stroke-linejoin="round"/>
-      <!-- Right face -->
-      <path class="logo-fill logo-stroke" d="M50 50 L91.568 26 L91.568 74 L50 98 Z" stroke-width="2" stroke-linejoin="round"/>
-      <!-- Top face (no fill, stroke only) -->
-      <path class="logo-stroke" d="M50 2 L8.432 26 L50 50 L91.568 26 Z" fill="none" stroke-width="2" stroke-linejoin="round"/>
+    <svg class="logo" width="70" height="70" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Magio logo">
+      <!-- The Magio mark: a four-point spark with a companion spark. Coordinates
+           are resolved into the 0..100 viewBox; the main spark spans
+           8.432..91.568 on both axes, the box the previous mark filled. -->
+      <path class="logo-fill logo-stroke" d="M50 8.432 C51.934 34.048, 65.952 48.067, 91.568 50 C65.952 51.934, 51.934 65.952, 50 91.568 C48.067 65.952, 34.048 51.934, 8.432 50 C34.048 48.067, 48.067 34.048, 50 8.432 Z" stroke-width="2" stroke-linejoin="round"/>
+      <path class="logo-fill-dim" d="M82.144 11.427 C82.723 19.113, 86.928 23.319, 94.614 23.898 C86.928 24.478, 82.723 28.682, 82.144 36.369 C81.563 28.682, 77.358 24.478, 69.672 23.898 C77.358 23.319, 81.563 19.113, 82.144 11.427 Z"/>
       
-      <!-- OpenCode logo on top face -->
-      <g class="logo-inner" transform="matrix(0.866, 0.5, -0.866, 0.5, 50, 26) scale(0.75)">
-        <path class="logo-fill-solid" fill-rule="evenodd" clip-rule="evenodd" d="M-16 -20 L16 -20 L16 20 L-16 20 Z M-8 -12 L-8 12 L8 12 L8 -12 Z"/>
-        <path class="logo-fill-dim" d="M-8 -4 L8 -4 L8 12 L-8 12 Z"/>
-      </g>
     </svg>
     <!-- Status text stays empty while things are fine; populated only on error. -->
     <div class="status-text" id="loading-status"></div>
@@ -202,23 +193,23 @@ export function getWebviewHtml(options: WebviewHtmlOptions): string {
       initialSessionId: ${initialSessionId ? `"${initialSessionId.replace(/\\/g, '\\\\').replace(/"/g, '\\"')}"` : 'null'},
       initialComposer: ${initialComposer ? `"${initialComposer}"` : 'null'},
     };
-    window.__OPENCHAMBER_HOME__ = "${workspaceFolder.replace(/\\/g, '\\\\')}";
+    window.__MAGIO_HOME__ = "${workspaceFolder.replace(/\\/g, '\\\\')}";
     // VS Code's display language. The UI bundle uses it as the default locale
     // until the user picks one; the splash below picks its strings from it too.
-    window.__OPENCHAMBER_HOST_LANGUAGE__ = ${JSON.stringify(vscode.env.language)};
+    window.__MAGIO_HOST_LANGUAGE__ = ${JSON.stringify(vscode.env.language)};
 
-    // OpenChamber's own saved locale wins; before one exists, VS Code's display
+    // Magio's own saved locale wins; before one exists, VS Code's display
     // language decides, so a fresh install in a supported language never boots
     // in English.
     function resolveBootstrapLanguage() {
       try {
-        var rawLocale = window.localStorage.getItem('openchamber.i18n.v1');
+        var rawLocale = window.localStorage.getItem('magio.i18n.v1');
         if (rawLocale) {
           var parsedLocale = JSON.parse(rawLocale);
           if (parsedLocale && typeof parsedLocale.locale === 'string') return parsedLocale.locale.toLowerCase();
         }
       } catch {}
-      return String(window.__OPENCHAMBER_HOST_LANGUAGE__ || '').toLowerCase();
+      return String(window.__MAGIO_HOST_LANGUAGE__ || '').toLowerCase();
     }
 
     function getBootstrapMessages() {
@@ -403,7 +394,7 @@ export function getWebviewHtml(options: WebviewHtmlOptions): string {
           })
           .catch((error) => {
             attempt += 1;
-            console.warn('[OpenChamber] VS Code webview dev bundle unavailable, retrying...', error);
+            console.warn('[Magio] VS Code webview dev bundle unavailable, retrying...', error);
             setStatus(devMessages.waitingDevServer(hostLabel, attempt));
             window.setTimeout(() => {
               tryLoadDevBundle();

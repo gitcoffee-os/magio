@@ -73,9 +73,9 @@ import type {
   GitHubIssueLabel,
   GitHubReferenceReviewer,
   GitHubRepoSelector,
-} from '@openchamber/ui/lib/api/types';
-import { runtimeFetch } from '@openchamber/ui/lib/runtime-fetch';
-import type { RuntimeFetchOptions } from '@openchamber/ui/lib/runtime-fetch';
+} from '@magio/ui/lib/api/types';
+import { runtimeFetch } from '@magio/ui/lib/runtime-fetch';
+import type { RuntimeFetchOptions } from '@magio/ui/lib/runtime-fetch';
 import { isSafeRepositoryEndpoint, parseBindingResponse, resolveBindingReadiness } from '../../server/lib/source-control/binding-contract.js';
 import { fetchGitHubPullStatuses, fetchGitHubReferenceDetail, fetchGitHubReferences } from './github-references';
 

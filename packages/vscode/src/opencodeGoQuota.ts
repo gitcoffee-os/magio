@@ -86,7 +86,7 @@ const parseConsoleUsage = (payload: OpenCodeGoConsoleStatus) => {
 };
 
 const fetchApiKeyUsage = async (credential: OpenCodeGoApiKeyCredential) => {
-  const response = await fetch(API_KEY_USAGE_URL, { headers: { Accept: 'application/json', Authorization: `Bearer ${credential.apiKey}`, 'x-opencode-session': 'openchamber-usage' }, signal: AbortSignal.timeout(15_000) });
+  const response = await fetch(API_KEY_USAGE_URL, { headers: { Accept: 'application/json', Authorization: `Bearer ${credential.apiKey}`, 'x-opencode-session': 'magio-usage' }, signal: AbortSignal.timeout(15_000) });
   if (response.status === 401 || response.status === 403 || (response.status >= 300 && response.status < 400)) throw new Error('OpenCode Go authentication failed');
   if (!response.ok) throw new Error(`OpenCode Go usage API returned HTTP ${response.status}`);
   const parsed = apiKeyStatusSchema.safeParse(await response.json().catch(() => null));

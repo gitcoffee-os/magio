@@ -15,7 +15,7 @@ Before editing behavior a user can reach, write the surface list from `ui-api-de
 
 ## Runtime Boundary
 
-- Electron boots `@openchamber/web` in the same Node process and loads the UI over loopback. Do not introduce a sidecar server process.
+- Electron boots `@magio/web` in the same Node process and loads the UI over loopback. Do not introduce a sidecar server process.
 - Keep renderer contracts and domain logic in `packages/ui`, server behavior in `packages/web`, and Electron focused on inherently native behavior: windows, menus, dialogs, notifications, updater, deep links, runtime host switching, privileged IPC, SSH, and tunnel lifecycle.
 - Electron is the desktop release target.
 
@@ -49,8 +49,8 @@ Non-user-visible child processes must never flash a console window.
 
 ## Validation
 
-Before judging any change to the update or quit/install sequence, read `openchamber-change-discipline`'s `references/updater-testing.md`: that path cannot be verified by review or by unit tests, a run done the obvious way reports success while testing nothing, and a passing run on one platform says nothing about the others.
+Before judging any change to the update or quit/install sequence, read `magio-change-discipline`'s `references/updater-testing.md`: that path cannot be verified by review or by unit tests, a run done the obvious way reports success while testing nothing, and a passing run on one platform says nothing about the others.
 
-Auth and header bugs reproduce only in the installed app: only the packaged renderer (`openchamber-ui://app`) is cross-origin and attaches the client bearer (`Authorization: Bearer oc_client_…`); dev web and dev Electron run same-origin without it. To inspect the installed app, quit it and relaunch `/Applications/OpenChamber.app/Contents/MacOS/OpenChamber --remote-debugging-port=9222`, then talk CDP over the page's own `webSocketDebuggerUrl` from `http://127.0.0.1:9222/json/list` (a browser-level `connectOverCDP` times out). Its server answers on `desktopLocalPort` from `~/.config/openchamber/settings.json`; logs are in `~/Library/Logs/OpenChamber/main.log`.
+Auth and header bugs reproduce only in the installed app: only the packaged renderer (`magio-ui://app`) is cross-origin and attaches the client bearer (`Authorization: Bearer mg_client_…`); dev web and dev Electron run same-origin without it. To inspect the installed app, quit it and relaunch `/Applications/Magio.app/Contents/MacOS/Magio --remote-debugging-port=9222`, then talk CDP over the page's own `webSocketDebuggerUrl` from `http://127.0.0.1:9222/json/list` (a browser-level `connectOverCDP` times out). Its server answers on `desktopLocalPort` from `~/.config/magio/settings.json`; logs are in `~/Library/Logs/Magio/main.log`.
 
 Run focused Electron tests and package checks. For startup, preload, routing, or packaging changes, completion requires both HMR development and bundled UI validation. For Windows process work, completion requires inspection of the complete process tree with no console flash; command success alone is insufficient.

@@ -1,5 +1,5 @@
 import express from 'express';
-import { guestStorageRequestSchema } from '@openchamber/sdk/schemas';
+import { guestStorageRequestSchema } from '@magio/sdk/schemas';
 import { runGuestStorage } from './storage.js';
 import fs from 'node:fs/promises';
 import os from 'node:os';
@@ -17,7 +17,7 @@ import {
   isGuestRequestPath,
   requestedGuestCapabilities,
   resolveIntegrationAuth,
-} from '@openchamber/sdk';
+} from '@magio/sdk';
 
 import {
   findInstalledGuest,
@@ -163,7 +163,7 @@ const renderOauthCallbackPage = ({ title, message }) => `<!doctype html>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>${escapeHtml(title)} — OpenChamber</title>
+<title>${escapeHtml(title)} — Magio</title>
 <style>
   :root { color-scheme: light dark; }
   body { margin: 0; min-height: 100vh; display: flex; align-items: center; justify-content: center;
@@ -207,18 +207,18 @@ const declaredSettings = (guest) => {
 };
 
 export const registerGuestRoutes = (app, {
-  openchamberDataDir,
-  openchamberVersion,
+  magioDataDir,
+  magioVersion,
   resolveGitBinaryForSpawn,
   resolveOptionalProjectDirectory,
   getSmallModelService,
   onGuestDeactivated = async () => false,
   surfaceViewerHeaders = () => null,
 }) => {
-  const persistPath = extensionsPersistPath(openchamberDataDir);
-  const authPath = guestAuthPersistPath(openchamberDataDir);
-  const versionOptions = { openchamberVersion };
-  const installOptions = () => ({ openchamberVersion, gitBinary: resolveGitBinaryForSpawn() });
+  const persistPath = extensionsPersistPath(magioDataDir);
+  const authPath = guestAuthPersistPath(magioDataDir);
+  const versionOptions = { magioVersion };
+  const installOptions = () => ({ magioVersion, gitBinary: resolveGitBinaryForSpawn() });
 
   const loadGuest = async (id) => {
     if (!isGuestPanelId(id)) {
@@ -265,7 +265,7 @@ export const registerGuestRoutes = (app, {
         return res.status(body.status).json({ error: body.error });
       }
       const replace = req.query?.replace === 'true';
-      const result = await installGuestFromZipBuffer(body.buffer, persistPath, { openchamberVersion, replace });
+      const result = await installGuestFromZipBuffer(body.buffer, persistPath, { magioVersion, replace });
       sendInstallResult(res, result);
     } catch (error) {
       console.error('Failed to install uploaded guest:', error);
@@ -491,7 +491,7 @@ export const registerGuestRoutes = (app, {
         error: queryValue(req, 'error'),
         errorDescription: queryValue(req, 'error_description'),
       });
-      finish(200, 'Connected', 'You can close this tab and return to OpenChamber.');
+      finish(200, 'Connected', 'You can close this tab and return to Magio.');
     } catch (error) {
       if (error instanceof GuestOAuthError) {
         return finish(400, 'Could not connect', error.message);
@@ -674,8 +674,8 @@ export const registerGuestRoutes = (app, {
       const { directory } = await resolveOptionalProjectDirectory(req);
       // The host names the composer's provider, which the model stays on, and
       // its model, used when that provider has no small one.
-      const provider = providerHeaderSchema.safeParse(req.get('x-openchamber-provider'));
-      const composerModel = providerHeaderSchema.safeParse(req.get('x-openchamber-model'));
+      const provider = providerHeaderSchema.safeParse(req.get('x-magio-provider'));
+      const composerModel = providerHeaderSchema.safeParse(req.get('x-magio-model'));
       const { generateSmallModelText } = await getSmallModelService();
       let generated;
       try {
@@ -856,14 +856,14 @@ export const registerGuestRoutes = (app, {
       } catch {
         return res.status(404).end();
       }
-      const token = parseGuestUrlToken(req.query.oc_url_token);
+      const token = parseGuestUrlToken(req.query.mg_url_token);
       const body = contentType.startsWith('text/html')
         ? injectGuestDocumentStyles(injectGuestAssetTokens(raw.toString('utf8'), token))
         : raw;
       res.setHeader('Content-Type', contentType);
       res.setHeader('X-Content-Type-Options', 'nosniff');
       res.setHeader('Cache-Control', 'no-store');
-      // Guest files are third-party code served from the OpenChamber origin.
+      // Guest files are third-party code served from the Magio origin.
       // The rail embeds them in a sandboxed iframe; `sandbox` makes the
       // document sandboxed even when opened directly, so a guest page can
       // never run with the user's session on the app origin. The rest keeps
@@ -881,7 +881,7 @@ export const registerGuestRoutes = (app, {
       // refused. `null`, not `*`: only opaque-origin documents may read them.
       // The app UI's own origin, already allowed by the server's CORS layer,
       // keeps its answer: the rail draws a package icon as a CSS mask, which is
-      // a CORS fetch from openchamber-ui:// or the dev origin.
+      // a CORS fetch from magio-ui:// or the dev origin.
       if (!res.getHeader('Access-Control-Allow-Origin')) {
         res.setHeader('Access-Control-Allow-Origin', 'null');
       }

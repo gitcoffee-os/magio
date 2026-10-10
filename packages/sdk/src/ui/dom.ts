@@ -1,6 +1,6 @@
 import { installGuestScrollbarActivity } from '../scrollbar-style.ts';
 
-const STYLE_ID = 'oc-sdk-ui-style';
+const STYLE_ID = 'mg-sdk-ui-style';
 
 /** Every mount returns this. `update` merges props and repaints; `dispose` removes the node and every listener. */
 export type Handle<P> = {

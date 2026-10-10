@@ -122,9 +122,9 @@ const phaseLabelKey = (phase?: string): I18nKey => {
     case 'remote_probe':
       return 'settings.remoteInstances.page.phase.probingRemote';
     case 'installing':
-      return 'settings.remoteInstances.page.phase.installingOpenChamber';
+      return 'settings.remoteInstances.page.phase.installingMagio';
     case 'updating':
-      return 'settings.remoteInstances.page.phase.updatingOpenChamber';
+      return 'settings.remoteInstances.page.phase.updatingMagio';
     case 'server_detecting':
       return 'settings.remoteInstances.page.phase.detectingServer';
     case 'server_starting':
@@ -194,7 +194,7 @@ const errorRemedy = (detail?: string): ErrorRemedy => {
   if (text.includes('neither bun nor npm')) return 'noRuntime';
   if (text.includes('opencode cli is not installed')) return 'noOpencode';
   if (text.includes('requires a ui password')) return 'uiPassword';
-  if (text.includes('preferred remote openchamber port')) return 'externalPort';
+  if (text.includes('preferred remote magio port')) return 'externalPort';
   return null;
 };
 
@@ -415,11 +415,11 @@ const normalizeForSave = (instance: DesktopSshInstance): DesktopSshInstance => {
           ? Math.max(1, Math.min(65535, Math.round(instance.localForward.preferredLocalPort)))
           : undefined,
     },
-    remoteOpenchamber: {
-      ...instance.remoteOpenchamber,
+    remotemagio: {
+      ...instance.remotemagio,
       preferredPort:
-        typeof instance.remoteOpenchamber.preferredPort === 'number'
-          ? Math.max(1, Math.min(65535, Math.round(instance.remoteOpenchamber.preferredPort)))
+        typeof instance.remotemagio.preferredPort === 'number'
+          ? Math.max(1, Math.min(65535, Math.round(instance.remotemagio.preferredPort)))
           : undefined,
     },
     portForwards: forwards,
@@ -527,7 +527,7 @@ export const RemoteInstancesPage: React.FC = () => {
       return t('settings.remoteInstances.clientAuth.addDevice.transport.lanHint');
     }
     if (lanBlockedByEnterprise) {
-      return t('settings.openchamber.desktopNetwork.field.enterpriseBlocked');
+      return t('settings.magio.desktopNetwork.field.enterpriseBlocked');
     }
     return t('settings.remoteInstances.clientAuth.addDevice.transport.lanUnavailableDesktopHint');
   })();
@@ -621,9 +621,9 @@ export const RemoteInstancesPage: React.FC = () => {
     const redeemBody = JSON.stringify({
       pairingId: payload.pairingId,
       secret: payload.secret,
-      clientLabel: payload.label || 'OpenChamber Desktop',
+      clientLabel: payload.label || 'Magio Desktop',
       clientKind: 'desktop',
-      deviceName: 'OpenChamber Desktop',
+      deviceName: 'Magio Desktop',
       devicePlatform: desktopPlatformName(),
       ...(installId ? { dedupeKey: `desktop:${installId}` } : {}),
     });
@@ -1188,16 +1188,16 @@ export const RemoteInstancesPage: React.FC = () => {
 
     // "Already running" cannot pick a port on its own; catching it here keeps
     // the failure in the form instead of surfacing it mid-connect.
-    if (normalized.remoteOpenchamber.mode === 'external' && !normalized.remoteOpenchamber.preferredPort) {
+    if (normalized.remotemagio.mode === 'external' && !normalized.remotemagio.preferredPort) {
       toast.error(t('settings.remoteInstances.page.validation.externalPortRequired'));
       setAdvancedOpen(true);
       return;
     }
 
     if (
-      normalized.remoteOpenchamber.mode === 'managed' &&
-      normalized.remoteOpenchamber.bindHost === '0.0.0.0' &&
-      !normalized.auth.openchamberPassword?.value?.trim()
+      normalized.remotemagio.mode === 'managed' &&
+      normalized.remotemagio.bindHost === '0.0.0.0' &&
+      !normalized.auth.magioPassword?.value?.trim()
     ) {
       toast.error(t('settings.remoteInstances.page.validation.remoteLanNeedsPassword'));
       setAdvancedOpen(true);
@@ -1226,15 +1226,15 @@ export const RemoteInstancesPage: React.FC = () => {
     }
 
     if (
-      normalized.auth.openchamberPassword?.enabled &&
-      normalized.auth.openchamberPassword.value?.trim() &&
-      normalized.auth.openchamberPassword.store !== 'settings'
+      normalized.auth.magioPassword?.enabled &&
+      normalized.auth.magioPassword.value?.trim() &&
+      normalized.auth.magioPassword.store !== 'settings'
     ) {
       const store = await confirmSsh('settings.remoteInstances.page.confirm.storeUiPasswordPlaintext');
       if (store === null) return;
-      normalized.auth.openchamberPassword.store = store ? 'settings' : 'never';
+      normalized.auth.magioPassword.store = store ? 'settings' : 'never';
       if (!store) {
-        normalized.auth.openchamberPassword.value = undefined;
+        normalized.auth.magioPassword.value = undefined;
       }
     }
 
@@ -1497,7 +1497,7 @@ export const RemoteInstancesPage: React.FC = () => {
       return;
     }
 
-    if (!canDisconnect && draft.remoteOpenchamber.mode === 'external' && !draft.remoteOpenchamber.preferredPort) {
+    if (!canDisconnect && draft.remotemagio.mode === 'external' && !draft.remotemagio.preferredPort) {
       toast.error(t('settings.remoteInstances.page.validation.externalPortRequired'));
       setAdvancedOpen(true);
       return;
@@ -1505,9 +1505,9 @@ export const RemoteInstancesPage: React.FC = () => {
 
     if (
       !canDisconnect &&
-      draft.remoteOpenchamber.mode === 'managed' &&
-      draft.remoteOpenchamber.bindHost === '0.0.0.0' &&
-      !draft.auth.openchamberPassword?.value?.trim()
+      draft.remotemagio.mode === 'managed' &&
+      draft.remotemagio.bindHost === '0.0.0.0' &&
+      !draft.auth.magioPassword?.value?.trim()
     ) {
       toast.error(t('settings.remoteInstances.page.validation.remoteLanNeedsPassword'));
       setAdvancedOpen(true);
@@ -2171,11 +2171,11 @@ export const RemoteInstancesPage: React.FC = () => {
     );
   }
 
-  const isManagedMode = draft.remoteOpenchamber.mode === 'managed';
+  const isManagedMode = draft.remotemagio.mode === 'managed';
   // Publishing the remote server to its network turns the UI password from an
   // option into the only thing standing in front of it.
-  const remoteLanExposed = isManagedMode && draft.remoteOpenchamber.bindHost === '0.0.0.0';
-  const uiPasswordMissing = remoteLanExposed && !draft.auth.openchamberPassword?.value?.trim();
+  const remoteLanExposed = isManagedMode && draft.remotemagio.bindHost === '0.0.0.0';
+  const uiPasswordMissing = remoteLanExposed && !draft.auth.magioPassword?.value?.trim();
   const instanceTitle = draft.nickname?.trim() || draft.sshParsed?.destination || draft.id;
 
   return (
@@ -2329,12 +2329,12 @@ export const RemoteInstancesPage: React.FC = () => {
                 />
             </div>
             <Select
-              value={draft.remoteOpenchamber.mode}
+              value={draft.remotemagio.mode}
               onValueChange={(value) =>
                 updateDraft((current) => ({
                   ...current,
-                  remoteOpenchamber: {
-                    ...current.remoteOpenchamber,
+                  remotemagio: {
+                    ...current.remotemagio,
                     mode: value === 'external' ? 'external' : 'managed',
                   },
                 }))
@@ -2395,12 +2395,12 @@ export const RemoteInstancesPage: React.FC = () => {
               max={65535}
               step={1}
               className={cn(SETTINGS_NUMBER_INPUT_CLASS, 'tabular-nums')}
-              value={draft.remoteOpenchamber.preferredPort}
+              value={draft.remotemagio.preferredPort}
               onValueChange={(next) => {
                 updateDraft((current) => ({
                   ...current,
-                  remoteOpenchamber: {
-                    ...current.remoteOpenchamber,
+                  remotemagio: {
+                    ...current.remotemagio,
                     preferredPort: Number.isFinite(next) && next > 0 ? next : undefined,
                   },
                 }));
@@ -2408,8 +2408,8 @@ export const RemoteInstancesPage: React.FC = () => {
               onClear={() => {
                 updateDraft((current) => ({
                   ...current,
-                  remoteOpenchamber: {
-                    ...current.remoteOpenchamber,
+                  remotemagio: {
+                    ...current.remotemagio,
                     preferredPort: undefined,
                   },
                 }));
@@ -2427,12 +2427,12 @@ export const RemoteInstancesPage: React.FC = () => {
                 />
               </div>
               <Select
-                value={draft.remoteOpenchamber.installMethod}
+                value={draft.remotemagio.installMethod}
                 onValueChange={(value) =>
                   updateDraft((current) => ({
                     ...current,
-                    remoteOpenchamber: {
-                      ...current.remoteOpenchamber,
+                    remotemagio: {
+                      ...current.remotemagio,
                       installMethod: value === 'npm' || value === 'bun' ? value : 'auto',
                     },
                   }))
@@ -2464,8 +2464,8 @@ export const RemoteInstancesPage: React.FC = () => {
                   onCheckedChange={(checked) =>
                     updateDraft((current) => ({
                       ...current,
-                      remoteOpenchamber: {
-                        ...current.remoteOpenchamber,
+                      remotemagio: {
+                        ...current.remotemagio,
                         bindHost: checked ? '0.0.0.0' : '127.0.0.1',
                       },
                     }))
@@ -2491,12 +2491,12 @@ export const RemoteInstancesPage: React.FC = () => {
               </div>
               <div className="flex w-full items-center gap-2 md:max-w-xs">
                 <Switch
-                  checked={draft.remoteOpenchamber.keepRunning}
+                  checked={draft.remotemagio.keepRunning}
                   onCheckedChange={(checked) =>
                     updateDraft((current) => ({
                       ...current,
-                      remoteOpenchamber: {
-                        ...current.remoteOpenchamber,
+                      remotemagio: {
+                        ...current.remotemagio,
                         keepRunning: checked,
                       },
                     }))
@@ -2607,7 +2607,7 @@ export const RemoteInstancesPage: React.FC = () => {
           <div className="space-y-1 pt-1">
             <p className="typography-micro text-muted-foreground">{t('settings.remoteInstances.page.tunnelPreview.caption')}</p>
             <p className="typography-micro font-mono text-foreground/80 break-all">
-              {`${draft.localForward.bindHost}:${draft.localForward.preferredLocalPort || 'auto'} → ${draft.sshParsed?.destination || draft.nickname || 'remote'}:${draft.remoteOpenchamber.preferredPort || 'auto'}`}
+              {`${draft.localForward.bindHost}:${draft.localForward.preferredLocalPort || 'auto'} → ${draft.sshParsed?.destination || draft.nickname || 'remote'}:${draft.remotemagio.preferredPort || 'auto'}`}
             </p>
           </div>
       </SettingsSection>
@@ -2661,16 +2661,16 @@ export const RemoteInstancesPage: React.FC = () => {
               type="password"
               ref={uiPasswordRef}
               aria-invalid={uiPasswordMissing}
-              value={draft.auth.openchamberPassword?.value || ''}
+              value={draft.auth.magioPassword?.value || ''}
               onChange={(event) =>
                 updateDraft((current) => ({
                   ...current,
                   auth: {
                     ...current.auth,
-                    openchamberPassword: {
+                    magioPassword: {
                       enabled: event.target.value.trim().length > 0,
                       value: event.target.value,
-                      store: current.auth.openchamberPassword?.store || 'never',
+                      store: current.auth.magioPassword?.store || 'never',
                     },
                   },
                 }))

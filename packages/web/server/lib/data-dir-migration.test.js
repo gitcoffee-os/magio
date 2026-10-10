@@ -6,7 +6,7 @@ import fsPromises from 'fs/promises';
 import { ensureChatsDir, migrateLegacyUserDirs } from './data-dir-migration.js';
 
 const setup = async () => {
-  const root = await fsPromises.mkdtemp(path.join(os.tmpdir(), 'oc-data-dir-'));
+  const root = await fsPromises.mkdtemp(path.join(os.tmpdir(), 'mg-data-dir-'));
   const legacyRoot = path.join(root, 'legacy');
   const dataDir = path.join(root, 'custom');
   await fsPromises.mkdir(path.join(legacyRoot, 'projects'), { recursive: true });
@@ -60,9 +60,9 @@ describe('migrateLegacyUserDirs', () => {
 
 describe('ensureChatsDir', () => {
   it('creates a missing chats folder, parents included, and leaves an existing one as it is', async () => {
-    const root = await fsPromises.mkdtemp(path.join(os.tmpdir(), 'oc-chats-dir-'));
+    const root = await fsPromises.mkdtemp(path.join(os.tmpdir(), 'mg-chats-dir-'));
     try {
-      const chatsDir = path.join(root, 'openchamber', 'chats');
+      const chatsDir = path.join(root, 'magio', 'chats');
       expect(await ensureChatsDir({ fsPromises, chatsDir })).toBe(true);
       expect((await fsPromises.stat(chatsDir)).isDirectory()).toBe(true);
 
@@ -75,12 +75,12 @@ describe('ensureChatsDir', () => {
   });
 
   it('reports a folder it cannot create and does not throw', async () => {
-    const root = await fsPromises.mkdtemp(path.join(os.tmpdir(), 'oc-chats-dir-'));
+    const root = await fsPromises.mkdtemp(path.join(os.tmpdir(), 'mg-chats-dir-'));
     try {
       // A file where a parent folder should be makes the folder impossible to create.
-      await fsPromises.writeFile(path.join(root, 'openchamber'), '');
+      await fsPromises.writeFile(path.join(root, 'magio'), '');
       const warnings = [];
-      const chatsDir = path.join(root, 'openchamber', 'chats');
+      const chatsDir = path.join(root, 'magio', 'chats');
       expect(await ensureChatsDir({ fsPromises, chatsDir, warn: (message) => warnings.push(message) })).toBe(false);
       expect(warnings).toHaveLength(1);
       expect(warnings[0]).toContain(chatsDir);

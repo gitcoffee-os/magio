@@ -1,4 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="ic_launcher_background">#FFFFFF</color>
+    <!-- Launcher background for the adaptive icon. Dark ground so the gold C-spark
+         foreground has the contrast the mark is designed around; this matches the
+         #151313 tile the app icon, web/PWA and desktop surfaces all use. Gold on the
+         old #FFFFFF ground would not hold up at launcher size. -->
+    <color name="ic_launcher_background">#151313</color>
 </resources>

@@ -122,7 +122,7 @@ const registerExec = ({ spawn }) => {
     resolveProjectDirectory: async () => ({ directory: '/repo' }),
     buildAugmentedPath: () => '/usr/bin',
     resolveGitBinaryForSpawn: () => 'git',
-    openchamberUserConfigRoot: '/home/user/.config',
+    magioUserConfigRoot: '/home/user/.config',
   });
   return getRoute('POST', '/api/fs/exec');
 };
@@ -142,7 +142,7 @@ const registerWrite = (fsPromises) => {
     resolveProjectDirectory: async () => ({ directory: '/repo' }),
     buildAugmentedPath: () => '/usr/bin',
     resolveGitBinaryForSpawn: () => 'git',
-    openchamberUserConfigRoot: '/home/user/.config',
+    magioUserConfigRoot: '/home/user/.config',
   });
   return getRoute('POST', '/api/fs/write');
 };
@@ -166,7 +166,7 @@ const registerUpload = (fsPromises) => {
     resolveProjectDirectory: async () => ({ directory: '/repo' }),
     buildAugmentedPath: () => '/usr/bin',
     resolveGitBinaryForSpawn: () => 'git',
-    openchamberUserConfigRoot: '/home/user/.config',
+    magioUserConfigRoot: '/home/user/.config',
   });
   return getRoute('POST', '/api/fs/upload');
 };
@@ -186,7 +186,7 @@ const registerRead = (fsPromises, resolveProjectDirectory = async () => ({ direc
     resolveProjectDirectory,
     buildAugmentedPath: () => '/usr/bin',
     resolveGitBinaryForSpawn: () => 'git',
-    openchamberUserConfigRoot: '/home/user/.config',
+    magioUserConfigRoot: '/home/user/.config',
   });
   return getRoute('GET', '/api/fs/read');
 };
@@ -206,7 +206,7 @@ const registerRaw = (fsPromises) => {
     resolveProjectDirectory: async () => ({ directory: '/repo' }),
     buildAugmentedPath: () => '/usr/bin',
     resolveGitBinaryForSpawn: () => 'git',
-    openchamberUserConfigRoot: '/home/user/.config',
+    magioUserConfigRoot: '/home/user/.config',
   });
   return getRoute('GET', '/api/fs/raw');
 };
@@ -226,7 +226,7 @@ const registerMkdir = (fsPromises) => {
     resolveProjectDirectory: async () => ({ directory: '/repo' }),
     buildAugmentedPath: () => '/usr/bin',
     resolveGitBinaryForSpawn: () => 'git',
-    openchamberUserConfigRoot: '/home/user/.config',
+    magioUserConfigRoot: '/home/user/.config',
   });
   return getRoute('POST', '/api/fs/mkdir');
 };
@@ -249,7 +249,7 @@ const registerClone = ({ fsPromises = {}, cloneRepository = vi.fn(), spawn = vi.
     resolveProjectDirectory: async () => ({ directory: '/repo' }),
     buildAugmentedPath: () => '/usr/bin',
     resolveGitBinaryForSpawn: () => 'git',
-    openchamberUserConfigRoot: '/home/user/.config',
+    magioUserConfigRoot: '/home/user/.config',
     cloneRepository,
   });
   return { handler: getRoute('POST', '/api/fs/clone'), cloneRepository, spawn };
@@ -271,7 +271,7 @@ const registerReveal = ({ fsPromises, spawn, platform = 'linux' }) => {
     resolveProjectDirectory: async () => ({ directory: '/repo' }),
     buildAugmentedPath: () => '/usr/bin',
     resolveGitBinaryForSpawn: () => 'git',
-    openchamberUserConfigRoot: '/home/user/.config',
+    magioUserConfigRoot: '/home/user/.config',
   });
   return getRoute('POST', '/api/fs/reveal');
 };
@@ -623,7 +623,7 @@ describe('fs rename', () => {
       resolveProjectDirectory: async () => ({ directory: '/repo' }),
       buildAugmentedPath: () => '/usr/bin',
       resolveGitBinaryForSpawn: () => 'git',
-      openchamberUserConfigRoot: '/home/user/.config',
+      magioUserConfigRoot: '/home/user/.config',
     });
     return getRoute('POST', '/api/fs/rename');
   };
@@ -777,8 +777,8 @@ describe('fs upload', () => {
   });
 
   it('cleans up a partial temp file when the configured streaming limit is exceeded', async () => {
-    const previous = process.env.OPENCHAMBER_FS_UPLOAD_MAX_BYTES;
-    process.env.OPENCHAMBER_FS_UPLOAD_MAX_BYTES = '5';
+    const previous = process.env.MAGIO_FS_UPLOAD_MAX_BYTES;
+    process.env.MAGIO_FS_UPLOAD_MAX_BYTES = '5';
     const write = vi.fn(async (_buffer, _offset, length) => ({ bytesWritten: length }));
     const fsPromises = {
       open: vi.fn(async () => ({ write, close: vi.fn(async () => undefined) })),
@@ -799,14 +799,14 @@ describe('fs upload', () => {
       expect(fsPromises.link).not.toHaveBeenCalled();
       expect(fsPromises.unlink).toHaveBeenCalledWith(expect.stringMatching(/^\/repo\/file\.bin\.upload-/));
     } finally {
-      if (previous === undefined) delete process.env.OPENCHAMBER_FS_UPLOAD_MAX_BYTES;
-      else process.env.OPENCHAMBER_FS_UPLOAD_MAX_BYTES = previous;
+      if (previous === undefined) delete process.env.MAGIO_FS_UPLOAD_MAX_BYTES;
+      else process.env.MAGIO_FS_UPLOAD_MAX_BYTES = previous;
     }
   });
 
   it('rejects a declared oversized upload before opening a temp file', async () => {
-    const previous = process.env.OPENCHAMBER_FS_UPLOAD_MAX_BYTES;
-    process.env.OPENCHAMBER_FS_UPLOAD_MAX_BYTES = '5';
+    const previous = process.env.MAGIO_FS_UPLOAD_MAX_BYTES;
+    process.env.MAGIO_FS_UPLOAD_MAX_BYTES = '5';
     const fsPromises = {
       open: vi.fn(async () => ({ write: vi.fn(), close: vi.fn() })),
     };
@@ -818,8 +818,8 @@ describe('fs upload', () => {
       expect(res.body).toEqual({ error: 'File exceeds maximum size of 5 bytes' });
       expect(fsPromises.open).not.toHaveBeenCalled();
     } finally {
-      if (previous === undefined) delete process.env.OPENCHAMBER_FS_UPLOAD_MAX_BYTES;
-      else process.env.OPENCHAMBER_FS_UPLOAD_MAX_BYTES = previous;
+      if (previous === undefined) delete process.env.MAGIO_FS_UPLOAD_MAX_BYTES;
+      else process.env.MAGIO_FS_UPLOAD_MAX_BYTES = previous;
     }
   });
 
@@ -951,7 +951,7 @@ describe('fs read', () => {
       },
       normalizeDirectoryPath: (p) => p,
       resolveProjectDirectory: async () => ({ directory: '/repo' }),
-      openchamberUserConfigRoot: '/home/user/.config',
+      magioUserConfigRoot: '/home/user/.config',
     });
     const res = await callRead(getRoute('GET', '/api/fs/stat'), { path: '/tmp/plan.txt', allowOutsideWorkspace: 'true' });
     expect(res.statusCode).toBe(200);
@@ -1159,11 +1159,11 @@ describe('fs reveal', () => {
 
 describe('fs exec git-read cache', () => {
   beforeEach(() => {
-    delete process.env.OPENCHAMBER_GIT_READ_CACHE_TTL_MS;
+    delete process.env.MAGIO_GIT_READ_CACHE_TTL_MS;
   });
 
   afterEach(() => {
-    delete process.env.OPENCHAMBER_GIT_READ_CACHE_TTL_MS;
+    delete process.env.MAGIO_GIT_READ_CACHE_TTL_MS;
   });
 
   it('rejects background command execution', async () => {
@@ -1272,7 +1272,7 @@ describe('fs exec git-read cache', () => {
   });
 
   it('disables caching when TTL is 0', async () => {
-    process.env.OPENCHAMBER_GIT_READ_CACHE_TTL_MS = '0';
+    process.env.MAGIO_GIT_READ_CACHE_TTL_MS = '0';
     const command = 'git rev-parse --absolute-git-dir';
     const { spawn, calls } = createSpawn({ stdoutByCommand: { [command]: '/repo/.git\n' } });
     const handler = registerExec({ spawn });
@@ -1381,7 +1381,7 @@ describe('fs raw byte ranges', () => {
   });
 
   it.each(['complete', 'disconnect', 'disconnect while opening'])('closes the real file handle on %s', async (scenario) => {
-    const root = await mkdtemp(path.join(tmpdir(), 'oc-raw-stream-'));
+    const root = await mkdtemp(path.join(tmpdir(), 'mg-raw-stream-'));
     const file = path.join(root, 'clip.mp4');
     await nativeFs.writeFile(file, Buffer.alloc(256 * 1024));
     let handle;
@@ -1531,7 +1531,7 @@ describe('fs list symlink path space (issue 2627)', () => {
       resolveProjectDirectory: async () => ({ directory: '/workspace' }),
       buildAugmentedPath: () => '/usr/bin',
       resolveGitBinaryForSpawn: () => 'git',
-      openchamberUserConfigRoot: '/home/user/.config',
+      magioUserConfigRoot: '/home/user/.config',
     });
     return getRoute('GET', '/api/fs/list');
   };
@@ -1631,7 +1631,7 @@ describe('fs git-dirs', () => {
       resolveProjectDirectory: async () => ({ directory: '/workspace' }),
       buildAugmentedPath: () => '/usr/bin',
       resolveGitBinaryForSpawn: () => 'git',
-      openchamberUserConfigRoot: '/home/user/.config',
+      magioUserConfigRoot: '/home/user/.config',
     });
     return { handler: getRoute('GET', '/api/fs/git-dirs'), readdir };
   };
@@ -1892,7 +1892,7 @@ describe('fs stat directory scope (issue 3019)', () => {
       resolveProjectDirectory: projectDirectoryRuntime.resolveProjectDirectory,
       buildAugmentedPath: () => '/usr/bin',
       resolveGitBinaryForSpawn: () => 'git',
-      openchamberUserConfigRoot: '/home/user/.config',
+      magioUserConfigRoot: '/home/user/.config',
     });
     return getRoute('GET', '/api/fs/stat');
   };
@@ -1932,7 +1932,7 @@ describe('fs stat directory scope (issue 3019)', () => {
 
 describe('fs stat directory error handling', () => {
   it('loads in Node without workspace node_modules, as packaged desktop does', async () => {
-    const directory = await mkdtemp(path.join(tmpdir(), 'openchamber-fs-import-'));
+    const directory = await mkdtemp(path.join(tmpdir(), 'magio-fs-import-'));
     try {
       await mkdir(path.join(directory, 'fs'));
       await mkdir(path.join(directory, 'git'));
@@ -1992,7 +1992,7 @@ describe('fs stat directory error handling', () => {
       resolveProjectDirectory: async () => ({ directory: '/repo' }),
       buildAugmentedPath: () => '/usr/bin',
       resolveGitBinaryForSpawn: () => 'git',
-      openchamberUserConfigRoot: '/home/user/.config',
+      magioUserConfigRoot: '/home/user/.config',
     });
     const handler = getRoute('GET', '/api/fs/directory-stat');
 
@@ -2053,7 +2053,7 @@ describe('fs managed chats root', () => {
       resolveProjectDirectory: async () => ({ directory: '/repo' }),
       buildAugmentedPath: () => '/usr/bin',
       resolveGitBinaryForSpawn: () => 'git',
-      openchamberUserConfigRoot: '/home/user/.config/openchamber',
+      magioUserConfigRoot: '/home/user/.config/magio',
       managedChatsRoot,
     });
     return {
@@ -2070,17 +2070,17 @@ describe('fs managed chats root', () => {
 
     expect(res.statusCode).toBe(200);
     expect(res.body.home).toBe('/home/user');
-    expect(res.body.chatsRoot).toBe('/home/user/.config/openchamber/chats');
+    expect(res.body.chatsRoot).toBe('/home/user/.config/magio/chats');
   });
 
-  it('exposes a relocated chats root when OPENCHAMBER_CHATS_DIR is configured upstream', async () => {
-    const { home } = registerWithChatsRoot({ managedChatsRoot: '/srv/openchamber-chats' });
+  it('exposes a relocated chats root when MAGIO_CHATS_DIR is configured upstream', async () => {
+    const { home } = registerWithChatsRoot({ managedChatsRoot: '/srv/magio-chats' });
 
     const res = createMockResponse();
     await home(undefined, res);
 
     expect(res.statusCode).toBe(200);
-    expect(res.body.chatsRoot).toBe('/srv/openchamber-chats');
+    expect(res.body.chatsRoot).toBe('/srv/magio-chats');
   });
 
   it('fails home lookup on permission errors and retries the next request', async () => {
@@ -2097,7 +2097,7 @@ describe('fs managed chats root', () => {
     const recovered = createMockResponse();
     await home(undefined, recovered);
     expect(recovered.statusCode).toBe(200);
-    expect(recovered.body.chatsRoot).toBe('/home/user/.config/openchamber/chats');
+    expect(recovered.body.chatsRoot).toBe('/home/user/.config/magio/chats');
   });
 
   it('keeps an accessible relocated root available when legacy alias lookup fails', async () => {
@@ -2120,7 +2120,7 @@ describe('fs managed chats root', () => {
   it('allows mkdir inside the relocated chats root outside the active workspace', async () => {
     const mkdirCalls = [];
     const { mkdir } = registerWithChatsRoot({
-      managedChatsRoot: '/srv/openchamber-chats',
+      managedChatsRoot: '/srv/magio-chats',
       fsPromises: {
         mkdir: async (targetPath) => {
           mkdirCalls.push(targetPath);
@@ -2129,11 +2129,11 @@ describe('fs managed chats root', () => {
     });
 
     const res = createMockResponse();
-    await mkdir({ body: { path: '/srv/openchamber-chats/2026-08-25/session-a' } }, res);
+    await mkdir({ body: { path: '/srv/magio-chats/2026-08-25/session-a' } }, res);
 
     expect(res.statusCode).toBe(200);
     expect(res.body.success).toBe(true);
-    expect(mkdirCalls).toEqual(['/srv/openchamber-chats/2026-08-25/session-a']);
+    expect(mkdirCalls).toEqual(['/srv/magio-chats/2026-08-25/session-a']);
   });
 
   it('accepts a canonical relocated root even when the config root cannot be resolved', async () => {
@@ -2153,7 +2153,7 @@ describe('fs managed chats root', () => {
   });
 
   it('still rejects mkdir outside the workspace and all managed roots', async () => {
-    const { mkdir } = registerWithChatsRoot({ managedChatsRoot: '/srv/openchamber-chats' });
+    const { mkdir } = registerWithChatsRoot({ managedChatsRoot: '/srv/magio-chats' });
 
     const res = createMockResponse();
     await mkdir({ body: { path: '/etc/passwd-holder' } }, res);
@@ -2165,25 +2165,25 @@ describe('fs managed chats root', () => {
 
 describe('canonical managed roots with real filesystem aliases', () => {
   const setup = async (context, { relocated = false, caseAlias = false } = {}) => {
-    const root = await nativeFs.mkdtemp(path.join(tmpdir(), 'oc-canonical-chats-'));
+    const root = await nativeFs.mkdtemp(path.join(tmpdir(), 'mg-canonical-chats-'));
     context.onTestFinished(() => nativeFs.rm(root, { recursive: true, force: true }));
     const home = path.join(root, 'Home');
     await nativeFs.mkdir(home);
     const reportedHome = path.join(root, caseAlias ? 'home' : 'home-alias');
     if (!caseAlias) await nativeFs.symlink(home, reportedHome, 'junction');
-    const config = path.join(reportedHome, '.config/openchamber');
+    const config = path.join(reportedHome, '.config/magio');
     const rawChats = relocated ? path.join(reportedHome, 'scratch/chats') : path.join(config, 'chats');
     const canonicalHome = await nativeFs.realpath(home);
     if (caseAlias && await nativeFs.realpath(reportedHome).catch(() => null) !== canonicalHome) {
       context.skip('This volume distinguishes Home from home');
     }
-    const canonicalChats = path.join(canonicalHome, relocated ? 'scratch/chats' : '.config/openchamber/chats');
+    const canonicalChats = path.join(canonicalHome, relocated ? 'scratch/chats' : '.config/magio/chats');
     const { app, getRoute } = createRouteRegistry();
     registerFsRoutes(app, {
       os: { homedir: () => reportedHome }, path, fsPromises: nativeFs,
       normalizeDirectoryPath: value => value,
       resolveProjectDirectory: async () => ({ directory: path.join(root, 'unrelated-project') }),
-      openchamberUserConfigRoot: config, managedChatsRoot: rawChats,
+      magioUserConfigRoot: config, managedChatsRoot: rawChats,
     });
     return { getRoute, canonicalHome, canonicalChats, rawChats, reportedHome };
   };
@@ -2196,7 +2196,7 @@ describe('canonical managed roots with real filesystem aliases', () => {
       expect(home.body).toEqual({
         home: reportedHome, chatsRoot: rawChats,
         canonicalChatsRoot: canonicalChats,
-        canonicalLegacyChatsRoot: path.join(canonicalHome, '.config/openchamber/chats'),
+        canonicalLegacyChatsRoot: path.join(canonicalHome, '.config/magio/chats'),
       });
       await expect(nativeFs.stat(canonicalChats)).rejects.toMatchObject({ code: 'ENOENT' });
 
@@ -2233,9 +2233,9 @@ describe('fs html preview grants', () => {
     ['/workspace/site/index.html', '<img src="logo.png">'],
     ['/workspace/site/logo.png', 'png'],
     ['/workspace/data.json', '{}'],
-    ['/home/user/.config/openchamber/projects/p1/canvases/c1/index.html', '<h1>canvas</h1>'],
-    ['/home/user/.config/openchamber/projects/p1/canvases/c1/data.json', '[]'],
-    ['/home/user/.config/openchamber/guest-auth.json', '{"token":"secret"}'],
+    ['/home/user/.config/magio/projects/p1/canvases/c1/index.html', '<h1>canvas</h1>'],
+    ['/home/user/.config/magio/projects/p1/canvases/c1/data.json', '[]'],
+    ['/home/user/.config/magio/guest-auth.json', '{"token":"secret"}'],
   ]);
 
   const register = () => {
@@ -2262,7 +2262,7 @@ describe('fs html preview grants', () => {
       resolveProjectDirectory: async () => ({ directory: '/workspace' }),
       buildAugmentedPath: () => '/usr/bin',
       resolveGitBinaryForSpawn: () => 'git',
-      openchamberUserConfigRoot: '/home/user/.config/openchamber',
+      magioUserConfigRoot: '/home/user/.config/magio',
     });
     const mintHandler = routes.find((route) => route.method === 'POST' && route.routePath === '/api/fs/preview').handler;
     const serveRoute = routes.find((route) => route.method === 'GET' && route.routePath instanceof RegExp && route.routePath.test('/api/fs/preview/g/x'));
@@ -2296,21 +2296,21 @@ describe('fs html preview grants', () => {
     expect(sibling.statusCode).toBe(200);
     expect(sibling.getHeader('access-control-allow-origin')).toBe('null');
 
-    // OpenChamber's own folder can be embedded but never read from script.
-    const managed = await serve(`/api/fs/preview/${grant}/home/user/.config/openchamber/guest-auth.json`);
+    // Magio's own folder can be embedded but never read from script.
+    const managed = await serve(`/api/fs/preview/${grant}/home/user/.config/magio/guest-auth.json`);
     expect(managed.statusCode).toBe(200);
     expect(managed.getHeader('access-control-allow-origin')).toBeUndefined();
   });
 
-  it('limits a page inside the OpenChamber folder to reading its own folder', async () => {
+  it('limits a page inside the Magio folder to reading its own folder', async () => {
     const { mint, serve } = register();
-    const { grant } = (await mint('/home/user/.config/openchamber/projects/p1/canvases/c1/index.html')).body;
+    const { grant } = (await mint('/home/user/.config/magio/projects/p1/canvases/c1/index.html')).body;
 
-    const data = await serve(`/api/fs/preview/${grant}/home/user/.config/openchamber/projects/p1/canvases/c1/data.json`);
+    const data = await serve(`/api/fs/preview/${grant}/home/user/.config/magio/projects/p1/canvases/c1/data.json`);
     expect(data.statusCode).toBe(200);
     expect(data.getHeader('access-control-allow-origin')).toBe('null');
 
-    const secret = await serve(`/api/fs/preview/${grant}/home/user/.config/openchamber/guest-auth.json`);
+    const secret = await serve(`/api/fs/preview/${grant}/home/user/.config/magio/guest-auth.json`);
     expect(secret.getHeader('access-control-allow-origin')).toBeUndefined();
   });
 
@@ -2327,7 +2327,7 @@ describe('fs html preview grants', () => {
 describe('GET /api/fs/find-by-name', () => {
   let repo;
   beforeEach(async () => {
-    repo = await mkdtemp(path.join(tmpdir(), 'oc-find-by-name-'));
+    repo = await mkdtemp(path.join(tmpdir(), 'mg-find-by-name-'));
     execFileSync('git', ['init', '-q'], { cwd: repo });
     await mkdir(path.join(repo, 'src', 'chat'), { recursive: true });
     await mkdir(path.join(repo, 'lib'), { recursive: true });
@@ -2354,7 +2354,7 @@ describe('GET /api/fs/find-by-name', () => {
       resolveProjectDirectory: async () => ({ directory: repo }),
       buildAugmentedPath: () => '/usr/bin',
       resolveGitBinaryForSpawn: () => 'git',
-      openchamberUserConfigRoot: '/home/user/.config',
+      magioUserConfigRoot: '/home/user/.config',
     });
     const route = getRoute('GET', '/api/fs/find-by-name');
     const ask = async (name) => {

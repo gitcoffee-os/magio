@@ -10,7 +10,7 @@ import {
   updateSharedProjectSetup,
   type ProjectRef,
   type ProjectSetup,
-} from '@/lib/openchamberConfig';
+} from '@/lib/magioConfig';
 
 type SharedProjectConfigSectionProps = {
   projectRef: ProjectRef;

@@ -1,16 +1,16 @@
 const RELATIVE_ASSET = /(<(?:script|link|img)\b[^>]*?\s(?:src|href)=)(["'])(?!https?:|\/\/|data:|#)([^"']+)\2/gi;
 
 const withToken = (url, token) => {
-  if (url.includes('oc_url_token=')) {
+  if (url.includes('mg_url_token=')) {
     return url;
   }
   const joiner = url.includes('?') ? '&' : '?';
-  return `${url}${joiner}oc_url_token=${encodeURIComponent(token)}`;
+  return `${url}${joiner}mg_url_token=${encodeURIComponent(token)}`;
 };
 
 const firstQueryValue = (value) => (Array.isArray(value) ? value[0] : value);
 
-/** Query `oc_url_token` for guest HTML. Empty when the query is missing or not a token. */
+/** Query `mg_url_token` for guest HTML. Empty when the query is missing or not a token. */
 export const parseGuestUrlToken = (value) => {
   const first = firstQueryValue(value);
   if (first == null || first === '') {

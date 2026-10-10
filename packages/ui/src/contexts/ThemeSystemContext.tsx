@@ -60,17 +60,17 @@ const suppressTransitionsForThemeSwitch = () => {
   }
 
   const root = document.documentElement;
-  root.classList.add('oc-theme-switching');
+  root.classList.add('mg-theme-switching');
 
   const frame = window.requestAnimationFrame(() => {
     window.requestAnimationFrame(() => {
-      root.classList.remove('oc-theme-switching');
+      root.classList.remove('mg-theme-switching');
     });
   });
 
   return () => {
     window.cancelAnimationFrame(frame);
-    root.classList.remove('oc-theme-switching');
+    root.classList.remove('mg-theme-switching');
   };
 };
 
@@ -123,7 +123,7 @@ export function ThemeSystemProvider({ children, defaultThemeId }: ThemeSystemPro
     if (typeof window === 'undefined' || !isVSCodeRuntime()) {
       return null;
     }
-    const existing = (window as unknown as { __OPENCHAMBER_VSCODE_THEME__?: Theme }).__OPENCHAMBER_VSCODE_THEME__;
+    const existing = (window as unknown as { __MAGIO_VSCODE_THEME__?: Theme }).__MAGIO_VSCODE_THEME__;
     return existing || null;
   });
   const isVSCode = useMemo(() => isVSCodeRuntime(), []);
@@ -180,8 +180,8 @@ export function ThemeSystemProvider({ children, defaultThemeId }: ThemeSystemPro
       });
     };
 
-    window.addEventListener('openchamber:theme-hmr', handleThemeHmr);
-    return () => window.removeEventListener('openchamber:theme-hmr', handleThemeHmr);
+    window.addEventListener('magio:theme-hmr', handleThemeHmr);
+    return () => window.removeEventListener('magio:theme-hmr', handleThemeHmr);
   }, []);
 
   const getThemeByIdFromAvailable = useCallback(
@@ -305,13 +305,13 @@ export function ThemeSystemProvider({ children, defaultThemeId }: ThemeSystemPro
       }
     };
 
-    const existing = (window as unknown as { __OPENCHAMBER_VSCODE_THEME__?: Theme }).__OPENCHAMBER_VSCODE_THEME__;
+    const existing = (window as unknown as { __MAGIO_VSCODE_THEME__?: Theme }).__MAGIO_VSCODE_THEME__;
     if (existing) {
       applyVSCodeTheme(existing);
     }
 
-    window.addEventListener('openchamber:vscode-theme', handleThemeEvent as EventListener);
-    return () => window.removeEventListener('openchamber:vscode-theme', handleThemeEvent as EventListener);
+    window.addEventListener('magio:vscode-theme', handleThemeEvent as EventListener);
+    return () => window.removeEventListener('magio:vscode-theme', handleThemeEvent as EventListener);
   }, [isVSCode]);
 
   const updateBrowserChrome = useCallback((theme: Theme) => {
@@ -485,8 +485,8 @@ export function ThemeSystemProvider({ children, defaultThemeId }: ThemeSystemPro
       setPreferences((prev) => resolveThemePreferencesFromSettingsSync(detail, prev) ?? prev);
     };
 
-    window.addEventListener('openchamber:settings-synced', handleSettingsSynced);
-    return () => window.removeEventListener('openchamber:settings-synced', handleSettingsSynced);
+    window.addEventListener('magio:settings-synced', handleSettingsSynced);
+    return () => window.removeEventListener('magio:settings-synced', handleSettingsSynced);
   }, []);
 
   const setTheme = useCallback(

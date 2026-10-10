@@ -140,7 +140,7 @@ const SessionFolderItemBase = <TSessionNode,>({
   void depth;
 
   return (
-    <div className="oc-folder">
+    <div className="mg-folder">
       {/* Folder header – also acts as a drop zone when droppableRef is provided */}
       <div
         ref={droppableRef}

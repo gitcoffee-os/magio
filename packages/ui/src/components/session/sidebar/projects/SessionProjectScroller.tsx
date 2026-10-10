@@ -487,7 +487,7 @@ function SessionProjectScrollerComponent({ model, view, actions }: Props): React
         // Sticky zone headers replace the top shadow in the grouped view; the
         // flat timeline has none, so it shows the shadow once there is content above.
         ref={setScrollContainer} useScrollShadow hideTopScrollShadow={!view.timelineView} scrollShadowSize={40}
-        outerClassName="flex-1 min-h-0" className="oc-sidebar-scroller pb-1 pl-2.5 pr-2 [overflow-anchor:none]"
+        outerClassName="flex-1 min-h-0" className="mg-sidebar-scroller pb-1 pl-2.5 pr-2 [overflow-anchor:none]"
       >
         <DndContext sensors={sensors} collisionDetection={closestCenter} onDragStart={(event) => {
           setIsProjectDragging(projectDragIds.has(String(event.active.id)));

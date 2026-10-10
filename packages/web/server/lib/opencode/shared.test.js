@@ -7,7 +7,7 @@ import { parseMdFile, writeMdFile, readConfigFile, readConfigLayers, writeConfig
 import { updateAgent } from './agents.js';
 import { updateMcpConfig, createMcpConfig, deleteMcpConfig } from './mcp.js';
 
-const FIXTURE_DIR = path.join(os.tmpdir(), `openchamber-shared-test-${process.pid}`);
+const FIXTURE_DIR = path.join(os.tmpdir(), `magio-shared-test-${process.pid}`);
 
 const STANDARD_MD = [
   '---',
@@ -49,7 +49,7 @@ describe('parseMdFile', () => {
   });
 
   it('parses frontmatter whose closing --- is at end-of-file without a trailing newline', () => {
-    // gray-matter (used by OpenCode) accepts this shape; OpenChamber must too,
+    // gray-matter (used by OpenCode) accepts this shape; Magio must too,
     // otherwise a later save duplicates the YAML block.
     const file = writeFixture('eof-close.md', [
       '---',
@@ -147,7 +147,7 @@ describe('updateAgent frontmatter preservation', () => {
 
   it('updates the model in place without duplicating YAML for a file with EOF-closed frontmatter', () => {
     // Repro of OPE-178: the file's closing --- sits at EOF (no trailing
-    // newline). OpenCode parses it; OpenChamber previously treated the whole
+    // newline). OpenCode parses it; Magio previously treated the whole
     // file as the prompt body and prepended a second frontmatter block on save.
     const projectDir = path.join(FIXTURE_DIR, 'project');
     const agentPath = path.join(projectDir, '.opencode', 'agents', 'strateg.md');
@@ -307,7 +307,7 @@ describe('readConfigFile / writeConfig JSONC safety (issue #2923)', () => {
       /cannot be loaded safely/,
     );
     expect(fs.readFileSync(file, 'utf8')).toBe(PARTIAL_PARSE_CONFIG);
-    expect(fs.existsSync(`${file}.openchamber.backup`)).toBe(false);
+    expect(fs.existsSync(`${file}.magio.backup`)).toBe(false);
   });
 
   it('preserves a valid config across MCP updates', () => {
@@ -320,7 +320,7 @@ describe('readConfigFile / writeConfig JSONC safety (issue #2923)', () => {
     expect(rewritten.plugin).toEqual(['opencode-see-image']);
     expect(rewritten.provider['ollama-cloud'].name).toBe('Ollama Cloud');
     expect(rewritten.mcp.openproject.enabled).toBe(false);
-    expect(fs.readFileSync(`${file}.openchamber.backup`, 'utf8')).toBe(VALID_CONFIG);
+    expect(fs.readFileSync(`${file}.magio.backup`, 'utf8')).toBe(VALID_CONFIG);
   });
 
   it('does not wipe an unparseable user config during MCP mutation attempts', () => {
@@ -333,7 +333,7 @@ describe('readConfigFile / writeConfig JSONC safety (issue #2923)', () => {
         /cannot be loaded safely/,
       );
       expect(fs.readFileSync(file, 'utf8')).toBe(PARTIAL_PARSE_CONFIG);
-      expect(fs.existsSync(`${file}.openchamber.backup`)).toBe(false);
+      expect(fs.existsSync(`${file}.magio.backup`)).toBe(false);
     } finally {
       if (previousOpenCodeConfig === undefined) delete process.env.OPENCODE_CONFIG;
       else process.env.OPENCODE_CONFIG = previousOpenCodeConfig;
@@ -352,7 +352,7 @@ describe('readConfigFile / writeConfig JSONC safety (issue #2923)', () => {
       /cannot be loaded safely/,
     );
     expect(fs.readFileSync(yamlish, 'utf8')).toBe('mcp:\n  openproject:\n    type: remote\n');
-    expect(fs.existsSync(`${yamlish}.openchamber.backup`)).toBe(false);
+    expect(fs.existsSync(`${yamlish}.magio.backup`)).toBe(false);
   });
 
   it('keeps a valid custom layer readable when a project layer is unparseable', () => {
@@ -381,7 +381,7 @@ describe('readConfigFile / writeConfig JSONC safety (issue #2923)', () => {
       expect(rewritten.mcp.openproject).toBeUndefined();
       expect(rewritten.mcp.servers.openproject.disabled).toBe(true);
       expect(fs.readFileSync(projectFile, 'utf8')).toBe(PARTIAL_PARSE_CONFIG);
-      expect(fs.existsSync(`${projectFile}.openchamber.backup`)).toBe(false);
+      expect(fs.existsSync(`${projectFile}.magio.backup`)).toBe(false);
     } finally {
       if (previousOpenCodeConfig === undefined) delete process.env.OPENCODE_CONFIG;
       else process.env.OPENCODE_CONFIG = previousOpenCodeConfig;
@@ -528,7 +528,7 @@ describe('writeConfig preserves JSONC comments (issue #3587)', () => {
       },
       plugin: ['opencode-see-image'],
     });
-    expect(fs.readFileSync(`${file}.openchamber.backup`, 'utf8')).toBe(COMMENTED_CONFIG);
+    expect(fs.readFileSync(`${file}.magio.backup`, 'utf8')).toBe(COMMENTED_CONFIG);
   });
 
   it('keeps comments when adding a new MCP server', () => {

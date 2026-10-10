@@ -23,7 +23,7 @@
  * keyboard has landed), so the slot's ResizeObserver publishes one final
  * inset and keyboardFollowGlide moves scrollTop on the keyboard's curve.
  *
- * The motion is timed to the keyboard: it starts on the `oc:keyboard-anim`
+ * The motion is timed to the keyboard: it starts on the `mg:keyboard-anim`
  * event for its direction and runs on the keyboard's shared duration and
  * curve (mobileKeyboardTiming.ts); it ends on the keyboard's settled event.
  * A fallback timer runs it alone when no keyboard event follows (an expand
@@ -80,13 +80,13 @@ const morphTiming = (direction: ComposerMorphDirection) => ({
 const composerMorphSupported = (): boolean => {
     // isCapacitorApp() is false outside a window, so the DOM is present past it.
     if (!isCapacitorApp()) return false;
-    if (document.documentElement.classList.contains('oc-platform-android')) return false;
+    if (document.documentElement.classList.contains('mg-platform-android')) return false;
     if (window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches) return false;
     return true;
 };
 
 const dispatchMorph = (detail: ComposerMorphEventDetail) => {
-    window.dispatchEvent(new CustomEvent('oc:composer-morph', { detail }));
+    window.dispatchEvent(new CustomEvent('mg:composer-morph', { detail }));
 };
 
 export interface ComposerMorphController {
@@ -245,8 +245,8 @@ export function createComposerMorphController(): ComposerMorphController {
         const cleanup = () => {
             if (startTimer !== null) window.clearTimeout(startTimer);
             if (finishTimer !== null) window.clearTimeout(finishTimer);
-            window.removeEventListener('oc:keyboard-anim', handleKeyboardAnim);
-            window.removeEventListener('oc:keyboard-settled', handleKeyboardSettled);
+            window.removeEventListener('mg:keyboard-anim', handleKeyboardAnim);
+            window.removeEventListener('mg:keyboard-settled', handleKeyboardSettled);
             restore();
         };
         const finish = () => {
@@ -265,7 +265,7 @@ export function createComposerMorphController(): ComposerMorphController {
                 window.clearTimeout(startTimer);
                 startTimer = null;
             }
-            window.removeEventListener('oc:keyboard-anim', handleKeyboardAnim);
+            window.removeEventListener('mg:keyboard-anim', handleKeyboardAnim);
             // Re-read the resting geometry now that the keyboard's root class
             // has flipped, so the pinned inset (expand) and the announced
             // delta (collapse) match what the slot will measure at release —
@@ -322,14 +322,14 @@ export function createComposerMorphController(): ComposerMorphController {
             }
         };
         function handleKeyboardAnim(event: Event) {
-            // SAFETY: oc:keyboard-anim is dispatched only by useNativeMobileChrome
+            // SAFETY: mg:keyboard-anim is dispatched only by useNativeMobileChrome
             // as a CustomEvent whose detail carries `phase: 'show' | 'hide'`.
             const detail = (event as CustomEvent<{ phase: 'show' | 'hide' }>).detail;
             if (detail.phase !== phase) return;
             start(true);
         }
         function handleKeyboardSettled(event: Event) {
-            // SAFETY: oc:keyboard-settled is dispatched only by useNativeMobileChrome
+            // SAFETY: mg:keyboard-settled is dispatched only by useNativeMobileChrome
             // as a CustomEvent whose detail carries `open`.
             const detail = (event as CustomEvent<{ open: boolean }>).detail;
             if (!started || !startedByKeyboard) return;
@@ -338,8 +338,8 @@ export function createComposerMorphController(): ComposerMorphController {
         }
 
         dispatchMorph({ phase: 'hold', direction, delta: transcriptDelta, durationMs: timing.durationMs });
-        window.addEventListener('oc:keyboard-anim', handleKeyboardAnim);
-        window.addEventListener('oc:keyboard-settled', handleKeyboardSettled);
+        window.addEventListener('mg:keyboard-anim', handleKeyboardAnim);
+        window.addEventListener('mg:keyboard-settled', handleKeyboardSettled);
         startTimer = window.setTimeout(() => {
             startTimer = null;
             start(false);

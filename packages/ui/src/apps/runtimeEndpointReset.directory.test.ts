@@ -38,13 +38,13 @@ const installWindow = (): void => {
   Object.defineProperty(globalThis, 'window', {
     configurable: true,
     value: {
-      __OPENCHAMBER_HOME__: LOCAL_HOME,
-      __OPENCHAMBER_LOCAL_ORIGIN__: LOCAL,
-      __OPENCHAMBER_API_BASE_URL__: LOCAL,
+      __MAGIO_HOME__: LOCAL_HOME,
+      __MAGIO_LOCAL_ORIGIN__: LOCAL,
+      __MAGIO_API_BASE_URL__: LOCAL,
       localStorage,
       // The packaged desktop page: not an http origin, so the API base comes
       // from the injected globals above.
-      location: new URL('openchamber-ui://app/index.html'),
+      location: new URL('magio-ui://app/index.html'),
       matchMedia: () => ({ matches: false }),
       addEventListener: events.addEventListener.bind(events),
       removeEventListener: events.removeEventListener.bind(events),

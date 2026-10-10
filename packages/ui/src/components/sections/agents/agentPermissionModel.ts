@@ -42,8 +42,8 @@ export const BUILTIN_ACTIONS = [
   'external_directory',
 ] as const;
 
-/** OpenChamber's own agent tools, shown so their rules are discoverable. */
-export const OPENCHAMBER_ACTIONS = ['openchamber', 'openchamber_web', 'openchamber_memory', 'openchamber_notify'] as const;
+/** Magio's own agent tools, shown so their rules are discoverable. */
+export const MAGIO_ACTIONS = ['magio', 'magio_web', 'magio_memory', 'magio_notify'] as const;
 
 /**
  * v1 permission keys OpenCode 2 no longer checks. Rules on them are inert, so

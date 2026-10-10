@@ -56,7 +56,7 @@ const renderMemorySection = (entries) => entries
  * agents told nothing here saved only when the user said "remember".
  */
 const MEMORY_SAVE_GUIDANCE = 'You have memory that persists across sessions, through the'
-  + ' openchamber_memory tool. Save to it in the moment, without asking first, when:'
+  + ' magio_memory tool. Save to it in the moment, without asking first, when:'
   + ' the user corrects how you work or states a preference; the user confirms that'
   + ' a non-obvious approach worked; or you learn a project fact that took real'
   + ' effort to find and is not in the code or docs. One fact per entry. The user'
@@ -64,7 +64,7 @@ const MEMORY_SAVE_GUIDANCE = 'You have memory that persists across sessions, thr
   + ' briefly.';
 
 /**
- * When to link, stated in every session that has the `openchamber` tool. The
+ * When to link, stated in every session that has the `magio` tool. The
  * same rule leads that tool's description; stated only there, an agent given
  * an issue to investigate never opened the tool and so never linked it.
  * The tool description states the same rule; change both together.
@@ -72,7 +72,7 @@ const MEMORY_SAVE_GUIDANCE = 'You have memory that persists across sessions, thr
 export const SESSION_LINK_GUIDANCE = "When the user gives you an issue or a change under"
   + " review (a pull or merge request) to work on, fix, investigate or review, when you"
   + " open one for this work, and when the work resolves one, link it to this session"
-  + " with the openchamber tool's session.link as soon as you know it, so the user"
+  + " with the magio tool's session.link as soon as you know it, so the user"
   + " sees it with the session. Not one merely mentioned in passing.";
 
 /**
@@ -95,7 +95,7 @@ const buildMemoryBlock = ({ global, project, enabled = false, complete = false }
     ...(enabled ? [MEMORY_SAVE_GUIDANCE] : []),
     'Stored memory from earlier sessions: only the titles are listed below.',
     'A title is an abbreviation, not the memory. Read the entry with the'
-      + ' openchamber_memory tool before you act on it: titles routinely leave out'
+      + ' magio_memory tool before you act on it: titles routinely leave out'
       + ' the conditions, exceptions and reasons that decide how the memory'
       + ' applies, and a title that looks self-explanatory is the most likely to'
       + ' be hiding them. Read every title that could bear on the task at hand;'
@@ -153,9 +153,9 @@ export const createSessionKnowledgeRuntime = (dependencies) => {
     agentMemoryRuntime,
     resolveProjectId,
     isAgentMemoryEnabled,
-    // Whether this session's agent has the `openchamber` tool to link with.
+    // Whether this session's agent has the `magio` tool to link with.
     isSessionLinkingAvailable = null,
-    // Pins and the delivered-signature cursor live in OpenChamber's own session
+    // Pins and the delivered-signature cursor live in Magio's own session
     // metadata store: OpenCode 2.x accepts session metadata only at create time.
     readSessionMetadata = null,
     persistSessionMetadata = null,
@@ -177,8 +177,8 @@ export const createSessionKnowledgeRuntime = (dependencies) => {
    */
   const readPins = (session) => {
     const metadata = isRecord(session?.metadata) ? session.metadata : {};
-    const openchamber = isRecord(metadata.openchamber) ? metadata.openchamber : {};
-    const pins = isRecord(openchamber[PINS_METADATA_KEY]) ? openchamber[PINS_METADATA_KEY] : {};
+    const magio = isRecord(metadata.magio) ? metadata.magio : {};
+    const pins = isRecord(magio[PINS_METADATA_KEY]) ? magio[PINS_METADATA_KEY] : {};
     const strings = (value) => Array.isArray(value)
       ? [...new Set(value.filter((entry) => typeof entry === 'string' && entry.trim()).map((entry) => entry.trim()))]
       : [];
@@ -290,8 +290,8 @@ export const createSessionKnowledgeRuntime = (dependencies) => {
 
   const readDeliveredSignature = (session) => {
     const metadata = isRecord(session?.metadata) ? session.metadata : {};
-    const openchamber = isRecord(metadata.openchamber) ? metadata.openchamber : {};
-    const delivered = openchamber[KNOWLEDGE_METADATA_KEY];
+    const magio = isRecord(metadata.magio) ? metadata.magio : {};
+    const delivered = magio[KNOWLEDGE_METADATA_KEY];
     return typeof delivered === 'string' ? delivered : '';
   };
 
@@ -331,7 +331,7 @@ export const createSessionKnowledgeRuntime = (dependencies) => {
     // Clearing the delivered signature is what makes the next send carry the
     // changed pin set; the merge patch leaves neighbouring state alone.
     await persistSessionMetadata(sessionId, directory, {
-      openchamber: {
+      magio: {
         [PINS_METADATA_KEY]: { ...pins, [key]: [...next] },
         [KNOWLEDGE_METADATA_KEY]: '',
       },
@@ -345,13 +345,13 @@ export const createSessionKnowledgeRuntime = (dependencies) => {
    * agent had context it never received.
    *
    * Merged onto a fresh read, because the session's metadata holds other
-   * OpenChamber state — pinned messages among it — and a blind write would
+   * Magio state — pinned messages among it — and a blind write would
    * drop whatever changed in between.
    */
   const recordDelivered = async (sessionId, directory, signature) => {
     requireMetadataStore();
     await persistSessionMetadata(sessionId, directory, {
-      openchamber: { [KNOWLEDGE_METADATA_KEY]: signature },
+      magio: { [KNOWLEDGE_METADATA_KEY]: signature },
     });
   };
 

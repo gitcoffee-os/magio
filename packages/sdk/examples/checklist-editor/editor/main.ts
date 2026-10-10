@@ -1,5 +1,5 @@
-import { connectHost, createFileSaveTracker } from '@openchamber/sdk';
-import { applyHostReady, mountButton, mountEmpty } from '@openchamber/sdk/ui';
+import { connectHost, createFileSaveTracker } from '@magio/sdk';
+import { applyHostReady, mountButton, mountEmpty } from '@magio/sdk/ui';
 
 import { checklistVersion, insertItem, parseChecklist, serializeChecklist, type ChecklistLine } from './checklist.ts';
 
@@ -15,16 +15,16 @@ if (!root) throw new Error('Missing root');
 
 const style = document.createElement('style');
 style.textContent = `
-  html, body { margin: 0; height: 100%; background: var(--oc-bg); color: var(--oc-fg); font-family: var(--oc-font); font-size: 13px; }
+  html, body { margin: 0; height: 100%; background: var(--mg-bg); color: var(--mg-fg); font-family: var(--mg-font); font-size: 13px; }
   #root { box-sizing: border-box; height: 100%; overflow: auto; padding: 16px 20px; }
-  .note { margin: 2px 0; color: var(--oc-muted); white-space: pre-wrap; min-height: 1em; }
+  .note { margin: 2px 0; color: var(--mg-muted); white-space: pre-wrap; min-height: 1em; }
   .item { display: flex; align-items: center; gap: 8px; margin: 2px 0; }
-  .item input[type="checkbox"] { width: 16px; height: 16px; margin: 0; accent-color: var(--oc-primary); }
-  .item input[type="text"] { flex: 1; min-width: 0; border: 1px solid transparent; border-radius: var(--oc-radius); padding: 4px 6px;
+  .item input[type="checkbox"] { width: 16px; height: 16px; margin: 0; accent-color: var(--mg-primary); }
+  .item input[type="text"] { flex: 1; min-width: 0; border: 1px solid transparent; border-radius: var(--mg-radius); padding: 4px 6px;
     background: transparent; color: inherit; font: inherit; }
-  .item input[type="text"]:hover { border-color: var(--oc-border); }
-  .item input[type="text"]:focus { outline: none; border-color: var(--oc-focus); background: var(--oc-elevated); }
-  .item.done input[type="text"] { color: var(--oc-muted); text-decoration: line-through; }
+  .item input[type="text"]:hover { border-color: var(--mg-border); }
+  .item input[type="text"]:focus { outline: none; border-color: var(--mg-focus); background: var(--mg-elevated); }
+  .item.done input[type="text"] { color: var(--mg-muted); text-decoration: line-through; }
   .item .remove { visibility: hidden; }
   .item:hover .remove, .item:focus-within .remove { visibility: visible; }
   .actions { margin-top: 12px; }

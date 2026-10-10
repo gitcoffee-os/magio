@@ -1,12 +1,12 @@
 {
-  "name": "@openchamber/sdk",
-  "version": "2.2.0",
-  "description": "Contract for OpenChamber guests: manifest parse and iframe host bridge.",
+  "name": "@magio/sdk",
+  "version": "1.0.0",
+  "description": "Contract for Magio guests: manifest parse and iframe host bridge.",
   "private": false,
-  "license": "MIT",
+  "license": "Apache-2.0",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/openchamber/openchamber.git",
+    "url": "git+https://github.com/gitcoffee-os/magio.git",
     "directory": "packages/sdk"
   },
   "type": "module",
@@ -27,7 +27,7 @@
     }
   },
   "bin": {
-    "openchamber-guest-bundle": "./scripts/bundle-guest.ts"
+    "magio-guest-bundle": "./scripts/bundle-guest.ts"
   },
   "publishConfig": {
     "access": "public"
@@ -47,7 +47,8 @@
     "API.md",
     "DOCUMENTATION.md",
     "GUEST_SERVICES.md",
-    "LICENSE"
+    "LICENSE",
+    "NOTICE"
   ],
   "dependencies": {
     "zod": "^4.3.6"

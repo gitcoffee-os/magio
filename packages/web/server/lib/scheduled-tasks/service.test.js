@@ -72,7 +72,7 @@ describe('scheduled-task service list', () => {
 
 describe('scheduled-task loop-file mutations', () => {
   it('updates only enabled in loop frontmatter and reconciles the task', async () => {
-    const tempRoot = await mkdtemp(path.join(os.tmpdir(), 'oc-loop-toggle-'));
+    const tempRoot = await mkdtemp(path.join(os.tmpdir(), 'mg-loop-toggle-'));
     try {
       const loopFilePath = path.join(tempRoot, 'daily.md');
       await writeFile(loopFilePath, `---
@@ -107,7 +107,7 @@ Run the digest.
   });
 
   it('deletes the authoritative loop file and reconciles the task away', async () => {
-    const tempRoot = await mkdtemp(path.join(os.tmpdir(), 'oc-loop-remove-'));
+    const tempRoot = await mkdtemp(path.join(os.tmpdir(), 'mg-loop-remove-'));
     try {
       const loopFilePath = path.join(tempRoot, 'daily.md');
       await writeFile(loopFilePath, 'loop', 'utf8');
@@ -126,7 +126,7 @@ Run the digest.
   });
 
   it('does not rewrite a malformed loop when toggling', async () => {
-    const tempRoot = await mkdtemp(path.join(os.tmpdir(), 'oc-loop-invalid-'));
+    const tempRoot = await mkdtemp(path.join(os.tmpdir(), 'mg-loop-invalid-'));
     try {
       const loopFilePath = path.join(tempRoot, 'daily.md');
       const malformed = '---\nname: daily-digest\n---\nRun.\n';
@@ -173,7 +173,7 @@ describe('scheduled-task loop-file routes', () => {
       sanitizeProjects: vi.fn(),
       projectConfigRuntime: {},
       scheduledTasksRuntime: {},
-      getOpenChamberEventClients: () => new Set(),
+      getMagioEventClients: () => new Set(),
       writeSseEvent: vi.fn(),
     });
     return handlers;
@@ -208,7 +208,7 @@ describe('scheduled-task loop-file routes', () => {
 
 describe('scheduled-task service remove', () => {
   it('rejects deleting a loop-sourced task while its loop file still exists', async () => {
-    const tempRoot = await mkdtemp(path.join(os.tmpdir(), 'oc-loop-delete-'));
+    const tempRoot = await mkdtemp(path.join(os.tmpdir(), 'mg-loop-delete-'));
     try {
       const loopFilePath = path.join(tempRoot, 'daily.md');
       await writeFile(loopFilePath, '---\nname: daily-digest\n---\nRun.\n', 'utf8');
@@ -231,7 +231,7 @@ describe('scheduled-task service remove', () => {
   });
 
   it('allows deleting a loop-sourced task once its loop file is gone', async () => {
-    const tempRoot = await mkdtemp(path.join(os.tmpdir(), 'oc-loop-delete-'));
+    const tempRoot = await mkdtemp(path.join(os.tmpdir(), 'mg-loop-delete-'));
     try {
       // The loop file was removed from disk; the orphan task is allowed to be
       // deleted directly instead of waiting for the next reconcile.
@@ -291,7 +291,7 @@ describe('scheduled-task service run', () => {
 });
 
 describe('scheduled-task service chats scope', () => {
-  const chatsScope = createChatsScope('/home/user/.config/openchamber/chats');
+  const chatsScope = createChatsScope('/home/user/.config/magio/chats');
 
   it('keys the chats id the UI sends by the chats root storage id', async () => {
     const { service, scheduledTasksRuntime } = createService({
@@ -327,7 +327,7 @@ describe('scheduled-task service chats scope', () => {
   });
 
   it('records approval of the exact loop version when the user enables it', async () => {
-    const tempRoot = await mkdtemp(path.join(os.tmpdir(), 'oc-loop-approve-'));
+    const tempRoot = await mkdtemp(path.join(os.tmpdir(), 'mg-loop-approve-'));
     try {
       const loopFilePath = path.join(tempRoot, 'daily.md');
       await writeFile(loopFilePath, `---
@@ -373,7 +373,7 @@ ${prompt}
   const savedHome = { HOME: process.env.HOME, USERPROFILE: process.env.USERPROFILE };
 
   beforeEach(async () => {
-    tempRoot = await mkdtemp(path.join(os.tmpdir(), 'oc-loop-set-enabled-'));
+    tempRoot = await mkdtemp(path.join(os.tmpdir(), 'mg-loop-set-enabled-'));
     // User-scope loops live under the home directory.
     const home = path.join(tempRoot, 'home');
     process.env.HOME = home;

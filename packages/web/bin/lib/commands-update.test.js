@@ -5,17 +5,17 @@ import { describe, expect, it, vi } from 'vitest';
 
 import { createUpdateCommand } from './commands-update.js';
 
-async function withTempOpenChamberDataDir(fn) {
-  const previous = process.env.OPENCHAMBER_DATA_DIR;
-  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'openchamber-update-test-'));
-  process.env.OPENCHAMBER_DATA_DIR = dir;
+async function withTempMagioDataDir(fn) {
+  const previous = process.env.MAGIO_DATA_DIR;
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'magio-update-test-'));
+  process.env.MAGIO_DATA_DIR = dir;
   try {
     return await fn(dir);
   } finally {
     if (typeof previous === 'string') {
-      process.env.OPENCHAMBER_DATA_DIR = previous;
+      process.env.MAGIO_DATA_DIR = previous;
     } else {
-      delete process.env.OPENCHAMBER_DATA_DIR;
+      delete process.env.MAGIO_DATA_DIR;
     }
     fs.rmSync(dir, { recursive: true, force: true });
   }
@@ -23,7 +23,7 @@ async function withTempOpenChamberDataDir(fn) {
 
 describe('update command', () => {
   it('uses the package-manager helpers on the update-available path', async () => {
-    await withTempOpenChamberDataDir(async () => {
+    await withTempMagioDataDir(async () => {
       const originalWrite = process.stdout.write;
       process.stdout.write = vi.fn(() => true);
       const executeUpdate = vi.fn(() => ({ success: true, exitCode: 0 }));
@@ -49,13 +49,13 @@ describe('update command', () => {
   });
 
   it('surfaces the installed-version verification failure', async () => {
-    await withTempOpenChamberDataDir(async () => {
+    await withTempMagioDataDir(async () => {
       const originalWrite = process.stdout.write;
       process.stdout.write = vi.fn(() => true);
       const executeUpdate = vi.fn(() => ({
         success: false,
         exitCode: 0,
-        error: 'Installed @openchamber/web version 1.0.0 does not match target 9.9.9.',
+        error: 'Installed @magio/web version 1.0.0 does not match target 9.9.9.',
       }));
       const updateCommand = createUpdateCommand({
         packageManagerPath: '/fake/package-manager.js',

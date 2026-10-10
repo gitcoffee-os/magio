@@ -11,11 +11,11 @@ describe('close tab target', () => {
     const releaseFirst = registerCloseTabTarget(() => closed.push('first'));
     const releaseSecond = registerCloseTabTarget(() => closed.push('second'));
 
-    window.dispatchEvent(new Event('openchamber:close-tab'));
+    window.dispatchEvent(new Event('magio:close-tab'));
     releaseSecond();
-    window.dispatchEvent(new Event('openchamber:close-tab'));
+    window.dispatchEvent(new Event('magio:close-tab'));
     releaseFirst();
-    window.dispatchEvent(new Event('openchamber:close-tab'));
+    window.dispatchEvent(new Event('magio:close-tab'));
 
     expect(closed).toEqual(['second', 'first']);
   });

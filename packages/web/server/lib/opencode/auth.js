@@ -12,7 +12,7 @@
  * A key OpenCode picks up from an environment variable (`ZAI_API_KEY`, ...)
  * is never stored, and that route does not list it. `GET /api/integration`
  * names the variable a connection came from, but not its value. When
- * OpenChamber launched OpenCode itself it knows the environment it passed, so
+ * Magio launched OpenCode itself it knows the environment it passed, so
  * the source reads the value from there; an external OpenCode runs with an
  * environment of its own, and its variable keys stay unknown. A stored
  * credential wins over a variable, which is the order OpenCode itself uses.
@@ -146,7 +146,7 @@ const sharedStoredRead = coalesce();
 
 /**
  * The keys the running OpenCode uses, keyed by provider id: stored
- * credentials, plus variable keys when OpenChamber launched OpenCode.
+ * credentials, plus variable keys when Magio launched OpenCode.
  * Throws when OpenCode cannot be asked.
  */
 export function readOpenCodeCredentials() {

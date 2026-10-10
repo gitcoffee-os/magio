@@ -204,7 +204,7 @@ export const MobileWorkspaceDrawer: React.FC<{
 
   const body = (
     <>
-      <div className="flex h-[var(--oc-header-height,56px)] shrink-0 items-center gap-2 px-3">
+      <div className="flex h-[var(--mg-header-height,56px)] shrink-0 items-center gap-2 px-3">
         <div className="flex h-9 min-w-0 flex-1 items-center">
           {/* Mounted only while shown; nonCompositedIndicator keeps the active
               pill off its own compositing layer — creating one inside the
@@ -301,9 +301,9 @@ export const MobileWorkspaceDrawer: React.FC<{
       aria-modal="true"
       aria-label={t('mobile.header.openWorkspaceAria')}
       aria-hidden={!open}
-      className="oc-keyboard-inset-surface oc-bottom-safe-surface fixed inset-0 z-50 flex flex-col bg-background text-foreground"
+      className="mg-keyboard-inset-surface mg-bottom-safe-surface fixed inset-0 z-50 flex flex-col bg-background text-foreground"
       style={{
-        paddingTop: 'var(--oc-safe-area-top, 0px)',
+        paddingTop: 'var(--mg-safe-area-top, 0px)',
         // Settled state drops the transform entirely so the drawer isn't kept
         // on a compositing layer (iOS clips those to the safe-area viewport).
         transform: entered ? 'none' : 'translateX(100%)',

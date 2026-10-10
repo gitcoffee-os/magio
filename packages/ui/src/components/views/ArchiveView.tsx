@@ -189,7 +189,7 @@ export function ArchiveSessionsView({ open, layout, onLeave }: {
         </div>
         <div
           className="min-h-0 flex-1 overflow-y-auto pt-1"
-          style={{ paddingBottom: 'calc(0.5rem + var(--oc-safe-area-bottom, 0px))' }}
+          style={{ paddingBottom: 'calc(0.5rem + var(--mg-safe-area-bottom, 0px))' }}
         >
           {visibleSessions.length === 0 ? emptyState : visibleSessions.map((session) => {
             const sessionDirectory = normalizePath(resolveGlobalSessionDirectory(session)) ?? '';

@@ -25,7 +25,7 @@ import * as sessionActions from '@/sync/session-actions';
 // Guest surfaces load on demand: VS Code and mobile never mount them, and the
 // composer must not pay for the guest bridge before an extension is installed.
 const GuestAttachDialog = React.lazy(() => import('@/components/layout/GuestAttachDialog').then((module) => ({ default: module.GuestAttachDialog })));
-import type { AttachIssueRequest } from '@openchamber/sdk';
+import type { AttachIssueRequest } from '@magio/sdk';
 import { getInlineCommentDraftKey, useInlineCommentDraftStore, type InlineCommentDraft, type InlineCommentDraftTarget } from '@/stores/useInlineCommentDraftStore';
 import { useSnippetsStore } from '@/stores/useSnippetsStore';
 import { renderMagicPrompt } from '@/lib/magicPrompts';
@@ -1227,6 +1227,12 @@ const ChatInputComponent: React.FC<ChatInputProps> = ({
         if (!isBtwActive && pendingInputText !== null) {
             const pending = consumePendingInputText(mailboxTarget);
             if (pending?.text) {
+                // Confirm the paths the sender queued with this text before it
+                // exists in the composer: the mention scan has to see them to
+                // resolve `@docs/my notes.md` or `@Makefile` as file references.
+                for (const mention of pending.mentions ?? []) {
+                    confirmedMentionsRef.current.add(mention);
+                }
                 if (pending.mode === 'append') {
                     setMessage((prev) => {
                         const next = pending.text;
@@ -3254,7 +3260,7 @@ const ChatInputComponent: React.FC<ChatInputProps> = ({
         e.preventDefault();
         e.stopPropagation();
         dragEnterCountRef.current++;
-        const isInternal = e.dataTransfer.types?.includes('application/x-openchamber-file-path') ?? false;
+        const isInternal = e.dataTransfer.types?.includes('application/x-magio-file-path') ?? false;
         if (isInternal !== isInternalDrag) {
             setIsInternalDrag(isInternal);
         }
@@ -3308,7 +3314,7 @@ const ChatInputComponent: React.FC<ChatInputProps> = ({
         if (!currentSessionId && !newSessionDraftOpen) return;
 
         // Internal drag: file tree → chat input (relative path as @mention)
-        const internalPath = e.dataTransfer.getData('application/x-openchamber-file-path');
+        const internalPath = e.dataTransfer.getData('application/x-magio-file-path');
         if (internalPath && internalPath !== '.') {
             confirmedMentionsRef.current.add(internalPath);
             const mention = `@${internalPath}`;
@@ -3847,7 +3853,7 @@ const ChatInputComponent: React.FC<ChatInputProps> = ({
 
     /** The dictation engine listens for this globally; the composer only asks. */
     const toggleDictation = React.useCallback(() => {
-        window.dispatchEvent(new CustomEvent('openchamber:dictation-toggle'));
+        window.dispatchEvent(new CustomEvent('magio:dictation-toggle'));
     }, []);
 
     const openMobileAttachSheet = React.useCallback(() => {
@@ -3974,7 +3980,7 @@ const ChatInputComponent: React.FC<ChatInputProps> = ({
                 "relative w-full pt-0 pb-4",
                 isDesktopExpanded && 'flex h-full min-h-0 flex-col pt-4',
                 isMobileExpanded && 'flex h-full min-h-0 flex-col pt-2',
-                isMobile && 'bottom-safe-area oc-mobile-composer'
+                isMobile && 'bottom-safe-area mg-mobile-composer'
             )}
             style={isMobile && inputBarOffset > 0 ? { marginBottom: `${inputBarOffset}px` } : undefined}
         >
@@ -4142,7 +4148,7 @@ const ChatInputComponent: React.FC<ChatInputProps> = ({
                         isComposerExpanded && 'flex-1 min-h-0',
                         "border border-border/80 focus-within:border-interactive-selection-foreground/35",
                         // The box floats over the transcript, so it is glass.
-                        'oc-glass-composer',
+                        'mg-glass-composer',
                         isDragging && "ring-2 ring-primary ring-offset-2"
                     )}
                     style={{ borderRadius: chatInputRadius }}

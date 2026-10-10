@@ -105,7 +105,7 @@ const countEvents = () => {
 const run = () => topUpV1Migration({ dbPath, logger: { log: () => {}, warn: () => {} }, now: () => 2_000_000 });
 
 beforeEach(() => {
-  dir = fs.mkdtempSync(path.join(os.tmpdir(), 'oc-topup-'));
+  dir = fs.mkdtempSync(path.join(os.tmpdir(), 'mg-topup-'));
   dbPath = path.join(dir, 'opencode.db');
 });
 

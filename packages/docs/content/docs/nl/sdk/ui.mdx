@@ -1,18 +1,18 @@
 ---
 title: UI-kit
-description: Knoppen, velden, keuzelijsten, tabbladen en andere onderdelen van @openchamber/sdk/ui voor extensies in de stijl van OpenChamber.
+description: Knoppen, velden, keuzelijsten, tabbladen en andere onderdelen van @magio/sdk/ui voor extensies in de stijl van Magio.
 ---
 
 # UI-kit
 
-`@openchamber/sdk/ui` bevat kant-en-klare bedieningselementen met de kleuren, lettertypen en afstanden van de app. Zo past uw extensie bij OpenChamber zonder stijlen te kopiëren. Elk onderdeel is een functie: u geeft een eigen element en instellingen door, het onderdeel tekent zichzelf daarin en geeft `{ update, dispose }` terug. U stelt zelf het scherm samen en beheert de gegevens. De kit roept uw provider of OpenChamber nooit aan; `host.request`, `host.attach` en andere methoden gebruikt u zelf. Voor wat ontbreekt kunt u eigen HTML en CSS schrijven. Gebruik waar mogelijk de kit: de onderdelen volgen automatisch het thema, de afstanden en toetsenbordbediening van de app. Uw paneel voelt daardoor als onderdeel van OpenChamber in plaats van als een website erin.
+`@magio/sdk/ui` bevat kant-en-klare bedieningselementen met de kleuren, lettertypen en afstanden van de app. Zo past uw extensie bij Magio zonder stijlen te kopiëren. Elk onderdeel is een functie: u geeft een eigen element en instellingen door, het onderdeel tekent zichzelf daarin en geeft `{ update, dispose }` terug. U stelt zelf het scherm samen en beheert de gegevens. De kit roept uw provider of Magio nooit aan; `host.request`, `host.attach` en andere methoden gebruikt u zelf. Voor wat ontbreekt kunt u eigen HTML en CSS schrijven. Gebruik waar mogelijk de kit: de onderdelen volgen automatisch het thema, de afstanden en toetsenbordbediening van de app. Uw paneel voelt daardoor als onderdeel van Magio in plaats van als een website erin.
 
 ## Roep eerst `applyHostReady` aan
 
 Onderdelen lezen kleuren uit CSS-variabelen die `applyHostReady` op de pagina instelt. Die functie zet ook het lettertype en de tekstkleur op het hoofdelement, zodat eigen HTML erbij past. Roep haar binnen `host.onReady` aan vóór het opbouwen van de eerste onderdelen. Bij themawisselingen volgen de kleuren dan automatisch.
 
 ```ts
-import { applyHostReady } from "@openchamber/sdk/ui";
+import { applyHostReady } from "@magio/sdk/ui";
 
 let mounted = false;
 host.onReady((ctx) => {
@@ -25,7 +25,7 @@ host.onReady((ctx) => {
 
 De kit gebruikt door de host berekende tekstkleuren voor lichtgekleurde knoppen, badges, meldingstitels, validatieberichten en links. U hoeft het contrast niet zelf te berekenen.
 
-Voor eigen CSS biedt `applyHostReady` de variabelen `--primary-text`, `--success-text`, `--warning-text`, `--error-text` en `--info-text`, plus bijbehorende `--oc-*-text`-aliassen. Gebruik die voor tekst op neutrale of lichtgetinte achtergronden. Gebruik basiskleuren voor kleurvlakken en `--oc-primary-fg` voor tekst op een volle `--oc-primary`-achtergrond. Pas elke `onReady`-momentopname toe om de kleuren actueel te houden.
+Voor eigen CSS biedt `applyHostReady` de variabelen `--primary-text`, `--success-text`, `--warning-text`, `--error-text` en `--info-text`, plus bijbehorende `--mg-*-text`-aliassen. Gebruik die voor tekst op neutrale of lichtgetinte achtergronden. Gebruik basiskleuren voor kleurvlakken en `--mg-primary-fg` voor tekst op een volle `--mg-primary`-achtergrond. Pas elke `onReady`-momentopname toe om de kleuren actueel te houden.
 
 `onReady` kan vaak worden aangeroepen terwijl het paneel openstaat, ook bij veranderde sessiecontext. Pas telkens het thema toe, maar bouw onderdelen en registreer listeners slechts één keer. Bewaar conceptwaarden buiten renderfuncties. Verberg bij tabbladwisselingen bestaande panelen of herstel hun waarden uit uw status, in plaats van ze te wissen.
 
@@ -36,7 +36,7 @@ Voor eigen CSS biedt `applyHostReady` de variabelen `--primary-text`, `--success
 Bouw deze onderdelen één keer op in de bestaande `root` van uw paneel:
 
 ```ts
-import { mountSelect, mountTabs } from "@openchamber/sdk/ui";
+import { mountSelect, mountTabs } from "@magio/sdk/ui";
 
 let activeId = "convert";
 const tabs = mountTabs(root, {
@@ -87,7 +87,7 @@ Naast de onderdelen zijn er drie hulpfuncties. `filterSelectOptions(options, que
 ## Een lijst met zoekfunctie
 
 ```ts
-import { applyHostReady, mountEmpty, mountList, mountSearchField } from "@openchamber/sdk/ui";
+import { applyHostReady, mountEmpty, mountList, mountSearchField } from "@magio/sdk/ui";
 
 let mounted = false;
 host.onReady((ctx) => {
@@ -138,10 +138,10 @@ host.onReady((ctx) => {
 
 ## Links in providertekst
 
-Uw pagina draait in een sandbox en kan niet zelf een nieuw tabblad openen. Geef bij `mountText` een `onOpenUrl` mee die de link aan OpenChamber overdraagt:
+Uw pagina draait in een sandbox en kan niet zelf een nieuw tabblad openen. Geef bij `mountText` een `onOpenUrl` mee die de link aan Magio overdraagt:
 
 ```ts
-import { mountText } from "@openchamber/sdk/ui";
+import { mountText } from "@magio/sdk/ui";
 
 mountText(root, {
   text: comment.body,

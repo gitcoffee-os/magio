@@ -27,7 +27,7 @@ describe('skills', () => {
   });
 
   it('discovers repository-local .agents skills for the project directory', async () => {
-    const tempRoot = await fsPromises.mkdtemp(path.join(os.tmpdir(), 'oc-project-agents-'));
+    const tempRoot = await fsPromises.mkdtemp(path.join(os.tmpdir(), 'mg-project-agents-'));
     const skillDir = path.join(tempRoot, '.agents', 'skills', 'repo-local-skill');
     const skillPath = path.join(skillDir, 'SKILL.md');
 
@@ -67,7 +67,7 @@ describe('skills', () => {
     // Expected values were recorded from the synchronous discovery on main
     // before it became async; they must not move.
     const buildTree = async () => {
-      const root = await fsPromises.realpath(await fsPromises.mkdtemp(path.join(os.tmpdir(), 'oc-skill-equiv-')));
+      const root = await fsPromises.realpath(await fsPromises.mkdtemp(path.join(os.tmpdir(), 'mg-skill-equiv-')));
       const write = async (relative, frontmatter) => {
         const file = path.join(root, relative);
         await fsPromises.mkdir(path.dirname(file), { recursive: true });
@@ -169,7 +169,7 @@ describe('skills', () => {
 
   describe('writes that race each other', () => {
     const makeProject = async () => {
-      const tempRoot = await fsPromises.mkdtemp(path.join(os.tmpdir(), 'oc-skills-race-'));
+      const tempRoot = await fsPromises.mkdtemp(path.join(os.tmpdir(), 'mg-skills-race-'));
       const projectRoot = path.join(tempRoot, 'project');
       await fsPromises.mkdir(path.join(projectRoot, '.git'), { recursive: true });
       return { tempRoot, projectRoot };
@@ -221,7 +221,7 @@ describe('skills', () => {
   it('resolves built-in OpenCode skill content without parsing virtual locations as files', async () => {
     const sources = await getSkillSources(
       'customize-opencode',
-      '/tmp/openchamber-skills-test-missing-project',
+      '/tmp/magio-skills-test-missing-project',
       {
         name: 'customize-opencode',
         path: '<built-in>',
@@ -243,10 +243,10 @@ describe('skills', () => {
   });
 
   it('clears file metadata when a discovered skill path is unreadable', async () => {
-    const missingPath = path.join(os.tmpdir(), 'openchamber-skills-test-missing-file', 'SKILL.md');
+    const missingPath = path.join(os.tmpdir(), 'magio-skills-test-missing-file', 'SKILL.md');
     const sources = await getSkillSources(
       'missing-agent-skill',
-      '/tmp/openchamber-skills-test-missing-project',
+      '/tmp/magio-skills-test-missing-project',
       {
         name: 'missing-agent-skill',
         path: missingPath,
@@ -266,7 +266,7 @@ describe('skills', () => {
   });
 
   it('enriches discovered skills when their location is a real markdown file', async () => {
-    const tempRoot = await fsPromises.mkdtemp(path.join(os.tmpdir(), 'oc-skills-'));
+    const tempRoot = await fsPromises.mkdtemp(path.join(os.tmpdir(), 'mg-skills-'));
     const skillDir = path.join(tempRoot, 'example-skill');
     const skillPath = path.join(skillDir, 'SKILL.md');
 
@@ -306,7 +306,7 @@ describe('skills', () => {
   });
 
   it('writes and clears "run only when called" as both frontmatter keys, keeping other metadata', async () => {
-    const tempRoot = await fsPromises.mkdtemp(path.join(os.tmpdir(), 'oc-skills-invocation-'));
+    const tempRoot = await fsPromises.mkdtemp(path.join(os.tmpdir(), 'mg-skills-invocation-'));
     const skillDir = path.join(tempRoot, 'manual-skill');
     const skillPath = path.join(skillDir, 'SKILL.md');
     const discovered = { name: 'manual-skill', path: skillPath, scope: 'user', source: 'agents' };
@@ -346,7 +346,7 @@ describe('skills', () => {
   });
 
   it('reads the invocation flag the way OpenCode does: opencode/autoinvoke wins', async () => {
-    const tempRoot = await fsPromises.mkdtemp(path.join(os.tmpdir(), 'oc-skills-invocation-read-'));
+    const tempRoot = await fsPromises.mkdtemp(path.join(os.tmpdir(), 'mg-skills-invocation-read-'));
     const skillDir = path.join(tempRoot, 'read-skill');
     const skillPath = path.join(skillDir, 'SKILL.md');
     const discovered = { name: 'read-skill', path: skillPath, scope: 'user', source: 'agents' };
@@ -370,7 +370,7 @@ describe('skills', () => {
   });
 
   it('renames a skill directory while preserving SKILL.md body and supporting files', async () => {
-    const tempRoot = await fsPromises.mkdtemp(path.join(os.tmpdir(), 'oc-skills-rename-'));
+    const tempRoot = await fsPromises.mkdtemp(path.join(os.tmpdir(), 'mg-skills-rename-'));
     const projectRoot = path.join(tempRoot, 'project');
     const skillDir = path.join(projectRoot, '.opencode', 'skills', 'original-skill');
     const skillPath = path.join(skillDir, 'SKILL.md');
@@ -437,7 +437,7 @@ describe('skills', () => {
   });
 
   it('rolls back the directory rename when frontmatter write fails', async () => {
-    const tempRoot = await fsPromises.mkdtemp(path.join(os.tmpdir(), 'oc-skills-rename-rollback-'));
+    const tempRoot = await fsPromises.mkdtemp(path.join(os.tmpdir(), 'mg-skills-rename-rollback-'));
     const projectRoot = path.join(tempRoot, 'project');
     const skillDir = path.join(projectRoot, '.opencode', 'skills', 'rollback-skill');
     const skillPath = path.join(skillDir, 'SKILL.md');
@@ -476,12 +476,12 @@ describe('skills', () => {
   });
 
   it('rejects invalid names, missing skills, conflicts, unmanaged paths, and frontmatter mismatches', async () => {
-    const tempRoot = await fsPromises.mkdtemp(path.join(os.tmpdir(), 'oc-skills-rename-reject-'));
+    const tempRoot = await fsPromises.mkdtemp(path.join(os.tmpdir(), 'mg-skills-rename-reject-'));
     const projectRoot = path.join(tempRoot, 'project');
     const managedDir = path.join(projectRoot, '.opencode', 'skills', 'managed-skill');
     const conflictDir = path.join(projectRoot, '.opencode', 'skills', 'taken-name');
     const mismatchDir = path.join(projectRoot, '.opencode', 'skills', 'folder-name');
-    const cacheStamp = `oc-rename-${Date.now()}`;
+    const cacheStamp = `mg-rename-${Date.now()}`;
     const cacheDir = path.join(os.homedir(), '.cache', 'opencode', 'skills', cacheStamp, 'cache-skill');
 
     try {

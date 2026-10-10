@@ -16,10 +16,10 @@ describe('parseIssueReference', () => {
   });
 
   test('parses GitLab issue URLs with nested groups', () => {
-    expect(parseIssueReference('https://gitlab.example.com/platform/tools/openchamber/-/issues/42')).toEqual({
+    expect(parseIssueReference('https://gitlab.example.com/platform/tools/magio/-/issues/42')).toEqual({
       number: 42,
       identity: { provider: 'gitlab', instance: 'https://gitlab.example.com' },
-      project: { owner: 'platform/tools', name: 'openchamber' },
+      project: { owner: 'platform/tools', name: 'magio' },
     });
   });
 

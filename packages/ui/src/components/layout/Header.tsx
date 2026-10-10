@@ -359,7 +359,7 @@ export const Header: React.FC = () => {
       return null;
     }
 
-    const injected = (window as unknown as { __OPENCHAMBER_MACOS_MAJOR__?: unknown }).__OPENCHAMBER_MACOS_MAJOR__;
+    const injected = (window as unknown as { __MAGIO_MACOS_MAJOR__?: unknown }).__MAGIO_MACOS_MAJOR__;
     if (typeof injected === 'number' && Number.isFinite(injected) && injected > 0) {
       return injected;
     }
@@ -498,7 +498,7 @@ export const Header: React.FC = () => {
     try {
       // Status-only poll: must not count as usage on the remote server's install id.
       const params = new URLSearchParams({ appType: 'web', instanceMode: 'remote', reportUsage: 'false' });
-      const response = await runtimeFetch(`/api/openchamber/update-check?${params.toString()}`, {
+      const response = await runtimeFetch(`/api/magio/update-check?${params.toString()}`, {
         method: 'GET',
         headers: { Accept: 'application/json' },
       });
@@ -741,7 +741,7 @@ export const Header: React.FC = () => {
 
   const currentSessionTitle = React.useMemo(() => {
     if (!currentSessionId) {
-      return activeProjectLabel ?? 'OpenChamber';
+      return activeProjectLabel ?? 'Magio';
     }
     const trimmedTitle = currentSession?.title?.trim();
     return trimmedTitle && trimmedTitle.length > 0 ? trimmedTitle : 'Untitled Session';
@@ -1093,7 +1093,7 @@ export const Header: React.FC = () => {
   // traffic lights / window-controls-overlay). When the sidebar is open this
   // space is owned by the sidebar's top strip instead, so the header drops back
   // to its normal content padding. The full value is published as
-  // `--oc-titlebar-left-inset` so the sidebar strip can mirror it.
+  // `--mg-titlebar-left-inset` so the sidebar strip can mirror it.
   const titlebarLeftInset = React.useMemo(() => {
     if (isDesktopApp && isMacPlatform && !isDesktopWindowFullscreen) {
       // Native traffic lights have a fixed physical footprint. Keep this
@@ -1101,10 +1101,10 @@ export const Header: React.FC = () => {
       return '88px';
     }
     if (isTabletStandalonePwa) {
-      return 'max(calc(0.75rem + var(--oc-wco-left-inset, 0px)), 5.5rem)';
+      return 'max(calc(0.75rem + var(--mg-wco-left-inset, 0px)), 5.5rem)';
     }
     if ((!isDesktopApp || usesFramelessChrome) && !isVSCode) {
-      return 'calc(0.75rem + var(--oc-wco-left-inset, 0px))';
+      return 'calc(0.75rem + var(--mg-wco-left-inset, 0px))';
     }
     return '0.75rem';
   }, [isDesktopApp, isDesktopWindowFullscreen, isMacPlatform, isTabletStandalonePwa, isVSCode, usesFramelessChrome]);
@@ -1113,7 +1113,7 @@ export const Header: React.FC = () => {
     if (typeof document === 'undefined') {
       return;
     }
-    document.documentElement.style.setProperty('--oc-titlebar-left-inset', titlebarLeftInset);
+    document.documentElement.style.setProperty('--mg-titlebar-left-inset', titlebarLeftInset);
   }, [titlebarLeftInset]);
 
   // Space reserved on the header's left for the persistent overlay when the
@@ -1123,10 +1123,10 @@ export const Header: React.FC = () => {
   // a no-drag carve under the control cluster. Both animate so the session title
   // slides in/out in lockstep with the sidebar. When the sidebar is open the
   // overlay is over the sidebar, so the header only keeps normal content padding.
-  const headerInsetSpacerWidth = isSidebarOpen ? '0.75rem' : 'var(--oc-titlebar-left-inset, 0.75rem)';
+  const headerInsetSpacerWidth = isSidebarOpen ? '0.75rem' : 'var(--mg-titlebar-left-inset, 0.75rem)';
   const headerControlsSpacerWidth = isSidebarOpen
     ? '0px'
-    : 'calc(var(--oc-titlebar-controls-width, 5.5rem) + 0.5rem)';
+    : 'calc(var(--mg-titlebar-controls-width, 5.5rem) + 0.5rem)';
 
   useEffect(() => {
     if (!isDesktopApp || !isMacPlatform) {
@@ -1154,11 +1154,11 @@ export const Header: React.FC = () => {
     };
 
     void syncFullscreenState();
-    window.addEventListener('openchamber:window-resized', onResize);
+    window.addEventListener('magio:window-resized', onResize);
 
     return () => {
       disposed = true;
-      window.removeEventListener('openchamber:window-resized', onResize);
+      window.removeEventListener('magio:window-resized', onResize);
     };
   }, [isDesktopApp, isMacPlatform]);
 
@@ -1179,7 +1179,7 @@ export const Header: React.FC = () => {
   // must be expressed in pixels. The interface font-size setting scales the
   // root rem unit, so a rem-based height floor collapses with it and lets
   // sidebar content slide underneath the macOS traffic lights. Mirrors the
-  // pixel `--oc-titlebar-left-inset` above. macOS <= 15 uses the taller 56px
+  // pixel `--mg-titlebar-left-inset` above. macOS <= 15 uses the taller 56px
   // titlebar that `macosHeaderSizeClass` also encodes.
   const titlebarMinHeight = React.useMemo(() => {
     if (isDesktopApp && isMacPlatform && !isDesktopWindowFullscreen) {
@@ -1192,7 +1192,7 @@ export const Header: React.FC = () => {
     // Height is owned by the native chrome floor plus the browser's
     // window-controls overlay. The rem term keeps the header growing with the
     // interface scale on runtimes that have no native controls to clear.
-    const height = `max(3rem, ${titlebarMinHeight}, var(--oc-wco-titlebar-height, 0px))`;
+    const height = `max(3rem, ${titlebarMinHeight}, var(--mg-wco-titlebar-height, 0px))`;
 
     // VS Code and non-frameless desktop size their own header, and frameless
     // Electron with right-side controls keeps the pr-0 class and no inline
@@ -1208,7 +1208,7 @@ export const Header: React.FC = () => {
     if (!sizesItsOwnHeader && !rightEdgeOwnedByInWindowControls) {
       // Left inset is handled by the no-drag spacer (see renderDesktop); only
       // the right inset is owned by the window-controls overlay.
-      style.paddingRight = 'calc(0.75rem + var(--oc-wco-right-inset, 0px))';
+      style.paddingRight = 'calc(0.75rem + var(--mg-wco-right-inset, 0px))';
     }
     return style;
   }, [isDesktopApp, isVSCode, titlebarMinHeight, usesFramelessChrome, windowControlsSide]);
@@ -1220,7 +1220,7 @@ export const Header: React.FC = () => {
 
     const height = headerRef.current?.getBoundingClientRect().height;
     if (height) {
-      document.documentElement.style.setProperty('--oc-header-height', `${height}px`);
+      document.documentElement.style.setProperty('--mg-header-height', `${height}px`);
     }
   }, []);
 

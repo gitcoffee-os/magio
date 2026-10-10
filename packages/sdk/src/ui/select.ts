@@ -42,24 +42,24 @@ let selectCount = 0;
 export const mountSelect = (root: Element, initial: SelectProps): SelectHandle => {
   ensureStyle(UI_CSS);
   let props = initial;
-  const uid = `oc-sdk-select-${selectCount += 1}`;
-  const wrap = el('div', 'oc-sdk oc-sdk-select');
-  const caption = el('span', 'oc-sdk-field-label');
+  const uid = `mg-sdk-select-${selectCount += 1}`;
+  const wrap = el('div', 'mg-sdk mg-sdk-select');
+  const caption = el('span', 'mg-sdk-field-label');
   caption.id = `${uid}-label`;
-  const trigger = button('oc-sdk-trigger');
+  const trigger = button('mg-sdk-trigger');
   trigger.setAttribute('aria-haspopup', 'listbox');
   trigger.setAttribute('aria-labelledby', caption.id);
-  const value = el('span', 'oc-sdk-trigger-value');
-  trigger.append(value, icon('chevron', 14, 'oc-sdk-trigger-chevron'));
+  const value = el('span', 'mg-sdk-trigger-value');
+  trigger.append(value, icon('chevron', 14, 'mg-sdk-trigger-chevron'));
   wrap.append(caption, trigger);
   root.append(wrap);
 
   let query = '';
   let activeId: string | null = null;
   let closePopup: (() => void) | null = null;
-  const popup = el('div', 'oc-sdk oc-sdk-popup');
-  const searchSlot = el('div', 'oc-sdk-popup-search');
-  const search = el('input', 'oc-sdk-input');
+  const popup = el('div', 'mg-sdk mg-sdk-popup');
+  const searchSlot = el('div', 'mg-sdk-popup-search');
+  const search = el('input', 'mg-sdk-input');
   search.type = 'text';
   search.autocomplete = 'off';
   searchSlot.append(search);
@@ -79,7 +79,7 @@ export const mountSelect = (root: Element, initial: SelectProps): SelectHandle =
     clearNode(listbox);
     const options = visible();
     if (options.length === 0) {
-      const empty = el('div', 'oc-sdk-popup-empty');
+      const empty = el('div', 'mg-sdk-popup-empty');
       empty.textContent = 'No matches';
       listbox.append(empty);
     }

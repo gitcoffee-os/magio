@@ -5,7 +5,7 @@ import { excerptHead, excerptHeadTail, turnsToHistory } from './history.js';
 import { createJevClient, decidePermission, decideRouting } from './jev.js';
 import { classifierEndpoint, parseCustomEndpointUrl, resolveClassifier } from './classifier.js';
 
-const AUTO = { providerID: 'openchamber', id: 'auto' };
+const AUTO = { providerID: 'magio', id: 'auto' };
 const FALLBACK = { model: { providerID: 'anthropic', modelID: 'claude-sonnet-5' }, variant: 'medium' };
 
 const readyConfig = () => {
@@ -122,7 +122,7 @@ describe('resolveAutoSelection', () => {
     expect(resolved.model).toEqual({ providerID: 'openai', id: 'gpt-6-astra', variant: 'high' });
     expect(resolved.agent).toBe('plan');
     expect(resolved.decision).toMatchObject({ category: 'hard', reason: 'routed', confidence: 0.97 });
-    expect(events.at(-1)).toMatchObject({ type: 'openchamber:routing.decision', properties: { sessionId: 's1', category: 'hard' } });
+    expect(events.at(-1)).toMatchObject({ type: 'magio:routing.decision', properties: { sessionId: 's1', category: 'hard' } });
   });
 
   it('uses the fallback pair and keeps the composer agent when the category has no model', async () => {
@@ -272,14 +272,14 @@ describe('jev endpoint', () => {
     const zen = await capture('zen-key', { zenKey: 'zen-secret' });
     expect(zen.url).toBe('https://opencode.ai/zen/v1/systemone');
     expect(zen.headers.authorization).toBe('Bearer zen-secret');
-    expect(zen.headers['x-opencode-client']).toBe('openchamber');
+    expect(zen.headers['x-opencode-client']).toBe('magio');
     expect(zen.body.model).toBe('jev-1.13');
 
     const free = await capture('zen-promo');
     expect(free.url).toBe('https://opencode.ai/zen/v1/systemone');
     expect(free.headers.authorization).toBeUndefined();
     // Zen counts our calls by this header, and does not know the `jev-latest` alias.
-    expect(free.headers['x-opencode-client']).toBe('openchamber');
+    expect(free.headers['x-opencode-client']).toBe('magio');
     expect(free.body.model).toBe('jev-1.13-free');
   });
 
@@ -409,7 +409,7 @@ describe('evaluatePermission', () => {
     expect(await runtime.evaluatePermission(permission, '/repo')).toEqual({ action: 'hold', score: 0.9, kind: 'git_history' });
     expect(await runtime.evaluatePermission(permission, '/repo')).toEqual({ action: 'hold', score: 0.9, kind: 'git_history' });
     expect(jev.ask).toHaveBeenCalledTimes(1);
-    expect(events.filter((e) => e.type === 'openchamber:routing.permission-held')).toHaveLength(1);
+    expect(events.filter((e) => e.type === 'magio:routing.permission-held')).toHaveLength(1);
     expect(runtime.heldPermissions()).toEqual([{ permissionId: 'p1', score: 0.9, kind: 'git_history' }]);
     runtime.forgetPermission('p1');
     expect(runtime.heldPermissions()).toEqual([]);
@@ -423,7 +423,7 @@ describe('evaluatePermission', () => {
   it('holds when Jev is unreachable, tells the UI why, and asks again next time', async () => {
     const { runtime, events, jev } = makeRuntime({ askError: Object.assign(new Error('Jev timed out after 4000ms'), { code: 'timeout' }) });
     expect(await runtime.evaluatePermission(permission, '/repo')).toEqual({ action: 'hold', skipped: 'Jev timed out after 4000ms' });
-    expect(events.at(-1)).toMatchObject({ type: 'openchamber:routing.safety-skipped', properties: { permissionId: 'p1', error: 'Jev timed out after 4000ms' } });
+    expect(events.at(-1)).toMatchObject({ type: 'magio:routing.safety-skipped', properties: { permissionId: 'p1', error: 'Jev timed out after 4000ms' } });
     await runtime.evaluatePermission(permission, '/repo');
     expect(jev.ask).toHaveBeenCalledTimes(2);
     expect(runtime.heldPermissions()).toEqual([]);

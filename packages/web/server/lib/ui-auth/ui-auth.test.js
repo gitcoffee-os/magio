@@ -3,8 +3,8 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 
-const dataDir = fs.mkdtempSync(path.join(os.tmpdir(), 'openchamber-ui-auth-test-'));
-process.env.OPENCHAMBER_DATA_DIR = dataDir;
+const dataDir = fs.mkdtempSync(path.join(os.tmpdir(), 'magio-ui-auth-test-'));
+process.env.MAGIO_DATA_DIR = dataDir;
 
 afterAll(() => {
   fs.rmSync(dataDir, { recursive: true, force: true });
@@ -93,7 +93,7 @@ describe('ui auth client credential seam', () => {
     const loginRes = createResponse();
     await auth.handleSessionCreate(loginReq, loginRes);
     const sessionCookie = String(loginRes.getHeader('set-cookie') || '').split(';', 1)[0];
-    expect(sessionCookie.startsWith('oc_ui_session=')).toBe(true);
+    expect(sessionCookie.startsWith('mg_ui_session=')).toBe(true);
 
     const sessionReq = { method: 'GET', path: '/api/client-auth/clients', headers: { cookie: sessionCookie } };
     const sessionRes = createResponse();
@@ -154,7 +154,7 @@ describe('ui auth client credential seam', () => {
       },
     });
 
-    const oldQueryReq = { method: 'GET', path: '/api/config/settings', url: '/api/config/settings?oc_client_token=client-token', headers: { accept: 'application/json' } };
+    const oldQueryReq = { method: 'GET', path: '/api/config/settings', url: '/api/config/settings?mg_client_token=client-token', headers: { accept: 'application/json' } };
     const oldQueryRes = createResponse();
     let oldQueryCalled = false;
     await auth.requireAuth(oldQueryReq, oldQueryRes, () => {
@@ -167,12 +167,12 @@ describe('ui auth client credential seam', () => {
     const mintRes = createResponse();
     await auth.handleUrlAuthToken(mintReq, mintRes);
     expect(typeof mintRes.body.token).toBe('string');
-    expect(mintRes.body.token.startsWith('oc_url_')).toBe(true);
+    expect(mintRes.body.token.startsWith('mg_url_')).toBe(true);
     expect(mintRes.body.expiresAt).toBeGreaterThan(Date.now());
     expect(mintRes.getHeader('cache-control')).toBe('no-store');
 
     const urlToken = mintRes.body.token;
-    const urlReq = { method: 'GET', path: '/api/fs/raw', url: `/api/fs/raw?path=%2Ftmp%2Fimage.png&oc_url_token=${encodeURIComponent(urlToken)}`, headers: {} };
+    const urlReq = { method: 'GET', path: '/api/fs/raw', url: `/api/fs/raw?path=%2Ftmp%2Fimage.png&mg_url_token=${encodeURIComponent(urlToken)}`, headers: {} };
     const urlRes = createResponse();
     let urlCalled = false;
     await auth.requireAuth(urlReq, urlRes, () => {
@@ -185,8 +185,8 @@ describe('ui auth client credential seam', () => {
     // The session URL token no longer opens file previews: a preview page can
     // read its own URL, so it gets a narrow fs grant instead (see fs routes).
     for (const denied of [
-      { method: 'GET', path: '/api/fs/serve/tmp/index.html', url: `/api/fs/serve/tmp/index.html?oc_url_token=${encodeURIComponent(urlToken)}`, headers: {} },
-      { method: 'GET', path: '/api/fs/preview/grant/tmp/index.html', url: `/api/fs/preview/grant/tmp/index.html?oc_url_token=${encodeURIComponent(urlToken)}`, headers: {} },
+      { method: 'GET', path: '/api/fs/serve/tmp/index.html', url: `/api/fs/serve/tmp/index.html?mg_url_token=${encodeURIComponent(urlToken)}`, headers: {} },
+      { method: 'GET', path: '/api/fs/preview/grant/tmp/index.html', url: `/api/fs/preview/grant/tmp/index.html?mg_url_token=${encodeURIComponent(urlToken)}`, headers: {} },
     ]) {
       const deniedRes = createResponse();
       let deniedCalled = false;
@@ -201,8 +201,8 @@ describe('ui auth client credential seam', () => {
       method: 'GET',
       baseUrl: '/api',
       path: '/fs/raw',
-      originalUrl: `/api/fs/raw?path=%2Ftmp%2Fimage.png&oc_url_token=${encodeURIComponent(urlToken)}`,
-      url: `/fs/raw?path=%2Ftmp%2Fimage.png&oc_url_token=${encodeURIComponent(urlToken)}`,
+      originalUrl: `/api/fs/raw?path=%2Ftmp%2Fimage.png&mg_url_token=${encodeURIComponent(urlToken)}`,
+      url: `/fs/raw?path=%2Ftmp%2Fimage.png&mg_url_token=${encodeURIComponent(urlToken)}`,
       headers: {},
     };
     const mountedRawRes = createResponse();
@@ -212,7 +212,7 @@ describe('ui auth client credential seam', () => {
     });
     expect(mountedRawCalled).toBe(true);
 
-    const guestReq = { method: 'GET', path: '/api/guests/hello/panel/index.html', url: `/api/guests/hello/panel/index.html?oc_url_token=${encodeURIComponent(urlToken)}`, headers: {} };
+    const guestReq = { method: 'GET', path: '/api/guests/hello/panel/index.html', url: `/api/guests/hello/panel/index.html?mg_url_token=${encodeURIComponent(urlToken)}`, headers: {} };
     const guestRes = createResponse();
     let guestCalled = false;
     await auth.requireAuth(guestReq, guestRes, () => {
@@ -228,17 +228,17 @@ describe('ui auth client credential seam', () => {
     await auth.handleUrlAuthToken(guestMintReq, guestMintRes);
     const guestToken = guestMintRes.body.token;
     expect(typeof guestToken).toBe('string');
-    const guestScopedReq = { method: 'GET', path: '/api/guests/hello/panel/main.js', url: `/api/guests/hello/panel/main.js?oc_url_token=${encodeURIComponent(guestToken)}`, headers: {} };
+    const guestScopedReq = { method: 'GET', path: '/api/guests/hello/panel/main.js', url: `/api/guests/hello/panel/main.js?mg_url_token=${encodeURIComponent(guestToken)}`, headers: {} };
     let guestScopedCalled = false;
     await auth.requireAuth(guestScopedReq, createResponse(), () => {
       guestScopedCalled = true;
     });
     expect(guestScopedCalled).toBe(true);
     for (const forbidden of [
-      { method: 'GET', path: '/api/fs/raw', url: `/api/fs/raw?path=%2Ftmp%2Fimage.png&oc_url_token=${encodeURIComponent(guestToken)}` },
-      { method: 'GET', path: '/api/event', url: `/api/event?oc_url_token=${encodeURIComponent(guestToken)}` },
-      { method: 'GET', path: '/api/guests/other/panel/main.js', url: `/api/guests/other/panel/main.js?oc_url_token=${encodeURIComponent(guestToken)}` },
-      { method: 'GET', path: '/api/guests', url: `/api/guests?oc_url_token=${encodeURIComponent(guestToken)}` },
+      { method: 'GET', path: '/api/fs/raw', url: `/api/fs/raw?path=%2Ftmp%2Fimage.png&mg_url_token=${encodeURIComponent(guestToken)}` },
+      { method: 'GET', path: '/api/event', url: `/api/event?mg_url_token=${encodeURIComponent(guestToken)}` },
+      { method: 'GET', path: '/api/guests/other/panel/main.js', url: `/api/guests/other/panel/main.js?mg_url_token=${encodeURIComponent(guestToken)}` },
+      { method: 'GET', path: '/api/guests', url: `/api/guests?mg_url_token=${encodeURIComponent(guestToken)}` },
     ]) {
       const forbiddenRes = createResponse();
       let forbiddenCalled = false;
@@ -255,7 +255,7 @@ describe('ui auth client credential seam', () => {
     const dictationWsReq = {
       method: 'GET',
       path: '/api/dictation/ws',
-      url: `/api/dictation/ws?oc_url_token=${encodeURIComponent(urlToken)}`,
+      url: `/api/dictation/ws?mg_url_token=${encodeURIComponent(urlToken)}`,
       headers: { upgrade: 'websocket' },
     };
     expect(await auth.ensureSessionToken(dictationWsReq, null)).toBe('client:device-1');
@@ -265,21 +265,21 @@ describe('ui auth client credential seam', () => {
     const surfaceWsReq = {
       method: 'GET',
       path: '/api/guests/server-chrome/surface/ws',
-      url: `/api/guests/server-chrome/surface/ws?oc_url_token=${encodeURIComponent(urlToken)}`,
+      url: `/api/guests/server-chrome/surface/ws?mg_url_token=${encodeURIComponent(urlToken)}`,
       headers: { upgrade: 'websocket' },
     };
     expect(await auth.ensureSessionToken(surfaceWsReq, null)).toBe('client:device-1');
-    expect(await auth.ensureSessionToken({ ...surfaceWsReq, url: `/api/guests/server-chrome/surface/ws?oc_url_token=${encodeURIComponent(guestToken)}` }, null)).toBe(null);
+    expect(await auth.ensureSessionToken({ ...surfaceWsReq, url: `/api/guests/server-chrome/surface/ws?mg_url_token=${encodeURIComponent(guestToken)}` }, null)).toBe(null);
     expect(await auth.ensureSessionToken({
       ...surfaceWsReq,
       path: '/api/guests/server-chrome/surface/ws/extra',
-      url: `/api/guests/server-chrome/surface/ws/extra?oc_url_token=${encodeURIComponent(urlToken)}`,
+      url: `/api/guests/server-chrome/surface/ws/extra?mg_url_token=${encodeURIComponent(urlToken)}`,
     }, null)).toBe(null);
 
     const devTunnelWsReq = {
       method: 'GET',
       path: '/api/dev-tunnel',
-      url: `/api/dev-tunnel?port=4322&oc_url_token=${encodeURIComponent(urlToken)}`,
+      url: `/api/dev-tunnel?port=4322&mg_url_token=${encodeURIComponent(urlToken)}`,
       headers: { upgrade: 'websocket' },
     };
     expect(await auth.ensureSessionToken(devTunnelWsReq, null)).toBe('client:device-1');
@@ -289,7 +289,7 @@ describe('ui auth client credential seam', () => {
       const spaceWsReq = {
         method: 'GET',
         path: `/api/spaces/a1b2c3d4e5f6/${socket}`,
-        url: `/api/spaces/a1b2c3d4e5f6/${socket}?oc_url_token=${encodeURIComponent(urlToken)}`,
+        url: `/api/spaces/a1b2c3d4e5f6/${socket}?mg_url_token=${encodeURIComponent(urlToken)}`,
         headers: { upgrade: 'websocket' },
       };
       expect(await auth.ensureSessionToken(spaceWsReq, null)).toBe('client:device-1');
@@ -297,26 +297,26 @@ describe('ui auth client credential seam', () => {
     expect(await auth.ensureSessionToken({
       method: 'GET',
       path: '/api/spaces/a1b2c3d4e5f6/dictation/ws',
-      url: `/api/spaces/a1b2c3d4e5f6/dictation/ws?oc_url_token=${encodeURIComponent(urlToken)}`,
+      url: `/api/spaces/a1b2c3d4e5f6/dictation/ws?mg_url_token=${encodeURIComponent(urlToken)}`,
       headers: { upgrade: 'websocket' },
     }, null)).toBe(null);
     expect(await auth.ensureSessionToken({
       method: 'GET',
       path: '/api/spaces/a1b2c3d4e5f6/fs/raw',
-      url: `/api/spaces/a1b2c3d4e5f6/fs/raw?path=x.png&oc_url_token=${encodeURIComponent(urlToken)}`,
+      url: `/api/spaces/a1b2c3d4e5f6/fs/raw?path=x.png&mg_url_token=${encodeURIComponent(urlToken)}`,
       headers: { accept: 'image/png' },
     }, null)).toBe('client:device-1');
     expect(await auth.ensureSessionToken({
       method: 'GET',
       path: '/api/spaces/a1b2c3d4e5f6/session',
-      url: `/api/spaces/a1b2c3d4e5f6/session?oc_url_token=${encodeURIComponent(urlToken)}`,
+      url: `/api/spaces/a1b2c3d4e5f6/session?mg_url_token=${encodeURIComponent(urlToken)}`,
       headers: { accept: 'application/json' },
     }, null)).toBe(null);
 
     const devTunnelSubpathWsReq = {
       method: 'GET',
       path: '/api/dev-tunnel/private',
-      url: `/api/dev-tunnel/private?port=4322&oc_url_token=${encodeURIComponent(urlToken)}`,
+      url: `/api/dev-tunnel/private?port=4322&mg_url_token=${encodeURIComponent(urlToken)}`,
       headers: { upgrade: 'websocket' },
     };
     expect(await auth.ensureSessionToken(devTunnelSubpathWsReq, null)).toBe(null);
@@ -324,7 +324,7 @@ describe('ui auth client credential seam', () => {
     const dictationHttpReq = {
       method: 'GET',
       path: '/api/dictation/ws',
-      url: `/api/dictation/ws?oc_url_token=${encodeURIComponent(urlToken)}`,
+      url: `/api/dictation/ws?mg_url_token=${encodeURIComponent(urlToken)}`,
       headers: { accept: 'application/json' },
     };
     const dictationHttpRes = createResponse();
@@ -335,7 +335,7 @@ describe('ui auth client credential seam', () => {
     expect(dictationHttpCalled).toBe(false);
     expect(dictationHttpRes.statusCode).toBe(401);
 
-    const arbitraryGetReq = { method: 'GET', path: '/api/config/settings', url: `/api/config/settings?oc_url_token=${encodeURIComponent(urlToken)}`, headers: { accept: 'application/json' } };
+    const arbitraryGetReq = { method: 'GET', path: '/api/config/settings', url: `/api/config/settings?mg_url_token=${encodeURIComponent(urlToken)}`, headers: { accept: 'application/json' } };
     const arbitraryGetRes = createResponse();
     let arbitraryGetCalled = false;
     await auth.requireAuth(arbitraryGetReq, arbitraryGetRes, () => {
@@ -345,7 +345,7 @@ describe('ui auth client credential seam', () => {
     expect(arbitraryGetRes.statusCode).toBe(401);
 
     for (const method of ['POST', 'PUT', 'PATCH', 'DELETE']) {
-      const writeReq = { method, path: '/api/fs/raw', url: `/api/fs/raw?path=%2Ftmp%2Fimage.png&oc_url_token=${encodeURIComponent(urlToken)}`, headers: { accept: 'application/json' } };
+      const writeReq = { method, path: '/api/fs/raw', url: `/api/fs/raw?path=%2Ftmp%2Fimage.png&mg_url_token=${encodeURIComponent(urlToken)}`, headers: { accept: 'application/json' } };
       const writeRes = createResponse();
       let writeCalled = false;
       await auth.requireAuth(writeReq, writeRes, () => {
@@ -387,7 +387,7 @@ describe('ui auth client credential seam', () => {
       body: {
         password: 'secret',
         issueClientToken: true,
-        clientLabel: 'OpenChamber Desktop',
+        clientLabel: 'Magio Desktop',
       },
     };
     const res = createResponse();
@@ -395,7 +395,7 @@ describe('ui auth client credential seam', () => {
     await auth.handleSessionCreate(req, res);
 
     expect(res.body.clientToken).toBe('client-token');
-    expect(createClientInput.fallbackLabel).toBe('OpenChamber Desktop');
+    expect(createClientInput.fallbackLabel).toBe('Magio Desktop');
     const expiresAt = Date.parse(createClientInput.expiresAt);
     expect(expiresAt).toBeGreaterThanOrEqual(before + 122_000);
     expect(expiresAt).toBeLessThanOrEqual(Date.now() + 124_000);
@@ -424,7 +424,7 @@ describe('ui auth client credential seam', () => {
 });
 
 // issue #2377: browsers key cookie jars on host only, so two instances on one
-// LAN IP (different ports) collided on `oc_ui_session`. Cookies are now scoped
+// LAN IP (different ports) collided on `mg_ui_session`. Cookies are now scoped
 // by the request port so each instance owns its own slot.
 describe('ui auth port-scoped session cookies (issue #2377)', () => {
   const loginHost = async (auth, host) => {
@@ -439,15 +439,15 @@ describe('ui auth port-scoped session cookies (issue #2377)', () => {
     const auth = createUiAuth({ password: 'secret' });
 
     const issued = await loginHost(auth, '192.168.0.1:3000');
-    expect(issued).toMatch(/^oc_ui_session_3000=/);
-    expect(issued.length).toBeGreaterThan('oc_ui_session_3000='.length);
+    expect(issued).toMatch(/^mg_ui_session_3000=/);
+    expect(issued.length).toBeGreaterThan('mg_ui_session_3000='.length);
   });
 
   it('keeps the bare cookie name when the host has no explicit port', async () => {
     const createUiAuth = await loadCreateUiAuth();
     const auth = createUiAuth({ password: 'secret' });
 
-    expect(await loginHost(auth, '192.168.0.1')).toMatch(/^oc_ui_session=/);
+    expect(await loginHost(auth, '192.168.0.1')).toMatch(/^mg_ui_session=/);
   });
 
   it('reads the slot for the request port and ignores another port cookie', async () => {
@@ -456,13 +456,13 @@ describe('ui auth port-scoped session cookies (issue #2377)', () => {
 
     // Valid token issued against :3000.
     const portCookie = await loginHost(auth, '192.168.0.1:3000');
-    const validToken = portCookie.slice('oc_ui_session_3000='.length);
+    const validToken = portCookie.slice('mg_ui_session_3000='.length);
 
     // A request that lands on :3001 must read the :3001 slot, NOT the :3000 one,
     // even though the browser ships both cookies to either port.
     const wrongSlot = {
       method: 'GET',
-      headers: { host: '192.168.0.1:3001', cookie: `oc_ui_session_3000=${validToken}; oc_ui_session_3001=stale` },
+      headers: { host: '192.168.0.1:3001', cookie: `mg_ui_session_3000=${validToken}; mg_ui_session_3001=stale` },
     };
     const wrongRes = createResponse();
     await auth.handleSessionStatus(wrongSlot, wrongRes);
@@ -471,7 +471,7 @@ describe('ui auth port-scoped session cookies (issue #2377)', () => {
     // The same token read on its own port authenticates.
     const rightSlot = {
       method: 'GET',
-      headers: { host: '192.168.0.1:3000', cookie: `oc_ui_session_3000=${validToken}` },
+      headers: { host: '192.168.0.1:3000', cookie: `mg_ui_session_3000=${validToken}` },
     };
     const rightRes = createResponse();
     await auth.handleSessionStatus(rightSlot, rightRes);

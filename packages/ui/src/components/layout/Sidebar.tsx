@@ -43,11 +43,11 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, isMobile, children, cl
         sidebar.style.width = `${nextWidth}px`;
         sidebar.style.minWidth = `${nextWidth}px`;
         sidebar.style.maxWidth = `${nextWidth}px`;
-        sidebar.style.setProperty('--oc-left-sidebar-width', `${nextWidth}px`);
+        sidebar.style.setProperty('--mg-left-sidebar-width', `${nextWidth}px`);
         // A drag writes the DOM directly and does not re-render, so the root
         // copy has to be written here too or the titlebar overlay keeps
         // capping itself to the width the drag started from.
-        document.documentElement.style.setProperty('--oc-left-sidebar-width', `${nextWidth}px`);
+        document.documentElement.style.setProperty('--mg-left-sidebar-width', `${nextWidth}px`);
     }, []);
 
     React.useEffect(() => {
@@ -72,11 +72,11 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, isMobile, children, cl
 
     // The titlebar overlay that floats above the sidebar is a sibling of it, not
     // a child, so it cannot read the width published on <aside>. Publish it on
-    // the root as well, the way --oc-header-height and --oc-titlebar-left-inset
+    // the root as well, the way --mg-header-height and --mg-titlebar-left-inset
     // already are, so the overlay can cap itself to the sidebar.
     React.useEffect(() => {
         document.documentElement.style.setProperty(
-            '--oc-left-sidebar-width',
+            '--mg-left-sidebar-width',
             `${isResizing ? currentWidth : openWidth}px`,
         );
     }, [currentWidth, isResizing, openWidth]);
@@ -151,7 +151,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, isMobile, children, cl
                 width: `${currentWidth}px`,
                 minWidth: `${currentWidth}px`,
                 maxWidth: `${currentWidth}px`,
-                ['--oc-left-sidebar-width' as string]: `${isResizing ? currentWidth : openWidth}px`,
+                ['--mg-left-sidebar-width' as string]: `${isResizing ? currentWidth : openWidth}px`,
                 overflowX: 'clip',
                 transitionProperty: isResizing ? 'none' : 'width, min-width, max-width',
                 transitionDuration: '200ms',
@@ -186,7 +186,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, isMobile, children, cl
                     isResizing && 'pointer-events-none',
                     !isOpen && 'pointer-events-none select-none opacity-0'
                 )}
-                style={{ width: 'var(--oc-left-sidebar-width)', overflowX: 'hidden' }}
+                style={{ width: 'var(--mg-left-sidebar-width)', overflowX: 'hidden' }}
                 aria-hidden={!isOpen}
             >
                 {topBar}

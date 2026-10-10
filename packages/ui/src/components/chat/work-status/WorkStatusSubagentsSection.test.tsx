@@ -81,29 +81,29 @@ describe('subagent status rows', () => {
   });
 
   test('distinguishes unknown, running, retrying and settled status with Tasks icons', async () => {
-    expect(icon()).toBe('#oc-time');
+    expect(icon()).toBe('#mg-time');
     await publish({ sessionStatusReady: true });
-    expect(icon()).toBe('#oc-checkbox-circle');
+    expect(icon()).toBe('#mg-checkbox-circle');
     await publish({ session_status: { child: { type: 'busy' } } });
-    expect(icon()).toBe('#oc-record-circle');
+    expect(icon()).toBe('#mg-record-circle');
     expect(rowContent().textContent).toBe('Child$0.25');
     expect(row().getAttribute('aria-label')).toContain('is working');
     await publish({ session_status: { child: { type: 'retry', attempt: 1, message: 'Retrying', next: 100 } } });
-    expect(icon()).toBe('#oc-record-circle');
+    expect(icon()).toBe('#mg-record-circle');
     expect(container.textContent).toContain('1/1');
     await publish({ session_status: { child: { type: 'idle' } } });
-    expect(icon()).toBe('#oc-checkbox-circle');
+    expect(icon()).toBe('#mg-checkbox-circle');
     expect(rowContent().textContent).toBe('Child$0.25');
     expect(row().getAttribute('aria-label')).toContain('Done');
   });
 
   test('marks a subagent whose last turn failed instead of calling it done', async () => {
     await publish({ sessionStatusReady: true, session_status: { child: { type: 'idle' } } });
-    expect(icon()).toBe('#oc-checkbox-circle');
+    expect(icon()).toBe('#mg-checkbox-circle');
     await act(async () => useGlobalSessionStatusStore.setState({
       observedById: new Map([['child', { directory, outcome: 'failed' }]]),
     }));
-    expect(icon()).toBe('#oc-close-circle');
+    expect(icon()).toBe('#mg-close-circle');
     expect(row().getAttribute('aria-label')).toContain('Failed');
   });
 
@@ -115,15 +115,15 @@ describe('subagent status rows', () => {
       permission: { child: [{ id: 'permission', sessionID: 'child', action: 'bash', resources: ['*'], metadata: {} } as PermissionRequest] },
       form: { child: [childForm] },
     });
-    expect(icon()).toBe('#oc-alert');
+    expect(icon()).toBe('#mg-alert');
     expect(rowContent().textContent).toContain('needs permission');
     expect(rowContent().querySelector('span[title]')).toBeNull();
     await publish({ permission: {} });
-    expect(icon()).toBe('#oc-alert');
+    expect(icon()).toBe('#mg-alert');
     expect(rowContent().textContent).toContain('asked a question');
     expect(rowContent().querySelector('span[title]')).toBeNull();
     await publish({ form: {} });
-    expect(icon()).toBe('#oc-record-circle');
+    expect(icon()).toBe('#mg-record-circle');
     expect(rowContent().querySelector('span[title]')).not.toBeNull();
   });
 

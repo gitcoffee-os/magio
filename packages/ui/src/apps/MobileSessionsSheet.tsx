@@ -208,9 +208,9 @@ const TIMELINE_CHAT_PAGE_SIZE = 3;
 // worktree sessions sit one level deeper. SessionRow adds 16px (dot + gap) on top.
 const PROJECT_SESSION_INDENT = 40;
 /** Expansion key of the "In work" section, alongside project ids. */
-const WORK_SECTION_ID = 'openchamber:work';
+const WORK_SECTION_ID = 'magio:work';
 /** Expansion key of the optional Recent section in the grouped view. */
-const RECENT_SECTION_ID = 'openchamber:recent';
+const RECENT_SECTION_ID = 'magio:recent';
 // Timeline chats align with the timeline rows' text, which has no gutter.
 const TIMELINE_CHAT_INDENT = 12;
 // Extra left padding applied to each nested subsession level.
@@ -991,7 +991,7 @@ export const MobileSessionsSheet: React.FC<MobileSessionsSheetProps> = ({ open, 
     [childrenBySessionId],
   );
 
-  // Managed Chats (sessions under ~/.config/openchamber/chats) are not owned
+  // Managed Chats (sessions under ~/.config/magio/chats) are not owned
   // by any registered project; they get their own section above the project
   // tree, the same split the desktop sidebar makes. Temporary /btw forks are
   // dropped here as well.
@@ -2342,7 +2342,7 @@ export const MobileSessionsSheet: React.FC<MobileSessionsSheetProps> = ({ open, 
         {footer ? (
           <div
             className="flex shrink-0 items-center justify-between gap-2 border-t border-border/70 px-2 pt-1.5"
-            style={{ paddingBottom: 'calc(0.375rem + var(--oc-safe-area-bottom, 0px))' }}
+            style={{ paddingBottom: 'calc(0.375rem + var(--mg-safe-area-bottom, 0px))' }}
           >
             {footer.instanceLabel && footer.onOpenInstances ? (
               <Button
@@ -2555,7 +2555,7 @@ export const MobileSessionsSheet: React.FC<MobileSessionsSheetProps> = ({ open, 
     if (!open) return null;
     return (
       <div className="flex h-full min-h-0 flex-col">
-        <div className="flex h-[var(--oc-header-height,56px)] shrink-0 items-center justify-between gap-2 border-b border-border/70 px-4">
+        <div className="flex h-[var(--mg-header-height,56px)] shrink-0 items-center justify-between gap-2 border-b border-border/70 px-4">
           <h2 className="truncate typography-ui-label font-semibold text-foreground">
             {t('mobile.sessions.sheet.title')}
           </h2>
@@ -2587,7 +2587,7 @@ export const MobileSessionsSheet: React.FC<MobileSessionsSheetProps> = ({ open, 
       }}
       ariaLabel={t('mobile.sessions.sheet.title')}
     >
-      <div className="flex h-[var(--oc-header-height,56px)] shrink-0 items-center gap-2 px-3">
+      <div className="flex h-[var(--mg-header-height,56px)] shrink-0 items-center gap-2 px-3">
         <button
           type="button"
           className="-ml-1 flex size-10 shrink-0 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-interactive-hover hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
@@ -2700,9 +2700,9 @@ const MobileSessionsDrawerContainer: React.FC<{
       aria-modal="true"
       aria-label={ariaLabel}
       aria-hidden={!open}
-      className="oc-keyboard-inset-surface fixed inset-0 z-50 flex flex-col bg-background text-foreground"
+      className="mg-keyboard-inset-surface fixed inset-0 z-50 flex flex-col bg-background text-foreground"
       style={{
-        paddingTop: 'var(--oc-safe-area-top, 0px)',
+        paddingTop: 'var(--mg-safe-area-top, 0px)',
         // Settled state drops the transform entirely so the drawer isn't kept
         // on a compositing layer (iOS clips those to the safe-area viewport).
         transform: entered ? 'none' : 'translateX(-100%)',

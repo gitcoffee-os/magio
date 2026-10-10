@@ -165,7 +165,7 @@ export function InlineCommentInput({
   return (
     <div
       className={cn(
-        'oc-inline-comment-band w-full max-w-[min(100%,calc(var(--oc-context-panel-width,100vw)-var(--oc-editor-gutter-width,0px)))] px-3 py-2 font-sans',
+        'mg-inline-comment-band w-full max-w-[min(100%,calc(var(--mg-context-panel-width,100vw)-var(--mg-editor-gutter-width,0px)))] px-3 py-2 font-sans',
         className
       )}
       style={{

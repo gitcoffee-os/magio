@@ -1,11 +1,11 @@
 import { describe, expect, test } from 'bun:test';
 
-import { OPENCHAMBER_SDK_API_VERSION } from './api-version.ts';
-import { clampStatusSectionHeight, hasGuestPage, requestedGuestCapabilities, resolveAttachEntry, resolveStatusSectionEntry, resolveAttachMode, resolveIntegrationApi, toPublicIntegration, type OpenChamberContributes } from './manifest.ts';
+import { MAGIO_SDK_API_VERSION } from './api-version.ts';
+import { clampStatusSectionHeight, hasGuestPage, requestedGuestCapabilities, resolveAttachEntry, resolveStatusSectionEntry, resolveAttachMode, resolveIntegrationApi, toPublicIntegration, type MagioContributes } from './manifest.ts';
 import { parseManifest, parseManifestJson } from './parse.ts';
 
 const validBlock = {
-  apiVersion: OPENCHAMBER_SDK_API_VERSION,
+  apiVersion: MAGIO_SDK_API_VERSION,
   contributes: {
     panel: {
       id: 'acme-hello',
@@ -68,9 +68,9 @@ describe('parseManifest', () => {
     expect(parseManifest({ ...validBlock, contributes: { ...validBlock.contributes, statusSection: { entry: 'status/index.html', defaultExpanded: 'no' } } })).toMatchObject({ ok: false, code: 'invalid-status-section' });
   });
 
-  test('reads package.json openchamber', () => {
+  test('reads package.json magio', () => {
     const result = parseManifest({
-      openchamber: validBlock,
+      magio: validBlock,
     });
     expect(result.ok).toBe(true);
     if (result.ok) {
@@ -83,7 +83,7 @@ describe('parseManifest', () => {
     const result = parseManifestJson(JSON.stringify({
       name: '@acme/hello-panel',
       version: '1.2.3',
-      openchamber: validBlock,
+      magio: validBlock,
     }));
     expect(result).toMatchObject({
       ok: true,
@@ -96,7 +96,7 @@ describe('parseManifest', () => {
     const result = parseManifestJson(JSON.stringify({
       name: '@acme/hello-panel',
       version: 'latest',
-      openchamber: validBlock,
+      magio: validBlock,
     }));
     expect(result).toMatchObject({ ok: false, code: 'invalid-version' });
   });
@@ -105,7 +105,7 @@ describe('parseManifest', () => {
     const result = parseManifestJson(JSON.stringify({
       name: '@acme/hello-panel',
       extra: true,
-      openchamber: {
+      magio: {
         apiVersion: 1,
         extra: true,
         contributes: {
@@ -139,10 +139,10 @@ describe('parseManifest', () => {
     expect(parseManifestJson('"nope"')).toMatchObject({ ok: false, code: 'not-object' });
   });
 
-  test('rejects a missing or non-object openchamber key', () => {
-    const missing = parseManifestJson('{"name":"@acme/hello-panel","openchamber":null}');
+  test('rejects a missing or non-object magio key', () => {
+    const missing = parseManifestJson('{"name":"@acme/hello-panel","magio":null}');
     expect(missing.ok).toBe(false);
-    if (!missing.ok) expect(missing.code).toBe('missing-openchamber');
+    if (!missing.ok) expect(missing.code).toBe('missing-magio');
   });
 
   test('rejects an unknown apiVersion', () => {
@@ -318,21 +318,21 @@ describe('parseManifest', () => {
     expect(result).toMatchObject({ ok: false, code: 'unsupported-api-version' });
   });
 
-  test('keeps engines.openchamber', () => {
+  test('keeps engines.magio', () => {
     const result = parseManifest({
       ...validBlock,
-      engines: { openchamber: '>=1.22.0' },
+      engines: { magio: '>=1.22.0' },
     });
     expect(result.ok).toBe(true);
     if (result.ok) {
-      expect(result.manifest.engines).toEqual({ openchamber: '>=1.22.0' });
+      expect(result.manifest.engines).toEqual({ magio: '>=1.22.0' });
     }
   });
 
-  test('rejects a junk engines.openchamber range', () => {
+  test('rejects a junk engines.magio range', () => {
     const result = parseManifest({
       ...validBlock,
-      engines: { openchamber: '^1.22.0' },
+      engines: { magio: '^1.22.0' },
     });
     expect(result).toMatchObject({ ok: false, code: 'invalid-engines' });
   });
@@ -693,9 +693,9 @@ describe('parseManifest', () => {
 
   test('reads a token integration', () => {
     const result = parseManifestJson(JSON.stringify({
-      name: '@openchamber/clickup',
-      openchamber: {
-        apiVersion: OPENCHAMBER_SDK_API_VERSION,
+      name: '@magio/clickup',
+      magio: {
+        apiVersion: MAGIO_SDK_API_VERSION,
         contributes: {
           panel: { id: 'clickup', name: 'ClickUp', icon: 'window', entry: 'panel/index.html' },
           integration: {
@@ -720,9 +720,9 @@ describe('parseManifest', () => {
 
   test('reads a host Linear integration', () => {
     const result = parseManifestJson(JSON.stringify({
-      name: '@openchamber/linear',
-      openchamber: {
-        apiVersion: OPENCHAMBER_SDK_API_VERSION,
+      name: '@magio/linear',
+      magio: {
+        apiVersion: MAGIO_SDK_API_VERSION,
         contributes: {
           panel: { id: 'linear-issues', name: 'Linear', icon: 'window', entry: 'panel/index.html' },
           integration: {
@@ -744,9 +744,9 @@ describe('parseManifest', () => {
 
   test('reads an OAuth integration', () => {
     const result = parseManifestJson(JSON.stringify({
-      name: '@openchamber/gitlab',
-      openchamber: {
-        apiVersion: OPENCHAMBER_SDK_API_VERSION,
+      name: '@magio/gitlab',
+      magio: {
+        apiVersion: MAGIO_SDK_API_VERSION,
         contributes: {
           panel: { id: 'gitlab', name: 'GitLab', icon: 'window', entry: 'panel/index.html' },
           integration: {
@@ -909,7 +909,7 @@ describe('contributes.tools', () => {
 
 describe('page-less extensions', () => {
   const pageless = { id: 'tools-only', name: 'Tools Only', icon: 'tools' };
-  const withContributes = (extra: Partial<Omit<OpenChamberContributes, 'panel'>>) => parseManifest({
+  const withContributes = (extra: Partial<Omit<MagioContributes, 'panel'>>) => parseManifest({
     apiVersion: 1,
     contributes: { panel: pageless, ...extra },
   });
@@ -932,7 +932,7 @@ describe('page-less extensions', () => {
   });
 
   test('background-only packages reject visible surfaces and actions that would open a panel', () => {
-    const visible: Partial<Omit<OpenChamberContributes, 'panel'>>[] = [
+    const visible: Partial<Omit<MagioContributes, 'panel'>>[] = [
       { page: true }, { page: { entry: 'page.html' } }, { attach: true }, { attach: 'dialog' },
       { actions: [{ id: 'inspect', label: 'Inspect', where: 'message' }] },
       { actions: [{ id: 'inspect', label: 'Inspect', where: 'session', mode: 'open' }] },
@@ -970,7 +970,7 @@ describe('page-less extensions', () => {
   });
 
   test('refuses every page-only contribution without entry as invalid-panel', () => {
-    const cases: Partial<Omit<OpenChamberContributes, 'panel'>>[] = [
+    const cases: Partial<Omit<MagioContributes, 'panel'>>[] = [
       { attach: true },
       { attach: 'panel' },
       { attach: 'dialog' },

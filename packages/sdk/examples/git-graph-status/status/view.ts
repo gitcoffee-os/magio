@@ -7,17 +7,17 @@ const MAX_LANES = 8;
 const SVG = 'http://www.w3.org/2000/svg';
 // Older hosts lack syntax tokens; the existing semantic palette remains their fallback.
 const LANE_COLORS = [
-  'var(--oc-syntax-keyword, var(--oc-primary))',
-  'var(--oc-syntax-string, var(--oc-info))',
-  'var(--oc-syntax-number, var(--oc-success))',
-  'var(--oc-syntax-function, var(--oc-warning))',
-  'var(--oc-syntax-type, var(--oc-error))',
+  'var(--mg-syntax-keyword, var(--mg-primary))',
+  'var(--mg-syntax-string, var(--mg-info))',
+  'var(--mg-syntax-number, var(--mg-success))',
+  'var(--mg-syntax-function, var(--mg-warning))',
+  'var(--mg-syntax-type, var(--mg-error))',
 ];
 
 export type RefKind = 'local' | 'remote' | 'tag';
 
 export const STYLE = `
-  html, body { margin: 0; background: transparent; color: var(--oc-fg); font: 12px/1.35 var(--oc-font); }
+  html, body { margin: 0; background: transparent; color: var(--mg-fg); font: 12px/1.35 var(--mg-font); }
   /* The host stops growing the frame at its maximum; past that the page scrolls. */
   html, body { height: 100%; overflow-y: auto; overflow-x: hidden; }
   button { font: inherit; color: inherit; }
@@ -25,63 +25,63 @@ export const STYLE = `
   .bar .grow { flex: 1; }
   .picker { display: flex; flex-direction: column; gap: 2px; max-height: 104px; overflow-y: auto; padding: 0 2px 6px; }
   .bar[hidden], .picker[hidden] { display: none; }
-  .picker-group { color: var(--oc-muted); font-size: 11px; padding-top: 2px; }
-  .note { color: var(--oc-muted); padding: 6px 2px; }
+  .picker-group { color: var(--mg-muted); font-size: 11px; padding-top: 2px; }
+  .note { color: var(--mg-muted); padding: 6px 2px; }
   .commit { display: flex; flex-direction: column; }
   .head { all: unset; box-sizing: border-box; display: flex; align-items: stretch; gap: 6px; width: 100%; height: ${ROW}px;
     cursor: pointer; border-radius: 6px; }
-  .head:hover { background: var(--oc-hover); }
-  .head:focus-visible { box-shadow: 0 0 0 2px var(--oc-focus); }
-  .commit.open > .head { background: var(--oc-selection); color: var(--oc-selection-fg); }
+  .head:hover { background: var(--mg-hover); }
+  .head:focus-visible { box-shadow: 0 0 0 2px var(--mg-focus); }
+  .commit.open > .head { background: var(--mg-selection); color: var(--mg-selection-fg); }
   .graph { flex: none; display: block; }
   .text { min-width: 0; flex: 1; display: flex; flex-direction: column; justify-content: center; }
   .line { display: flex; align-items: center; gap: 4px; min-width: 0; }
   .subject { min-width: 0; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .meta { color: var(--oc-muted); font-size: 11px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .meta { color: var(--mg-muted); font-size: 11px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .commit.open .meta { color: inherit; opacity: .8; }
   .ref { flex: none; max-width: 40%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
     border-radius: 4px; padding: 0 4px; font-size: 10px; line-height: 15px; font-weight: 600; }
-  .ref.head-ref { background: var(--oc-primary); color: var(--oc-primary-fg); }
-  .ref.local { background: var(--oc-hover); color: var(--oc-fg); }
-  .ref.remote { background: color-mix(in srgb, var(--oc-info) 18%, transparent); color: var(--oc-info-text); }
-  .ref.tag { background: color-mix(in srgb, var(--oc-warning) 18%, transparent); color: var(--oc-warning-text); }
-  .dirty .subject { font-style: italic; color: var(--oc-muted); }
+  .ref.head-ref { background: var(--mg-primary); color: var(--mg-primary-fg); }
+  .ref.local { background: var(--mg-hover); color: var(--mg-fg); }
+  .ref.remote { background: color-mix(in srgb, var(--mg-info) 18%, transparent); color: var(--mg-info-text); }
+  .ref.tag { background: color-mix(in srgb, var(--mg-warning) 18%, transparent); color: var(--mg-warning-text); }
+  .dirty .subject { font-style: italic; color: var(--mg-muted); }
   .dirty > .head { cursor: default; }
   .dirty > .head:hover { background: transparent; }
   .details { display: flex; gap: 6px; }
   .rail { flex: none; position: relative; }
   .rail svg { position: absolute; inset: 0; width: 100%; height: 100%; }
   .card { min-width: 0; flex: 1; display: flex; flex-direction: column; gap: 4px; margin: 2px 0 8px; padding: 8px;
-    border: 1px solid var(--oc-border); border-radius: var(--oc-radius); background: var(--oc-elevated); color: var(--oc-elevated-fg); }
+    border: 1px solid var(--mg-border); border-radius: var(--mg-radius); background: var(--mg-elevated); color: var(--mg-elevated-fg); }
   .card .full { font-weight: 600; white-space: pre-wrap; overflow-wrap: anywhere; }
-  .card .body { color: var(--oc-muted); white-space: pre-wrap; overflow-wrap: anywhere; max-height: 72px; overflow-y: auto; }
-  .card .row { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; color: var(--oc-muted); }
-  .card .add { color: var(--oc-success-text); }
-  .card .del { color: var(--oc-error-text); }
-  .card code { font-family: var(--oc-mono); color: var(--oc-elevated-fg); }
+  .card .body { color: var(--mg-muted); white-space: pre-wrap; overflow-wrap: anywhere; max-height: 72px; overflow-y: auto; }
+  .card .row { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; color: var(--mg-muted); }
+  .card .add { color: var(--mg-success-text); }
+  .card .del { color: var(--mg-error-text); }
+  .card code { font-family: var(--mg-mono); color: var(--mg-elevated-fg); }
   .card .actions { display: flex; gap: 6px; flex-wrap: wrap; padding-top: 2px; }
-  .card .error { color: var(--oc-error-text); }
+  .card .error { color: var(--mg-error-text); }
    .popover-card { display: flex; flex-direction: column; gap: 6px; box-sizing: border-box; min-height: 0; padding: 10px;
-     color: var(--oc-elevated-fg); }
+     color: var(--mg-elevated-fg); }
    .popover-author { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; min-width: 0; }
    .popover-initials { display: inline-flex; align-items: center; justify-content: center; flex: none; width: 20px; height: 20px;
-     border-radius: 4px; background: var(--oc-selection); color: var(--oc-selection-fg); font-size: 10px; font-weight: 600; }
+     border-radius: 4px; background: var(--mg-selection); color: var(--mg-selection-fg); font-size: 10px; font-weight: 600; }
    .popover-author-name { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 600; }
-   .popover-meta, .popover-body, .popover-stats, .popover-feedback { color: var(--oc-muted); font-size: 11px; }
+   .popover-meta, .popover-body, .popover-stats, .popover-feedback { color: var(--mg-muted); font-size: 11px; }
    .popover-subject { font-weight: 600; white-space: pre-wrap; overflow-wrap: anywhere; }
    .popover-body { max-height: 72px; overflow-y: auto; white-space: pre-wrap; overflow-wrap: anywhere; }
    .popover-refs, .popover-stats, .popover-actions { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
    .popover-refs .ref { max-width: 100%; }
-   .popover-stats .add { color: var(--oc-success-text); }
-   .popover-stats .del { color: var(--oc-error-text); }
+   .popover-stats .add { color: var(--mg-success-text); }
+   .popover-stats .del { color: var(--mg-error-text); }
    .popover-actions { padding-top: 2px; }
-   .popover-actions code { margin-right: auto; font-family: var(--oc-mono); }
-   .popover-feedback { min-height: 14px; color: var(--oc-error-text); }
+   .popover-actions code { margin-right: auto; font-family: var(--mg-mono); }
+   .popover-feedback { min-height: 14px; color: var(--mg-error-text); }
    .popover-feedback:empty { display: none; }
 `;
 
 const laneX = (lane: number): number => LANE / 2 + lane * LANE;
-const laneColor = (lane: number): string => LANE_COLORS[lane % LANE_COLORS.length] ?? 'var(--oc-muted)';
+const laneColor = (lane: number): string => LANE_COLORS[lane % LANE_COLORS.length] ?? 'var(--mg-muted)';
 
 const svgNode = <K extends keyof SVGElementTagNameMap>(name: K, attributes: Record<string, string | number>): SVGElementTagNameMap[K] => {
   const node = document.createElementNS(SVG, name);
@@ -121,7 +121,7 @@ export const drawRowGraph = (row: GraphRow, width: number, dot: 'commit' | 'head
     const color = laneColor(row.lane);
     const circle = svgNode('circle', {
       cx: x, cy: mid, r: dot === 'head' ? 4.5 : 3.5,
-      fill: dot === 'dirty' ? 'var(--oc-bg)' : color, stroke: dot === 'dirty' ? color : 'var(--oc-bg)', 'stroke-width': dot === 'dirty' ? 1.5 : 2,
+      fill: dot === 'dirty' ? 'var(--mg-bg)' : color, stroke: dot === 'dirty' ? color : 'var(--mg-bg)', 'stroke-width': dot === 'dirty' ? 1.5 : 2,
     });
     if (dot === 'dirty') circle.setAttribute('stroke-dasharray', '2 2');
     svg.append(circle);

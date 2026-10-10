@@ -22,12 +22,12 @@ export const useNativeMobileChrome = (): void => {
     const root = document.documentElement;
     // Marks the Capacitor shell so keyboard-inset CSS only applies here, not in
     // the browser-hosted PWA (which handles the keyboard via dvh / interactive-widget).
-    root.classList.add('oc-capacitor-app');
+    root.classList.add('mg-capacitor-app');
     // Platform marker: Android resizes the window for the keyboard natively (no manual
     // inset/choreography — the keyboard listeners below skip Android entirely).
     const capacitorPlatform = (window as typeof window & { Capacitor?: { getPlatform?: () => string } }).Capacitor?.getPlatform?.();
     if (capacitorPlatform === 'android') {
-      root.classList.add('oc-platform-android');
+      root.classList.add('mg-platform-android');
     }
 
     // iOS reports hardware keyboards natively (GCKeyboard); adopting that
@@ -35,7 +35,7 @@ export const useNativeMobileChrome = (): void => {
     cleanup.push(startHardwareKeyboardBridge());
 
     const setInset = (px: number) => {
-      root.style.setProperty('--oc-keyboard-inset', `${Math.max(0, Math.round(px))}px`);
+      root.style.setProperty('--mg-keyboard-inset', `${Math.max(0, Math.round(px))}px`);
     };
 
     void import('@capacitor/status-bar').then(async ({ StatusBar, Style }) => {
@@ -50,7 +50,7 @@ export const useNativeMobileChrome = (): void => {
           // Inset the WebView below the bar and paint it with the resolved theme background
           // (the splash colours the theme system persists). On Android 15+ edge-to-edge is
           // enforced and both calls are no-ops — there the app pads itself via the
-          // Capacitor-injected --safe-area-inset-* CSS vars (see mobile.css, oc-platform-android).
+          // Capacitor-injected --safe-area-inset-* CSS vars (see mobile.css, mg-platform-android).
           const isDark = document.documentElement.classList.contains('dark');
           const themeBg =
             (isDark ? localStorage.getItem('splashBgDark') : localStorage.getItem('splashBgLight')) ||
@@ -106,35 +106,35 @@ export const useNativeMobileChrome = (): void => {
     void import('@capacitor/keyboard').then(async ({ Keyboard }) => {
       if (disposed) return;
       // iOS (WKWebView, resize: 'none') keeps 100dvh at full height with the keyboard
-      // overlaying, so we lift the UI manually via --oc-keyboard-inset. Android resizes the
+      // overlaying, so we lift the UI manually via --mg-keyboard-inset. Android resizes the
       // window for the keyboard (dvh already shrinks), so applying the inset on top would
       // double-count — Android gets only the class/event signals below.
       const platform = (window as typeof window & { Capacitor?: { getPlatform?: () => string } }).Capacitor?.getPlatform?.();
       if (platform === 'android') {
         // Android resizes the WebView natively, so no inset/transform
         // choreography — but the UI still needs the open/closed signal:
-        // oc-keyboard-open drives CSS (draft starters, composer padding), and
+        // mg-keyboard-open drives CSS (draft starters, composer padding), and
         // the settled event gives the chat its one deterministic re-pin after
         // the native resize (the auto-follow idle gate ignores it otherwise).
         const willShowHandle = await Keyboard.addListener('keyboardWillShow', (info) => {
           observeNativeKeyboardHeight(info.keyboardHeight);
-          root.classList.add('oc-keyboard-open');
+          root.classList.add('mg-keyboard-open');
           // The composer already expanded on tap — re-pin the chat to it now,
           // so the native resize that follows is the only remaining movement.
-          window.dispatchEvent(new CustomEvent('oc:keyboard-settled', { detail: { open: true } }));
+          window.dispatchEvent(new CustomEvent('mg:keyboard-settled', { detail: { open: true } }));
         });
         const didShowHandle = await Keyboard.addListener('keyboardDidShow', () => {
-          window.dispatchEvent(new CustomEvent('oc:keyboard-settled', { detail: { open: true } }));
+          window.dispatchEvent(new CustomEvent('mg:keyboard-settled', { detail: { open: true } }));
         });
         const willHideHandle = await Keyboard.addListener('keyboardWillHide', () => {
           // Same single-motion trick as iOS: collapse the composer into the
           // pill synchronously (flushSync in ChatInput) so the native window
           // growth and the composer shrink land together, not as two steps.
-          window.dispatchEvent(new CustomEvent('oc:keyboard-intent', { detail: { open: false } }));
-          root.classList.remove('oc-keyboard-open');
+          window.dispatchEvent(new CustomEvent('mg:keyboard-intent', { detail: { open: false } }));
+          root.classList.remove('mg-keyboard-open');
         });
         const didHideHandle = await Keyboard.addListener('keyboardDidHide', () => {
-          window.dispatchEvent(new CustomEvent('oc:keyboard-settled', { detail: { open: false } }));
+          window.dispatchEvent(new CustomEvent('mg:keyboard-settled', { detail: { open: false } }));
         });
         const removeAll = () => {
           void willShowHandle.remove();
@@ -157,12 +157,12 @@ export const useNativeMobileChrome = (): void => {
       // block in mobile.css for the full picture). `keyboardWillShow` fires at the
       // START of the iOS keyboard animation and carries the final height; the
       // visible motion is transform-only (inline styles on the kb-movers), and the shell's layout
-      // height (--oc-kb-layout) snaps exactly once per open/close at the moment the
+      // height (--mg-kb-layout) snaps exactly once per open/close at the moment the
       // resize is invisible. visualViewport tracking was tried but doesn't shrink
       // under WKWebView's `resize: 'none'`, so these events are the reliable signal.
       // Durations and curve are shared with the composer morph and the
       // scroller inset tween (mobileKeyboardTiming.ts); the hide leg is also
-      // mirrored by the .oc-kb-hide transition-duration override in mobile.css.
+      // mirrored by the .mg-kb-hide transition-duration override in mobile.css.
       const KB_ANIM_MS = KEYBOARD_SHOW_MS;
       const KB_HIDE_MS = KEYBOARD_HIDE_MS;
       const KB_ANIM_EASING = KEYBOARD_EASING_CSS;
@@ -182,7 +182,7 @@ export const useNativeMobileChrome = (): void => {
           settleTimer = null;
         }
       };
-      const dispatchKb = (type: 'oc:keyboard-intent' | 'oc:keyboard-anim' | 'oc:keyboard-settled', detail: Record<string, unknown>) => {
+      const dispatchKb = (type: 'mg:keyboard-intent' | 'mg:keyboard-anim' | 'mg:keyboard-settled', detail: Record<string, unknown>) => {
         window.dispatchEvent(new CustomEvent(type, { detail }));
       };
       // Elements that ride the keyboard slide, with their travel factor. Driven
@@ -191,15 +191,15 @@ export const useNativeMobileChrome = (): void => {
       // left the composer parked until the keyboard finished.
       const getKbMovers = (): Array<{ el: HTMLElement; factor: number }> => {
         const movers: Array<{ el: HTMLElement; factor: number }> = [];
-        const composer = document.querySelector<HTMLElement>('.oc-mobile-composer');
+        const composer = document.querySelector<HTMLElement>('.mg-mobile-composer');
         if (composer) movers.push({ el: composer, factor: 1 });
         // Status row, recap hint and scroll-to-end button sit on the slot's
         // top edge outside the form; they ride the same slide.
-        const riders = document.querySelector<HTMLElement>('.oc-composer-riders');
+        const riders = document.querySelector<HTMLElement>('.mg-composer-riders');
         if (riders) movers.push({ el: riders, factor: 1 });
         // The centered draft title moves half the shift — exactly where the
         // center lands after the shell snap (see mobile.css notes).
-        const draftCenter = document.querySelector<HTMLElement>('.oc-draft-center');
+        const draftCenter = document.querySelector<HTMLElement>('.mg-draft-center');
         if (draftCenter) movers.push({ el: draftCenter, factor: 0.5 });
         return movers;
       };
@@ -219,11 +219,11 @@ export const useNativeMobileChrome = (): void => {
           // The shell's resolved padding-bottom while the keyboard is down IS the
           // bottom safe padding it gives up when open — measure it so the slide
           // distance lands the composer exactly where the final layout puts it.
-          const shell = document.querySelector('.oc-mobile-app-shell');
+          const shell = document.querySelector('.mg-mobile-app-shell');
           safeBottomPx = shell ? parseFloat(getComputedStyle(shell).paddingBottom) || 0 : 0;
         }
         const slide = Math.max(0, keyboardHeight - safeBottomPx);
-        root.classList.remove('oc-kb-hide');
+        root.classList.remove('mg-kb-hide');
         // WKWebView renders the caret as a native layer that doesn't ride CSS
         // transforms — after the rise it visibly "flies" from the pre-keyboard
         // position to the final one. Hide it for the transition (plus the lag
@@ -232,7 +232,7 @@ export const useNativeMobileChrome = (): void => {
           window.clearTimeout(caretTimer);
           caretTimer = null;
         }
-        root.classList.add('oc-keyboard-open', 'oc-kb-animating', 'oc-kb-caret-hold');
+        root.classList.add('mg-keyboard-open', 'mg-kb-animating', 'mg-kb-caret-hold');
         setInset(keyboardHeight);
         for (const { el, factor } of getKbMovers()) {
             el.style.transition = `transform ${KB_ANIM_MS}ms ${KB_ANIM_EASING}`;
@@ -245,21 +245,21 @@ export const useNativeMobileChrome = (): void => {
         // `slide` (keyboard minus the safe inset the shell gives up) is exactly
         // the strip the scroller loses at settle, so the glide's destination
         // and the settle snap stay geometry-neutral.
-        setVar('--oc-kb-scroll-inset', slide);
-        dispatchKb('oc:keyboard-anim', { phase: 'show', slide, durationMs: KB_ANIM_MS, easing: KB_ANIM_EASING });
+        setVar('--mg-kb-scroll-inset', slide);
+        dispatchKb('mg:keyboard-anim', { phase: 'show', slide, durationMs: KB_ANIM_MS, easing: KB_ANIM_EASING });
         settleTimer = window.setTimeout(() => {
           settleTimer = null;
           // Invisible swap: transition off, layout takes the keyboard height (one
           // reflow), shift returns to 0 in the same frame.
-          root.classList.remove('oc-kb-animating');
-          setVar('--oc-kb-layout', keyboardHeight);
+          root.classList.remove('mg-kb-animating');
+          setVar('--mg-kb-layout', keyboardHeight);
           layoutApplied = true;
           clearKbMovers();
-          dispatchKb('oc:keyboard-settled', { open: true });
+          dispatchKb('mg:keyboard-settled', { open: true });
           // Reveal the caret only after UIKit's own caret reposition window.
           caretTimer = window.setTimeout(() => {
             caretTimer = null;
-            root.classList.remove('oc-kb-caret-hold');
+            root.classList.remove('mg-kb-caret-hold');
           }, 250);
         }, KB_ANIM_MS + 20);
       });
@@ -278,14 +278,14 @@ export const useNativeMobileChrome = (): void => {
         // pill synchronously (flushSync in ChatInput), so the keyboard hide
         // compensation below measures keyboard + composer shrink as ONE delta
         // instead of two staggered steps.
-        dispatchKb('oc:keyboard-intent', { open: false });
+        dispatchKb('mg:keyboard-intent', { open: false });
         if (caretTimer !== null) {
           window.clearTimeout(caretTimer);
           caretTimer = null;
         }
-        root.classList.remove('oc-kb-caret-hold');
+        root.classList.remove('mg-kb-caret-hold');
         const slide = Math.max(0, keyboardHeight - safeBottomPx);
-        root.classList.remove('oc-keyboard-open');
+        root.classList.remove('mg-keyboard-open');
         setInset(0);
         // The scroller keeps its keyboard padding until the keyboard has
         // landed: the follow glide moves scrollTop down to where the end will
@@ -296,8 +296,8 @@ export const useNativeMobileChrome = (): void => {
           // Settled-open → restore the full-height layout NOW (still hidden behind
           // the keyboard) and FLIP the movers to their raised position without
           // transitioning, so the next frame looks unchanged.
-          root.classList.remove('oc-kb-animating');
-          setVar('--oc-kb-layout', 0);
+          root.classList.remove('mg-kb-animating');
+          setVar('--mg-kb-layout', 0);
           layoutApplied = false;
           for (const { el, factor } of getKbMovers()) {
             el.style.transition = 'none';
@@ -305,22 +305,22 @@ export const useNativeMobileChrome = (): void => {
           }
           // Force the style/layout flush so the transition below starts from the
           // FLIP position instead of coalescing both writes into one frame.
-          void (document.querySelector('.oc-mobile-app-shell') as HTMLElement | null)?.offsetHeight;
+          void (document.querySelector('.mg-mobile-app-shell') as HTMLElement | null)?.offsetHeight;
         }
         // If the hide interrupted a show mid-animation (layout not applied yet),
         // the movers transition back down from wherever they currently are.
-        dispatchKb('oc:keyboard-anim', { phase: 'hide', slide, durationMs: KB_HIDE_MS, easing: KB_ANIM_EASING });
-        root.classList.add('oc-kb-animating', 'oc-kb-hide');
+        dispatchKb('mg:keyboard-anim', { phase: 'hide', slide, durationMs: KB_HIDE_MS, easing: KB_ANIM_EASING });
+        root.classList.add('mg-kb-animating', 'mg-kb-hide');
         for (const { el } of getKbMovers()) {
             el.style.transition = `transform ${KB_HIDE_MS}ms ${KB_ANIM_EASING}`;
             el.style.transform = 'translateY(0px)';
         }
         settleTimer = window.setTimeout(() => {
           settleTimer = null;
-          root.classList.remove('oc-kb-animating', 'oc-kb-hide');
+          root.classList.remove('mg-kb-animating', 'mg-kb-hide');
           clearKbMovers();
-          setVar('--oc-kb-scroll-inset', 0);
-          dispatchKb('oc:keyboard-settled', { open: false });
+          setVar('--mg-kb-scroll-inset', 0);
+          dispatchKb('mg:keyboard-settled', { open: false });
         }, KB_HIDE_MS + 20);
       };
 
@@ -371,11 +371,11 @@ export const useNativeMobileChrome = (): void => {
       disposed = true;
       cleanup.forEach((remove) => remove());
       resetHardwareKeyboardDetection();
-      root.classList.remove('oc-capacitor-app', 'oc-keyboard-open', 'oc-kb-animating', 'oc-kb-hide', 'oc-kb-caret-hold', 'oc-platform-android');
-      root.style.removeProperty('--oc-keyboard-inset');
-      root.style.removeProperty('--oc-kb-shift');
-      root.style.removeProperty('--oc-kb-layout');
-      root.style.removeProperty('--oc-kb-scroll-inset');
+      root.classList.remove('mg-capacitor-app', 'mg-keyboard-open', 'mg-kb-animating', 'mg-kb-hide', 'mg-kb-caret-hold', 'mg-platform-android');
+      root.style.removeProperty('--mg-keyboard-inset');
+      root.style.removeProperty('--mg-kb-shift');
+      root.style.removeProperty('--mg-kb-layout');
+      root.style.removeProperty('--mg-kb-scroll-inset');
     };
   }, []);
 };
@@ -411,7 +411,7 @@ export const useNativeMobileLifecycle = (onResume: () => void): void => {
     void import('@capacitor/app').then(async ({ App }) => {
       if (disposed) return;
       const state = await App.addListener('appStateChange', ({ isActive }) => {
-        document.documentElement.classList.toggle('oc-native-app-active', isActive);
+        document.documentElement.classList.toggle('mg-native-app-active', isActive);
         if (!isActive) {
           wasInactiveRef.current = true;
           return;

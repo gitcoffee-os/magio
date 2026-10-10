@@ -25,7 +25,7 @@ JSON bodies enabled in `opencode/core-routes.js`; stopped by
 ## Auto routing
 
 `resolveAutoSelection` (the routing runtime) runs right before the send when
-the queued send config names `openchamber/auto`, and answers with the real
+the queued send config names `magio/auto`, and answers with the real
 model and agent. OpenCode 2.x holds both on the session, so the queue applies
 them with the `POST /api/session/:id/model` and `/agent` calls it already
 makes. The queue captures the sentinel like any other send config.
@@ -95,8 +95,8 @@ persistence, retries, directory query and delivery gates remain unchanged.
 
 ## Queue file
 
-`<data-dir>/message-queue.json` (`OPENCHAMBER_DATA_DIR` or
-`~/.config/openchamber`): `{ version, revision, sessions: { [sessionId]:
+`<data-dir>/message-queue.json` (`MAGIO_DATA_DIR` or
+`~/.config/magio`): `{ version, revision, sessions: { [sessionId]:
 { directory, items } } }`, written atomically (temp file + rename) through a
 serialized write chain. A missing file is an empty queue. A malformed file is
 a failure, not an empty queue: it is moved aside as
@@ -141,7 +141,7 @@ persisted "sending" flag would strand a message forever.
 5. The head is marked in flight (broadcast), then sent. The captured model and
    agent are switched onto the session first (`POST /session/:id/model`,
    `/agent`), because v2 holds both on the session rather than in the body; a
-   captured `openchamber/auto` is resolved into a real pair by the routing
+   captured `magio/auto` is resolved into a real pair by the routing
    runtime beforehand. Then the captured context goes ahead as synthetic
    messages (`POST /session/:id/synthetic` with `resume: false`, an attached
    item's metadata riding along), followed by pending project knowledge
@@ -175,7 +175,7 @@ minutes while the run continues. Releasing arms a dispatch.
 
 ## Routes (`/api/message-queue`)
 
-Normal authenticated OpenChamber runtime routes; never on browser URL-token
+Normal authenticated Magio runtime routes; never on browser URL-token
 allowlists.
 
 | Route | Purpose |
@@ -189,10 +189,10 @@ allowlists.
 | `DELETE .../sessions/:id` | Clear; the in-flight item stays |
 | `PUT .../sessions/:id/hold` | `{ held, ttlMs? }` |
 
-Every mutation broadcasts `openchamber:message-queue.updated` with
+Every mutation broadcasts `magio:message-queue.updated` with
 `{ revision, session }` to all connected clients (SSE and WS), so several
 devices on one server see one queue. SSE uses the shared control stream at
-`/api/openchamber/events`; `/api/global/event` carries no OpenChamber events.
+`/api/magio/events`; `/api/global/event` carries no Magio events.
 The UI subscribes independently of its OpenCode transport and re-reads the
 snapshot whenever either stream reconnects. The session in that payload always names
 its `directory`, including the broadcast that removes the last item: the UI
@@ -208,5 +208,5 @@ by the route family's 50 MB JSON limit.
 
 `packages/ui/src/stores/messageQueueStore.ts` is the projection: see its
 section in `packages/ui/src/stores/DOCUMENTATION.md`. VS Code intentionally
-does not use this module; with all OpenChamber webviews closed, queued
+does not use this module; with all Magio webviews closed, queued
 messages there are not delivered.

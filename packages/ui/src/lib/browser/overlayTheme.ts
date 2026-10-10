@@ -1,5 +1,5 @@
 /**
- * Resolves OpenChamber theme tokens into concrete color strings.
+ * Resolves Magio theme tokens into concrete color strings.
  *
  * The annotation overlay renders inside a page we do not control, so it cannot
  * reference our CSS variables — that page has its own `:root`. Theme tokens can
@@ -67,9 +67,9 @@ export const resolveAnnotationOverlayTheme = (colorScheme: 'light' | 'dark'): Br
 
     // The same recipe the app's tooltips and popovers use, resolved here
     // because the overlay cannot reach our stylesheet from inside the page.
-    const glassOpacity = probe.readVariable('--oc-glass-tooltip-opacity') || '62%';
-    const blur = probe.readVariable('--oc-glass-blur') || '26px';
-    const saturation = probe.readVariable('--oc-glass-saturation') || '1.16';
+    const glassOpacity = probe.readVariable('--mg-glass-tooltip-opacity') || '62%';
+    const blur = probe.readVariable('--mg-glass-blur') || '26px';
+    const saturation = probe.readVariable('--mg-glass-saturation') || '1.16';
 
     return {
       colorScheme,

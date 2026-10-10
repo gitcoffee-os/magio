@@ -12,8 +12,8 @@ describe('attachment citation links', () => {
     });
 
     test('rejects other links and malformed attachment links', () => {
-        expect(parseAttachmentHref('#openchamber-skill:review')).toBeNull();
-        expect(parseAttachmentHref('#openchamber-attachment:png')).toBeNull();
-        expect(parseAttachmentHref('#openchamber-attachment:png:%E0%A4%A')).toBeNull();
+        expect(parseAttachmentHref('#magio-skill:review')).toBeNull();
+        expect(parseAttachmentHref('#magio-attachment:png')).toBeNull();
+        expect(parseAttachmentHref('#magio-attachment:png:%E0%A4%A')).toBeNull();
     });
 });

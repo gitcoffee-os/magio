@@ -39,7 +39,7 @@ export const resolveGuestFrameUrl = async (
   if (runtimeKey !== getRuntimeKey()) throw new Error('Runtime changed while authorizing extension frame');
   return {
     kind: 'url',
-    url: getRuntimeUrlResolver().assetWithUrlToken(`/api/guests/${guestId}/${entry}`, token, { oc_ui: 'issue-page' }),
+    url: getRuntimeUrlResolver().assetWithUrlToken(`/api/guests/${guestId}/${entry}`, token, { mg_ui: 'issue-page' }),
     expiresAt,
   };
 };

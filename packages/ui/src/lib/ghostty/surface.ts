@@ -737,11 +737,11 @@ export class GhosttyTerminalSurface {
     options: GhosttyTerminalSurfaceOptions,
   ): Promise<GhosttyTerminalSurface> {
     const canvas = document.createElement('canvas');
-    canvas.className = 'oc-terminal-canvas';
+    canvas.className = 'mg-terminal-canvas';
     canvas.setAttribute('aria-hidden', 'true');
 
     const input = document.createElement('textarea');
-    input.className = 'oc-terminal-input';
+    input.className = 'mg-terminal-input';
     input.setAttribute('aria-label', options.labels.input);
     input.setAttribute('autocorrect', 'off');
     input.autocapitalize = 'off';
@@ -749,14 +749,14 @@ export class GhosttyTerminalSurface {
     input.spellcheck = false;
 
     const scrollbar = document.createElement('div');
-    scrollbar.className = 'oc-terminal-scrollbar';
+    scrollbar.className = 'mg-terminal-scrollbar';
     scrollbar.setAttribute('role', 'scrollbar');
     scrollbar.setAttribute('aria-label', options.labels.scrollbar);
     scrollbar.setAttribute('aria-orientation', 'vertical');
     scrollbar.tabIndex = -1;
     scrollbar.hidden = true;
     const scrollbarThumb = document.createElement('div');
-    scrollbarThumb.className = 'oc-terminal-scrollbar-thumb';
+    scrollbarThumb.className = 'mg-terminal-scrollbar-thumb';
     scrollbar.append(scrollbarThumb);
     mount.replaceChildren(canvas, input, scrollbar);
     // Size the backing store before the browser paints this canvas for the

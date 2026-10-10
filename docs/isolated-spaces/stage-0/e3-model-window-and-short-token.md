@@ -13,19 +13,19 @@ Run on 2026-09-19. Colima, Docker 29.2.1, linux/arm64. OpenCode `1.18.31` from `
 The scratch files were temporary and are not kept. `gk/` held `window.js`, `corridor.js`, `upstream.js`, the allowlists and a Dockerfile. `space/` holds the Dockerfile, both `opencode.json` files and the test scripts `turn.sh`, `prove.sh`, `trace.sh`, `dnsnames.py`, `serve-trace.sh`, `corridor-clients.sh`, `p3.sh`.
 
 ```
-docker build -t oc-s0-e3-gk gk ; docker build -t oc-s0-e3-space space
-docker network create --internal oc-s0-e3-inner ; docker network create oc-s0-e3-outer
-docker run -d --name oc-s0-e3-upstream --network oc-s0-e3-outer oc-s0-e3-gk node /gk/upstream.js
-docker run -d --name oc-s0-e3-gatekeeper --network oc-s0-e3-inner --network-alias gatekeeper oc-s0-e3-gk
-docker network connect oc-s0-e3-outer oc-s0-e3-gatekeeper
-docker run -d --name oc-s0-e3-space --network oc-s0-e3-inner --cap-drop ALL --security-opt no-new-privileges oc-s0-e3-space
-docker exec -d oc-s0-e3-gatekeeper sh -c 'mkfifo /gk/grants.fifo; while true; do cat /gk/grants.fifo; done | node /gk/window.js > /gk/window.log 2>&1'
-docker exec -d oc-s0-e3-gatekeeper sh -c 'node /gk/corridor.js > /gk/corridor.log 2>&1'
-printf '%s\n' '{"fakeai":{"upstream":"http://oc-s0-e3-upstream:9000/v1","header":"authorization","key":"sk-REAL-held-by-gatekeeper"}, ...}' | docker exec -i oc-s0-e3-gatekeeper sh -c 'cat > /gk/grants.fifo'
-docker exec oc-s0-e3-space bash /tmp/turn.sh fakeai/fake-1        # also openai/gpt-5.4-mini, anthropic/claude-haiku-4-5
-docker exec oc-s0-e3-space bash /tmp/prove.sh 172.19.0.2
-docker exec -e HTTPS_PROXY=http://gatekeeper:3128 -e HTTP_PROXY=http://gatekeeper:3128 -e NO_PROXY=gatekeeper,localhost,127.0.0.1 oc-s0-e3-space bash /tmp/corridor-clients.sh
-docker exec <same proxy env> -e OPENCODE_DISABLE_MODELS_FETCH=1 -e OPENCODE_DISABLE_AUTOUPDATE=1 oc-s0-e3-space bash /tmp/p3.sh file-fresh   # then file-stale, env-vs-put, put-live, put-first, put-late
+docker build -t mg-s0-e3-gk gk ; docker build -t mg-s0-e3-space space
+docker network create --internal mg-s0-e3-inner ; docker network create mg-s0-e3-outer
+docker run -d --name mg-s0-e3-upstream --network mg-s0-e3-outer mg-s0-e3-gk node /gk/upstream.js
+docker run -d --name mg-s0-e3-gatekeeper --network mg-s0-e3-inner --network-alias gatekeeper mg-s0-e3-gk
+docker network connect mg-s0-e3-outer mg-s0-e3-gatekeeper
+docker run -d --name mg-s0-e3-space --network mg-s0-e3-inner --cap-drop ALL --security-opt no-new-privileges mg-s0-e3-space
+docker exec -d mg-s0-e3-gatekeeper sh -c 'mkfifo /gk/grants.fifo; while true; do cat /gk/grants.fifo; done | node /gk/window.js > /gk/window.log 2>&1'
+docker exec -d mg-s0-e3-gatekeeper sh -c 'node /gk/corridor.js > /gk/corridor.log 2>&1'
+printf '%s\n' '{"fakeai":{"upstream":"http://mg-s0-e3-upstream:9000/v1","header":"authorization","key":"sk-REAL-held-by-gatekeeper"}, ...}' | docker exec -i mg-s0-e3-gatekeeper sh -c 'cat > /gk/grants.fifo'
+docker exec mg-s0-e3-space bash /tmp/turn.sh fakeai/fake-1        # also openai/gpt-5.4-mini, anthropic/claude-haiku-4-5
+docker exec mg-s0-e3-space bash /tmp/prove.sh 172.19.0.2
+docker exec -e HTTPS_PROXY=http://gatekeeper:3128 -e HTTP_PROXY=http://gatekeeper:3128 -e NO_PROXY=gatekeeper,localhost,127.0.0.1 mg-s0-e3-space bash /tmp/corridor-clients.sh
+docker exec <same proxy env> -e OPENCODE_DISABLE_MODELS_FETCH=1 -e OPENCODE_DISABLE_AUTOUPDATE=1 mg-s0-e3-space bash /tmp/p3.sh file-fresh   # then file-stale, env-vs-put, put-live, put-first, put-late
 ```
 
 The space image is `node:22-bookworm` plus `opencode-ai`, `strace`, and a non-root `agent` user. Files went in with `docker cp`. `upstream.js` (42 lines) answers `/chat/completions`, `/responses` and `/messages` with canned streams and logs the auth headers. The window, shortened only in its logging:
@@ -88,7 +88,7 @@ srv.listen(3128)
 - Tried. With no stored auth entry the built-in `openai` plugin stays out of the way. The request kept the config base URL and went to the window. `openai` uses the Responses API, so the window must pass `/responses`. `anthropic` sends `x-api-key`, so the window needs a per-provider header name.
 - Tried. `@ai-sdk/openai-compatible` is bundled in the binary. OpenCode installed nothing from npm for it.
 - Tried. In the space, `env`, `ps auxeww`, and a grep over `/home/agent`, `/work` and `/tmp` found no held key. The dummy key is only in `/work/opencode.json`. In the gatekeeper the key is absent from env, files, argv and `docker inspect`. It arrived on `docker exec -i` stdin.
-- Tried. From the space, `curl http://172.19.0.2:9000` and `curl https://1.1.1.1` fail at once with "Couldn't connect". `oc-s0-e3-upstream`, `models.dev` and `api.openai.com` do not resolve. The route table has one entry, the internal subnet, and no default route.
+- Tried. From the space, `curl http://172.19.0.2:9000` and `curl https://1.1.1.1` fail at once with "Couldn't connect". `mg-s0-e3-upstream`, `models.dev` and `api.openai.com` do not resolve. The route table has one entry, the internal subnet, and no default route.
 - Tried. One small-model call (title) goes out per turn. Point `small_model` at a window model, or it picks one by itself.
 
 ### Part 2, corridor
@@ -141,7 +141,7 @@ With both env flags set, `opencode serve` asked DNS for `gatekeeper` only and wa
 - Whether `opencode.json` `options.baseURL` on `openai` conflicts with an oauth record for the same id.
 - Which code path makes the leftover `registry.npmjs.org` attempts.
 - The exact refresh payload. With a dummy refresh string the real issuer answers 401.
-- OpenChamber server in the space, Copilot, git URL rewrite and the npm registry window.
+- Magio server in the space, Copilot, git URL rewrite and the npm registry window.
 - `serve` under `strace` with proxy env was slow to answer health checks. I dropped strace there and did not look further.
 
-Cleanup: all `oc-s0-e3-` containers, networks and images removed. The filtered `docker ps -a`, `docker network ls` and `docker volume ls` outputs were empty.
+Cleanup: all `mg-s0-e3-` containers, networks and images removed. The filtered `docker ps -a`, `docker network ls` and `docker volume ls` outputs were empty.

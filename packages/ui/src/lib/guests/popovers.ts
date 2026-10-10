@@ -1,4 +1,4 @@
-import type { GuestPopoverRequest, GuestPopoverSide } from '@openchamber/sdk';
+import type { GuestPopoverRequest, GuestPopoverSide } from '@magio/sdk';
 
 type GuestPopoverFrameBounds = {
   left: number;
@@ -29,7 +29,7 @@ export const GUEST_POPOVER_MODAL_SELECTOR = '[role="dialog"][aria-modal="true"],
 /** A guest preview must never cover a host permission or modal dialog. */
 export const guestPopoverOwnerBlocked = (frame: HTMLIFrameElement): boolean => (
   !frame.isConnected || frame.closest('[inert],[aria-hidden="true"],[data-base-ui-inert]') !== null
-  || frame.ownerDocument.documentElement.classList.contains('oc-dialog-open')
+  || frame.ownerDocument.documentElement.classList.contains('mg-dialog-open')
   || Array.from(frame.ownerDocument.querySelectorAll(GUEST_POPOVER_MODAL_SELECTOR)).some((element) => element.getClientRects().length > 0)
 );
 

@@ -5,8 +5,8 @@
  * Two sources, in priority order:
  *
  * 1. The native answer. On iOS the shell reads `GCKeyboard` and stamps
- *    `window.__OPENCHAMBER_HARDWARE_KEYBOARD__` at document start, then keeps it
- *    live via `oc:hardware-keyboard` (see BridgeViewController). This is
+ *    `window.__MAGIO_HARDWARE_KEYBOARD__` at document start, then keeps it
+ *    live via `mg:hardware-keyboard` (see BridgeViewController). This is
  *    authoritative and — crucially — known BEFORE the user focuses anything, so
  *    the draft screen and composer start in the right shape instead of
  *    re-laying-out after the first focus.
@@ -32,7 +32,7 @@ const KEYBOARD_EVENT_GRACE_MS = 600;
 
 declare global {
   interface Window {
-    __OPENCHAMBER_HARDWARE_KEYBOARD__?: boolean;
+    __MAGIO_HARDWARE_KEYBOARD__?: boolean;
   }
 }
 
@@ -40,8 +40,8 @@ declare global {
 // document start, and the very first render of the draft screen / composer must
 // already see it — otherwise the layout still settles one frame late.
 const initialNativeAnswer = typeof window !== 'undefined'
-  && typeof window.__OPENCHAMBER_HARDWARE_KEYBOARD__ === 'boolean'
-  ? window.__OPENCHAMBER_HARDWARE_KEYBOARD__
+  && typeof window.__MAGIO_HARDWARE_KEYBOARD__ === 'boolean'
+  ? window.__MAGIO_HARDWARE_KEYBOARD__
   : null;
 
 let hardwareKeyboardAttached = initialNativeAnswer === true;
@@ -51,7 +51,7 @@ let bridgeStarted = false;
 const subscribers = new Set<() => void>();
 
 if (hardwareKeyboardAttached && typeof document !== 'undefined') {
-  document.documentElement.classList.add('oc-hardware-keyboard');
+  document.documentElement.classList.add('mg-hardware-keyboard');
 }
 
 const clearFocusProbe = (): void => {
@@ -64,7 +64,7 @@ const setHardwareKeyboardAttached = (value: boolean): void => {
   if (hardwareKeyboardAttached === value) return;
   hardwareKeyboardAttached = value;
   if (typeof document !== 'undefined') {
-    document.documentElement.classList.toggle('oc-hardware-keyboard', value);
+    document.documentElement.classList.toggle('mg-hardware-keyboard', value);
   }
   for (const listener of subscribers) listener();
 };
@@ -83,8 +83,8 @@ export const startHardwareKeyboardBridge = (): (() => void) => {
     setHardwareKeyboardAttached(value);
   };
 
-  if (typeof window.__OPENCHAMBER_HARDWARE_KEYBOARD__ === 'boolean') {
-    adopt(window.__OPENCHAMBER_HARDWARE_KEYBOARD__);
+  if (typeof window.__MAGIO_HARDWARE_KEYBOARD__ === 'boolean') {
+    adopt(window.__MAGIO_HARDWARE_KEYBOARD__);
   }
 
   if (bridgeStarted) return () => {};
@@ -94,9 +94,9 @@ export const startHardwareKeyboardBridge = (): (() => void) => {
     const detail = (event as CustomEvent<{ attached?: boolean }>).detail;
     adopt(detail?.attached === true);
   };
-  window.addEventListener('oc:hardware-keyboard', handleNativeChange);
+  window.addEventListener('mg:hardware-keyboard', handleNativeChange);
   return () => {
-    window.removeEventListener('oc:hardware-keyboard', handleNativeChange);
+    window.removeEventListener('mg:hardware-keyboard', handleNativeChange);
     bridgeStarted = false;
   };
 };
@@ -124,7 +124,7 @@ export const observeEditorFocus = (): void => {
   if (hasNativeAnswer || typeof window === 'undefined' || typeof document === 'undefined') return;
   // A soft keyboard already up sends no second `keyboardWillShow` — a refocus
   // through it (the overlay-close keyboard restore) would look like silence.
-  if (document.documentElement.classList.contains('oc-keyboard-open')) return;
+  if (document.documentElement.classList.contains('mg-keyboard-open')) return;
   clearFocusProbe();
   focusProbeTimer = window.setTimeout(() => {
     focusProbeTimer = null;

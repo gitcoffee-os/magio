@@ -15,7 +15,7 @@ test('concurrent callers await one complete environment and later calls reuse it
     execute: (file, args, options) => {
       calls++;
       assert.equal(file, '/bin/zsh');
-      assert.deepEqual(args, ['-il', '-c', 'echo __OPENCHAMBER_ENV__; env -0']);
+      assert.deepEqual(args, ['-il', '-c', 'echo __MAGIO_ENV__; env -0']);
       assert.equal(options.timeout, 5000);
       assert.equal(options.windowsHide, true);
       return new Promise(resolve => { complete = resolve; });
@@ -70,11 +70,11 @@ for (const failure of ['error', 'empty']) {
           if (failure === 'error') throw new Error('Failed shell');
           return { stdout: Buffer.from('') };
         }
-        return { stdout: Buffer.from('OPENCHAMBER_SKIP_LOCAL_SERVER=1\0') };
+        return { stdout: Buffer.from('MAGIO_SKIP_LOCAL_SERVER=1\0') };
       },
     });
     const [first, second] = await Promise.all([load(), load()]);
-    assert.deepEqual(first, { OPENCHAMBER_SKIP_LOCAL_SERVER: '1' });
+    assert.deepEqual(first, { MAGIO_SKIP_LOCAL_SERVER: '1' });
     assert.equal(first, second);
     assert.deepEqual(modes, ['-il', '-l']);
   });
@@ -118,7 +118,7 @@ test('retains the Windows environment loader and caches its result', async () =>
 });
 
 const withShell = async (t, script) => {
-  const directory = await mkdtemp(path.join(os.tmpdir(), 'oc-shell-env-'));
+  const directory = await mkdtemp(path.join(os.tmpdir(), 'mg-shell-env-'));
   t.after(() => rm(directory, { recursive: true, force: true }));
   const shell = path.join(directory, 'shell');
   await writeFile(shell, '#!/bin/sh\n' + script, { mode: 0o700 });

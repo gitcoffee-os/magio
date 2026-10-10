@@ -14,21 +14,21 @@ Small Model is worth waking.
 
 - `questions.js` — the Jev questions (measured wording, see "Measurement"),
   the thresholds, and the decisions taken from the answers.
-- `state.js` — `metadata.openchamber.work` and the merge patches that change
+- `state.js` — `metadata.magio.work` and the merge patches that change
   it. Every patch is decided against the record at write time.
 - `runtime.js` — `createSessionWorkRuntime`: `processPayload` (a sent message,
   a turn start), `evaluateTurnEnd` (called by session assist), `stop`.
 
 ## State
 
-`metadata.openchamber.work`:
+`metadata.magio.work`:
 
 - `state`: `open` | `done`
 - `openedAt`, `openedBy` (`jev` | `user`)
 - `doneAt` once the user closed it
 - `suggestDoneAt` while Jev thinks the last turn closed the work out
 
-`metadata.openchamber.reviewOffer`: `{ at }` while Jev thinks the last turn
+`metadata.magio.reviewOffer`: `{ at }` while Jev thinks the last turn
 handed over changes the user could look over. It lives outside `work` so it
 needs neither the In work block nor a session in work.
 
@@ -55,7 +55,7 @@ also exists in VS Code.
   freshness rule). This runtime also deletes a hint it wrote when the next
   turn starts; the rule covers hints written by another process.
 - Only top-level, unarchived project sessions that are not review sessions
-  (`openchamber.kind === 'review'`) are asked about. Managed Chats (under the
+  (`magio.kind === 'review'`) are asked about. Managed Chats (under the
   `chatRoots` the server passes in) are plain conversations and never in work.
 - A known subsession costs nothing: `../session-lineage.js` remembers which
   sessions have a parent (from `session.created` events and from any record
@@ -97,7 +97,7 @@ was (80 hints, 22 followed by edits; 53 of 77 shipping steps).
 against whether the turn ran an edit tool (Jev sees no tools): with looks
 done winning it hinted after 271 of 362 edit turns and after 14 of 823 turns
 without edits. The lab is `julia-lab/jev-work` (`run-review.mjs`,
-`score-held.mjs`) under `~/projects/openchamber-extensions`.
+`score-held.mjs`) under `~/projects/magio-extensions`.
 `recap` stayed high (0.86–0.96) after a closing "thanks"/"commit" that followed
 real work, because it reads the same three turns the recap does. Do not change
 the wording or thresholds without re-running this measurement.
@@ -119,7 +119,7 @@ All four are read at every use.
 ## Runtime parity
 
 - Web, desktop, hosted mobile, Capacitor: all of it; the server owns Jev.
-- VS Code: no OpenChamber server, so no Jev, no done hint and no review offer. The block and
+- VS Code: no Magio server, so no Jev, no done hint and no review offer. The block and
   Track / Done work through the extension's metadata bridge.
 
 ## Tests
@@ -131,4 +131,4 @@ it, a late answer after the next turn started, never closing, failure as
 unknown), plus the gate cases in
 `../session-assist/runtime.test.js`, `loadSettledTurns` in
 `../session-assist/context.test.js`, and `updateSessionMetadata` in
-`../openchamber-sessions/session-metadata-store.test.js`.
+`../magio-sessions/session-metadata-store.test.js`.

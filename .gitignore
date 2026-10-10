@@ -21,7 +21,7 @@ changelog-*.png
 *.vsix
 /npm
 /tsc
-/openchamber@*
+/magio@*
 local-dev*
 .tmp/
 /tmp/
@@ -72,8 +72,8 @@ workspaces/
 *.pid
 .worktrees/
 
-# OpenChamber app runtime state (sessions db, screenshots)
-.openchamber/screenshots/
+# Magio app runtime state (sessions db, screenshots)
+.magio/screenshots/
 
 # Marks a disposable clone dedicated to unattended maintenance tasks.
 .maintenance-clone
@@ -83,3 +83,10 @@ artifacts/
 # TypeScript build-mode caches: UI declarations for project references
 packages/ui/.tsbuild/
 *.tsbuildinfo
+
+# rebrand: 上游源码下载件（内容已搬至仓库根，副本不入库）
+.gitcoffee/magio-*
+
+# rebrand: 上游归档参考副本与升级备份（只留 zip 源，解压件与备份不入库）
+.gitcoffee/openchamber-*
+.gitcoffee/backup/

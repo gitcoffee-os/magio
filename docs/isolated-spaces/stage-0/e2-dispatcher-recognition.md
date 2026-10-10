@@ -24,9 +24,9 @@ Method: code reading only, 2026-09-19. Nothing was run. Paths are relative to th
 | Global event WebSocket and SSE | `ui/sync/event-pipeline.ts:215-240`, `:565` | n/a | one stream for all directories, each event carries its directory (`:168-190`) |
 | Dev tunnel | `ui/lib/browser/devTunnel.ts:39-40` | No | `?port=` only |
 | Dev servers, probe, free port | `ui/lib/browser/devServers.ts:33,60`, `ui/lib/detectDevServer.ts:87` | No | nothing |
-| Dictation, guests, notifications, OpenChamber events | `dictation-client.ts:123`, `guests/surface-client.ts:67`, `useWebNotificationStream.ts:37`, `openchamberEvents.ts:376` | n/a | host services, never a space |
-| Authenticated assets | `FilesView.tsx:3089` (`/api/fs/raw`), `FilesView.tsx:4044` (`/api/fs/serve/...`), `markdownImageAssets.ts:252`, `runtime-url.ts:157` | Path always | `?path=` or path segment, plus `oc_url_token` (`runtime-url.ts:103-112`) |
-| Session-keyed OpenChamber routes | see next table | From session record | id in the URL path |
+| Dictation, guests, notifications, Magio events | `dictation-client.ts:123`, `guests/surface-client.ts:67`, `useWebNotificationStream.ts:37`, `magioEvents.ts:376` | n/a | host services, never a space |
+| Authenticated assets | `FilesView.tsx:3089` (`/api/fs/raw`), `FilesView.tsx:4044` (`/api/fs/serve/...`), `markdownImageAssets.ts:252`, `runtime-url.ts:157` | Path always | `?path=` or path segment, plus `mg_url_token` (`runtime-url.ts:103-112`) |
+| Session-keyed Magio routes | see next table | From session record | id in the URL path |
 
 Totals: 378 `runtimeFetch(` calls in 107 files. Openers that use the resolver directly: 5 WebSocket, 2 SSE, 5 asset URL builders.
 
@@ -48,7 +48,7 @@ Totals: 378 `runtimeFetch(` calls in 107 files. Openers that use the resolver di
 
 ## Design A cost
 
-- The dispatcher would have to read four places: query (`directory`, `path`, `cwd`), header, JSON body, and ids. OpenChamber routes get `express.json` up to 50 MB (`server/lib/opencode/core-routes.js:1089-1117`). OpenCode proxy routes skip the parser so bodies stream (`core-routes.js:1118-1119`). Sniffing a body means parsing before proxying and re-serialising, which is no longer "forward whole".
+- The dispatcher would have to read four places: query (`directory`, `path`, `cwd`), header, JSON body, and ids. Magio routes get `express.json` up to 50 MB (`server/lib/opencode/core-routes.js:1089-1117`). OpenCode proxy routes skip the parser so bodies stream (`core-routes.js:1118-1119`). Sniffing a body means parsing before proxying and re-serialising, which is no longer "forward whole".
 - The terminal socket cannot be forwarded whole. One socket carries frames for host and space terminals. The dispatcher would have to split frames by terminal id and keep a terminal-to-space index.
 - Session-keyed and terminal-keyed routes need a host index from id to space. That index is a cache of untrusted space data. When it is stale or missing, the dispatcher guesses. A malicious space can also claim another space's session id.
 - The dev tunnel and `/api/dev-servers` carry nothing to sniff. They need a new parameter, which is already design B.
@@ -66,7 +66,7 @@ Totals: 378 `runtimeFetch(` calls in 107 files. Openers that use the resolver di
 - Terminal: replace the singleton (`terminalApi.ts:465`) with one `TerminalTransport` per target (host, or a space id), chosen from the terminal's directory. `touch` is split per target.
 - Transports: the relay HTTP allowlist accepts any `/api/` path (`server/lib/relay/tunnel-host.js:23-28`), and the tunnel passes `pathname?search` unchanged (`ui/lib/relay/tunnel-payloads.ts:32-36`). `shouldResolveApiPath` accepts `/api/` (`runtime-fetch.ts:11-13`). So HTTP and SSE work on web, Electron, hosted mobile, and Capacitor with no transport change.
 - WebSocket and URL-token paths are exact-match lists. The new prefix must join all of them by shape, like `GUEST_SURFACE_WS_PATH`: `ALLOWED_WS_PATHS` (`tunnel-host.js:30-40`), `isUrlAuthWebSocketPath` (`server/lib/ui-auth/ui-auth.js:329-338`), `isUrlAuthReadableHttpPath` for `/api/spaces/<id>/fs/raw` (`ui-auth.js:314-327`), and the Electron realtime proxy (`server/lib/realtime-proxy.js:13-17`). Only `terminal/ws`, `dev-tunnel`, and `fs/raw` need it.
-- The host authenticates the user first, then the dispatcher strips cookies, the bearer, and the `oc_url_token` query parameter, and adds the space token. This does not break the relay rule: the relay host still injects nothing, the dispatcher is a separate hop after authentication.
+- The host authenticates the user first, then the dispatcher strips cookies, the bearer, and the `mg_url_token` query parameter, and adds the space token. This does not break the relay rule: the relay host still injects nothing, the dispatcher is a separate hop after authentication.
 
 ## Recommendation
 
@@ -94,7 +94,7 @@ Security property: the target is named in the URL by an authenticated user's cli
 
 - "Dispatcher, sessions, events", first bullet: replace "forwards matching requests whole" with the prefix rule above. Drop "The few requests without a directory are handled one by one". They use the same prefix.
 - Add: the UI resolves directory to space in one function. The terminal transport is per target. WebSocket and URL-token allowlists gain the prefix shapes.
-- Second bullet: add `oc_url_token` to the list of stripped credentials.
+- Second bullet: add `mg_url_token` to the list of stripped credentials.
 - Session bullet: add the merge rule that a space may only report directories under its own root, and the id collision rule.
 - LESSONS.md, "The existing server": add the `lastDirectory` fallback and the single multiplexed terminal socket.
 

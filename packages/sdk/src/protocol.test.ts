@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'bun:test';
 
-import { OPENCHAMBER_SDK_API_VERSION, OPENCHAMBER_SDK_CHANNEL } from './api-version.ts';
+import { MAGIO_SDK_API_VERSION, MAGIO_SDK_CHANNEL } from './api-version.ts';
 import {
   clampAttachRequest,
   clampPromptRequest,
@@ -19,13 +19,13 @@ import {
 } from './protocol.ts';
 
 test('background action messages round-trip and reject invalid payloads', () => {
-  const action = { channel: OPENCHAMBER_SDK_CHANNEL, v: 1, type: 'action', id: 'a1', payload: {
+  const action = { channel: MAGIO_SDK_CHANNEL, v: 1, type: 'action', id: 'a1', payload: {
     kind: 'message', action: 'count', sessionId: 's1', sessionTitle: 'Session', directory: null, messageId: 'm1', role: 'assistant', text: 'Hello',
   } };
   expect(hostMessageSchema.parse(action)).toEqual(action);
   expect(readHostMessage(action)).toEqual(action);
   expect(hostMessageSchema.safeParse({ ...action, payload: { ...action.payload, kind: 'issue' } }).success).toBe(false);
-  const reply = { channel: OPENCHAMBER_SDK_CHANNEL, v: 1, type: 'action-result', id: 'a1', payload: { ok: true } };
+  const reply = { channel: MAGIO_SDK_CHANNEL, v: 1, type: 'action-result', id: 'a1', payload: { ok: true } };
   expect(guestMessageSchema.parse(reply)).toEqual(reply);
   expect(guestMessageSchema.safeParse({ ...reply, payload: { ok: false } }).success).toBe(false);
   expect(guestMessageSchema.safeParse({ ...reply, payload: { ok: false, error: ' ' } }).success).toBe(false);
@@ -77,7 +77,7 @@ const readyPayload = {
 describe('parseHostMessage', () => {
   test('accepts bounded popover messages and refuses unsafe guest payloads', () => {
     const open = {
-      channel: OPENCHAMBER_SDK_CHANNEL, v: 1, type: 'popover-open', id: 'call-1', payload: {
+      channel: MAGIO_SDK_CHANNEL, v: 1, type: 'popover-open', id: 'call-1', payload: {
         id: 'preview-1', anchor: { x: 10, y: 20, width: 30, height: 40 }, width: 320, height: 160, data: { sha: 'abc' },
       },
     };
@@ -89,14 +89,14 @@ describe('parseHostMessage', () => {
   });
 
   test('reads popover close pushes only when their bounded shape is valid', () => {
-    const closed = { channel: OPENCHAMBER_SDK_CHANNEL, v: 1, type: 'popover-closed', payload: { id: 'preview-1', reason: 'escape' } };
+    const closed = { channel: MAGIO_SDK_CHANNEL, v: 1, type: 'popover-closed', payload: { id: 'preview-1', reason: 'escape' } };
     expect(parseHostMessage(closed)).toEqual(closed);
     expect(parseHostMessage({ ...closed, payload: { ...closed.payload, reason: 'late' } })).toBeNull();
   });
 
   test('requires computed theme text colors and rejects malformed values', () => {
     const tokens = { ...readyPayload.theme.tokens, primaryText: '#112233', successText: '#224433', warningText: '#664422', errorText: '#882233', infoText: '#334488' };
-    const envelope = { channel: OPENCHAMBER_SDK_CHANNEL, v: OPENCHAMBER_SDK_API_VERSION, type: 'ready', payload: { ...readyPayload, theme: { ...readyPayload.theme, tokens } } };
+    const envelope = { channel: MAGIO_SDK_CHANNEL, v: MAGIO_SDK_API_VERSION, type: 'ready', payload: { ...readyPayload, theme: { ...readyPayload.theme, tokens } } };
     const message = hostMessageSchema.parse(envelope);
     expect(message?.type).toBe('ready');
     if (message?.type !== 'ready') throw new Error('Expected ready snapshot');
@@ -109,13 +109,13 @@ describe('parseHostMessage', () => {
   });
   test('accepts ready', () => {
     const message = parseHostMessage({
-      channel: OPENCHAMBER_SDK_CHANNEL,
-      v: OPENCHAMBER_SDK_API_VERSION,
+      channel: MAGIO_SDK_CHANNEL,
+      v: MAGIO_SDK_API_VERSION,
       type: 'ready',
       payload: readyPayload,
     });
     expect(message).toEqual({
-      channel: OPENCHAMBER_SDK_CHANNEL,
+      channel: MAGIO_SDK_CHANNEL,
       v: 1,
       type: 'ready',
       payload: readyPayload,
@@ -124,8 +124,8 @@ describe('parseHostMessage', () => {
 
   test('keeps known ready features while dropping a future feature', () => {
     const message = parseHostMessage({
-      channel: OPENCHAMBER_SDK_CHANNEL,
-      v: OPENCHAMBER_SDK_API_VERSION,
+      channel: MAGIO_SDK_CHANNEL,
+      v: MAGIO_SDK_API_VERSION,
       type: 'ready',
       payload: { ...readyPayload, features: { statusControls: true, futureCapability: true } },
     });
@@ -136,7 +136,7 @@ describe('parseHostMessage', () => {
 
   test('accepts a null directory', () => {
     const message = parseHostMessage({
-      channel: OPENCHAMBER_SDK_CHANNEL,
+      channel: MAGIO_SDK_CHANNEL,
       v: 1,
       type: 'directory',
       payload: { directory: null },
@@ -155,7 +155,7 @@ describe('parseHostMessage', () => {
       payload: readyPayload,
     }).success).toBe(false);
     expect(hostMessageSchema.safeParse({
-      channel: OPENCHAMBER_SDK_CHANNEL,
+      channel: MAGIO_SDK_CHANNEL,
       v: 2,
       type: 'ready',
       payload: readyPayload,
@@ -164,7 +164,7 @@ describe('parseHostMessage', () => {
 
   test('accepts a null session push', () => {
     const message = parseHostMessage({
-      channel: OPENCHAMBER_SDK_CHANNEL,
+      channel: MAGIO_SDK_CHANNEL,
       v: 1,
       type: 'session',
       payload: { session: null },
@@ -177,7 +177,7 @@ describe('parseHostMessage', () => {
 
   test('drops ready without a surface field', () => {
     expect(hostMessageSchema.safeParse({
-      channel: OPENCHAMBER_SDK_CHANNEL,
+      channel: MAGIO_SDK_CHANNEL,
       v: 1,
       type: 'ready',
       payload: {
@@ -191,7 +191,7 @@ describe('parseHostMessage', () => {
 
   test('accepts an attach dialog surface', () => {
     const message = parseHostMessage({
-      channel: OPENCHAMBER_SDK_CHANNEL,
+      channel: MAGIO_SDK_CHANNEL,
       v: 1,
       type: 'ready',
       payload: { ...readyPayload, surface: 'dialog' },
@@ -211,7 +211,7 @@ describe('parseHostMessage', () => {
       kind: 'issue' as const,
     };
     const message = parseHostMessage({
-      channel: OPENCHAMBER_SDK_CHANNEL,
+      channel: MAGIO_SDK_CHANNEL,
       v: 1,
       type: 'ready',
       payload: { ...readyPayload, item },
@@ -221,13 +221,13 @@ describe('parseHostMessage', () => {
       expect(message.payload.item).toEqual(item);
     }
     const push = parseHostMessage({
-      channel: OPENCHAMBER_SDK_CHANNEL,
+      channel: MAGIO_SDK_CHANNEL,
       v: 1,
       type: 'item',
       payload: { item: null },
     });
     expect(push).toEqual({
-      channel: OPENCHAMBER_SDK_CHANNEL,
+      channel: MAGIO_SDK_CHANNEL,
       v: 1,
       type: 'item',
       payload: { item: null },
@@ -237,10 +237,10 @@ describe('parseHostMessage', () => {
   test('keeps attach data within the limit and refuses it over the limit', () => {
     const data = { status: 'open', comments: [{ author: 'mara', text: 'hi' }], n: 1, ok: true, none: null };
     const base = {
-      channel: OPENCHAMBER_SDK_CHANNEL,
+      channel: MAGIO_SDK_CHANNEL,
       v: 1,
       type: 'attach' as const,
-      id: 'oc-1',
+      id: 'mg-1',
     };
     const payload = { providerId: 'tasks-demo', id: 'DEMO-1', title: 'T', url: 'https://x.test/1' };
     const parsed = guestMessageSchema.safeParse({ ...base, payload: { ...payload, data } });
@@ -253,7 +253,7 @@ describe('parseHostMessage', () => {
       payload: { ...payload, data: 'x'.repeat(GUEST_ATTACH_DATA_MAX) },
     }).success).toBe(false);
     expect(parseHostMessage({
-      channel: OPENCHAMBER_SDK_CHANNEL,
+      channel: MAGIO_SDK_CHANNEL,
       v: 1,
       type: 'item',
       payload: { item: { ...payload, data } },
@@ -264,7 +264,7 @@ describe('parseHostMessage', () => {
     const { item: _item, ...withoutItem } = readyPayload;
     void _item;
     expect(hostMessageSchema.safeParse({
-      channel: OPENCHAMBER_SDK_CHANNEL,
+      channel: MAGIO_SDK_CHANNEL,
       v: 1,
       type: 'ready',
       payload: withoutItem,
@@ -273,7 +273,7 @@ describe('parseHostMessage', () => {
 
   test('drops ready without connection or settings', () => {
     expect(hostMessageSchema.safeParse({
-      channel: OPENCHAMBER_SDK_CHANNEL,
+      channel: MAGIO_SDK_CHANNEL,
       v: 1,
       type: 'ready',
       payload: {
@@ -288,10 +288,10 @@ describe('parseHostMessage', () => {
 
   test('resolves a failed result code and falls back to HOST_REJECTED', () => {
     expect(parseHostMessage({
-      channel: OPENCHAMBER_SDK_CHANNEL,
+      channel: MAGIO_SDK_CHANNEL,
       v: 1,
       type: 'result',
-      id: 'oc-1',
+      id: 'mg-1',
       ok: false,
       error: 'Not connected.',
       code: 'DISCONNECTED',
@@ -302,10 +302,10 @@ describe('parseHostMessage', () => {
       code: 'DISCONNECTED',
     });
     expect(parseHostMessage({
-      channel: OPENCHAMBER_SDK_CHANNEL,
+      channel: MAGIO_SDK_CHANNEL,
       v: 1,
       type: 'result',
-      id: 'oc-1',
+      id: 'mg-1',
       ok: false,
       error: 'Request failed.',
     })).toMatchObject({
@@ -314,10 +314,10 @@ describe('parseHostMessage', () => {
       code: 'HOST_REJECTED',
     });
     expect(parseHostMessage({
-      channel: OPENCHAMBER_SDK_CHANNEL,
+      channel: MAGIO_SDK_CHANNEL,
       v: 1,
       type: 'result',
-      id: 'oc-1',
+      id: 'mg-1',
       ok: false,
       error: 'Nope',
       code: 'NOT_A_CODE',
@@ -330,7 +330,7 @@ describe('parseHostMessage', () => {
 
   test('defaults missing session busy to false and keeps model and agent', () => {
     const message = parseHostMessage({
-      channel: OPENCHAMBER_SDK_CHANNEL,
+      channel: MAGIO_SDK_CHANNEL,
       v: 1,
       type: 'session',
       payload: {
@@ -358,13 +358,13 @@ describe('parseHostMessage', () => {
 
   test('accepts a session-lifecycle push', () => {
     const message = parseHostMessage({
-      channel: OPENCHAMBER_SDK_CHANNEL,
+      channel: MAGIO_SDK_CHANNEL,
       v: 1,
       type: 'session-lifecycle',
       payload: { sessionId: 'ses-1', phase: 'started' },
     });
     expect(message).toEqual({
-      channel: OPENCHAMBER_SDK_CHANNEL,
+      channel: MAGIO_SDK_CHANNEL,
       v: 1,
       type: 'session-lifecycle',
       payload: { sessionId: 'ses-1', phase: 'started' },
@@ -373,10 +373,10 @@ describe('parseHostMessage', () => {
 
   test('accepts a start-session result payload', () => {
     const message = parseHostMessage({
-      channel: OPENCHAMBER_SDK_CHANNEL,
+      channel: MAGIO_SDK_CHANNEL,
       v: 1,
       type: 'result',
-      id: 'oc-1',
+      id: 'mg-1',
       ok: true,
       payload: { sessionId: 'ses-9', sent: 'no-model' },
     });
@@ -389,10 +389,10 @@ describe('parseHostMessage', () => {
 
   test('accepts a prompt result payload', () => {
     const message = parseHostMessage({
-      channel: OPENCHAMBER_SDK_CHANNEL,
+      channel: MAGIO_SDK_CHANNEL,
       v: 1,
       type: 'result',
-      id: 'oc-1',
+      id: 'mg-1',
       ok: true,
       payload: { sent: 'sent' },
     });
@@ -405,10 +405,10 @@ describe('parseHostMessage', () => {
 
   test('accepts a request result payload', () => {
     const message = parseHostMessage({
-      channel: OPENCHAMBER_SDK_CHANNEL,
+      channel: MAGIO_SDK_CHANNEL,
       v: 1,
       type: 'result',
-      id: 'oc-1',
+      id: 'mg-1',
       ok: true,
       payload: { status: 200, body: '{"ok":true}' },
     });
@@ -421,10 +421,10 @@ describe('parseHostMessage', () => {
 
   test('accepts the four file result payloads', () => {
     const result = (payload: unknown) => parseHostMessage({
-      channel: OPENCHAMBER_SDK_CHANNEL,
+      channel: MAGIO_SDK_CHANNEL,
       v: 1,
       type: 'result',
-      id: 'oc-1',
+      id: 'mg-1',
       ok: true,
       // Untrusted wire value on purpose.
       payload: payload as { status: number; body: string },
@@ -442,7 +442,7 @@ describe('parseHostMessage', () => {
 
   test('drops ready without a session field', () => {
     expect(hostMessageSchema.safeParse({
-      channel: OPENCHAMBER_SDK_CHANNEL,
+      channel: MAGIO_SDK_CHANNEL,
       v: 1,
       type: 'ready',
       payload: {
@@ -455,7 +455,7 @@ describe('parseHostMessage', () => {
 
   test('drops a result without an id', () => {
     expect(hostMessageSchema.safeParse({
-      channel: OPENCHAMBER_SDK_CHANNEL,
+      channel: MAGIO_SDK_CHANNEL,
       v: 1,
       type: 'result',
       ok: true,
@@ -466,11 +466,11 @@ describe('parseHostMessage', () => {
 describe('parseGuestMessage', () => {
   test('accepts hello without an id', () => {
     expect(parseGuestMessage({
-      channel: OPENCHAMBER_SDK_CHANNEL,
+      channel: MAGIO_SDK_CHANNEL,
       v: 1,
       type: 'hello',
     })).toEqual({
-      channel: OPENCHAMBER_SDK_CHANNEL,
+      channel: MAGIO_SDK_CHANNEL,
       v: 1,
       type: 'hello',
     });
@@ -478,17 +478,17 @@ describe('parseGuestMessage', () => {
 
   test('accepts toast', () => {
     const message = parseGuestMessage({
-      channel: OPENCHAMBER_SDK_CHANNEL,
+      channel: MAGIO_SDK_CHANNEL,
       v: 1,
       type: 'toast',
-      id: 'oc-1',
+      id: 'mg-1',
       payload: { kind: 'info', message: 'Hello' },
     });
-    expect(message).toMatchObject({ type: 'toast', id: 'oc-1' });
+    expect(message).toMatchObject({ type: 'toast', id: 'mg-1' });
   });
 
   test('toast buttons round-trip and copy text is bounded without trimming it', () => {
-    const envelope = { channel: OPENCHAMBER_SDK_CHANNEL, v: 1, type: 'toast', id: 'toast-buttons' };
+    const envelope = { channel: MAGIO_SDK_CHANNEL, v: 1, type: 'toast', id: 'toast-buttons' };
     for (const copy of [true, false, { text: '  source\n' }, { text: 'x'.repeat(32_000) }]) {
       const payload = { kind: 'info', message: 'Summary', copy, dismiss: true, persistent: true };
       expect(guestMessageSchema.parse({ ...envelope, payload })).toEqual({ ...envelope, payload });
@@ -503,37 +503,37 @@ describe('parseGuestMessage', () => {
 
   test('drops toast with an empty message', () => {
     expect(guestMessageSchema.safeParse({
-      channel: OPENCHAMBER_SDK_CHANNEL,
+      channel: MAGIO_SDK_CHANNEL,
       v: 1,
       type: 'toast',
-      id: 'oc-1',
+      id: 'mg-1',
       payload: { kind: 'info', message: '   ' },
     }).success).toBe(false);
   });
 
   test('accepts clipboard-write and compose', () => {
     expect(parseGuestMessage({
-      channel: OPENCHAMBER_SDK_CHANNEL,
+      channel: MAGIO_SDK_CHANNEL,
       v: 1,
       type: 'clipboard-write',
-      id: 'oc-2',
+      id: 'mg-2',
       payload: { text: '/repo' },
     })?.type).toBe('clipboard-write');
     expect(parseGuestMessage({
-      channel: OPENCHAMBER_SDK_CHANNEL,
+      channel: MAGIO_SDK_CHANNEL,
       v: 1,
       type: 'compose',
-      id: 'oc-3',
+      id: 'mg-3',
       payload: { text: 'Ask about the diff', mode: 'append' },
     })?.type).toBe('compose');
   });
 
   test('accepts attach and close', () => {
     expect(parseGuestMessage({
-      channel: OPENCHAMBER_SDK_CHANNEL,
+      channel: MAGIO_SDK_CHANNEL,
       v: 1,
       type: 'attach',
-      id: 'oc-7',
+      id: 'mg-7',
       payload: {
         providerId: 'hello',
         id: 'HELLO-1',
@@ -542,20 +542,20 @@ describe('parseGuestMessage', () => {
       },
     })?.type).toBe('attach');
     expect(parseGuestMessage({
-      channel: OPENCHAMBER_SDK_CHANNEL,
+      channel: MAGIO_SDK_CHANNEL,
       v: 1,
       type: 'close',
-      id: 'oc-8',
+      id: 'mg-8',
     })?.type).toBe('close');
   });
 
   test('clamps an attach title the host schema would drop', () => {
     const title = 'x'.repeat(GUEST_ATTACH_TITLE_MAX + 40);
     expect(parseGuestMessage({
-      channel: OPENCHAMBER_SDK_CHANNEL,
+      channel: MAGIO_SDK_CHANNEL,
       v: 1,
       type: 'attach',
-      id: 'oc-7',
+      id: 'mg-7',
       payload: {
         providerId: 'clickup',
         id: 'abc',
@@ -564,10 +564,10 @@ describe('parseGuestMessage', () => {
       },
     })).toBeNull();
     expect(parseGuestMessage({
-      channel: OPENCHAMBER_SDK_CHANNEL,
+      channel: MAGIO_SDK_CHANNEL,
       v: 1,
       type: 'attach',
-      id: 'oc-7',
+      id: 'mg-7',
       payload: clampAttachRequest({
         providerId: 'clickup',
         id: 'abc',
@@ -620,10 +620,10 @@ describe('parseGuestMessage', () => {
       author: 'ada',
     });
     expect(parseGuestMessage({
-      channel: OPENCHAMBER_SDK_CHANNEL,
+      channel: MAGIO_SDK_CHANNEL,
       v: 1,
       type: 'attach',
-      id: 'oc-7',
+      id: 'mg-7',
       payload: {
         providerId: 'gitlab',
         id: '!12',
@@ -638,10 +638,10 @@ describe('parseGuestMessage', () => {
 
   test('accepts start-session and keeps worktree only when asked', () => {
     expect(parseGuestMessage({
-      channel: OPENCHAMBER_SDK_CHANNEL,
+      channel: MAGIO_SDK_CHANNEL,
       v: 1,
       type: 'start-session',
-      id: 'oc-12',
+      id: 'mg-12',
       payload: {
         providerId: 'gitlab',
         id: '!12',
@@ -670,17 +670,17 @@ describe('parseGuestMessage', () => {
 
   test('accepts prompt and session-link', () => {
     expect(parseGuestMessage({
-      channel: OPENCHAMBER_SDK_CHANNEL,
+      channel: MAGIO_SDK_CHANNEL,
       v: 1,
       type: 'prompt',
-      id: 'oc-20',
+      id: 'mg-20',
       payload: { text: 'Fix the login', send: true },
     })?.type).toBe('prompt');
     expect(parseGuestMessage({
-      channel: OPENCHAMBER_SDK_CHANNEL,
+      channel: MAGIO_SDK_CHANNEL,
       v: 1,
       type: 'session-link',
-      id: 'oc-21',
+      id: 'mg-21',
       payload: {
         providerId: 'gitlab',
         id: '!12',
@@ -699,10 +699,10 @@ describe('parseGuestMessage', () => {
 
   test('drops attach without an http url shape the host will accept later', () => {
     expect(parseGuestMessage({
-      channel: OPENCHAMBER_SDK_CHANNEL,
+      channel: MAGIO_SDK_CHANNEL,
       v: 1,
       type: 'attach',
-      id: 'oc-7',
+      id: 'mg-7',
       payload: {
         providerId: 'Hello',
         id: 'HELLO-1',
@@ -714,28 +714,28 @@ describe('parseGuestMessage', () => {
 
   test('accepts oauth-start, oauth-disconnect, and request', () => {
     expect(parseGuestMessage({
-      channel: OPENCHAMBER_SDK_CHANNEL,
+      channel: MAGIO_SDK_CHANNEL,
       v: 1,
       type: 'oauth-start',
-      id: 'oc-10',
+      id: 'mg-10',
     })?.type).toBe('oauth-start');
     expect(parseGuestMessage({
-      channel: OPENCHAMBER_SDK_CHANNEL,
+      channel: MAGIO_SDK_CHANNEL,
       v: 1,
       type: 'oauth-disconnect',
-      id: 'oc-11',
+      id: 'mg-11',
     })?.type).toBe('oauth-disconnect');
     expect(parseGuestMessage({
-      channel: OPENCHAMBER_SDK_CHANNEL,
+      channel: MAGIO_SDK_CHANNEL,
       v: 1,
       type: 'request',
-      id: 'oc-12',
+      id: 'mg-12',
       payload: { method: 'GET', path: '/api/v2/user' },
     })?.type).toBe('request');
   });
 
   test('accepts generate messages and drops an empty prompt or oversized output ask', () => {
-    const base = { channel: OPENCHAMBER_SDK_CHANNEL, v: 1 as const, id: 'oc-30' };
+    const base = { channel: MAGIO_SDK_CHANNEL, v: 1 as const, id: 'mg-30' };
     expect(parseGuestMessage({ ...base, type: 'generate', payload: { prompt: 'Summarize' } })?.type).toBe('generate');
     expect(parseGuestMessage({ ...base, type: 'generate', payload: { prompt: 'Summarize', system: 'Be brief', maxOutputTokens: 200 } })).toMatchObject({
       payload: { prompt: 'Summarize', system: 'Be brief', maxOutputTokens: 200 },
@@ -747,7 +747,7 @@ describe('parseGuestMessage', () => {
   });
 
   test('accepts file messages and drops an empty or backslash path', () => {
-    const base = { channel: OPENCHAMBER_SDK_CHANNEL, v: 1 as const, id: 'oc-20' };
+    const base = { channel: MAGIO_SDK_CHANNEL, v: 1 as const, id: 'mg-20' };
     expect(parseGuestMessage({ ...base, type: 'file-read', payload: { path: 'README.md' } })?.type).toBe('file-read');
     expect(parseGuestMessage({ ...base, type: 'file-write', payload: { path: '~/.config/x.json', content: '{}' } })?.type).toBe('file-write');
     expect(parseGuestMessage({ ...base, type: 'file-list', payload: { path: '.' } })?.type).toBe('file-list');
@@ -759,37 +759,37 @@ describe('parseGuestMessage', () => {
 
   test('drops a request path that escapes the api origin', () => {
     expect(parseGuestMessage({
-      channel: OPENCHAMBER_SDK_CHANNEL,
+      channel: MAGIO_SDK_CHANNEL,
       v: 1,
       type: 'request',
-      id: 'oc-12',
+      id: 'mg-12',
       payload: { method: 'GET', path: '/api/../secret' },
     })).toBeNull();
     expect(parseGuestMessage({
-      channel: OPENCHAMBER_SDK_CHANNEL,
+      channel: MAGIO_SDK_CHANNEL,
       v: 1,
       type: 'request',
-      id: 'oc-12',
+      id: 'mg-12',
       payload: { method: 'GET', path: 'https://evil.example/x' },
     })).toBeNull();
   });
 
   test('drops empty compose text', () => {
     expect(guestMessageSchema.safeParse({
-      channel: OPENCHAMBER_SDK_CHANNEL,
+      channel: MAGIO_SDK_CHANNEL,
       v: 1,
       type: 'compose',
-      id: 'oc-3',
+      id: 'mg-3',
       payload: { text: '   ' },
     }).success).toBe(false);
   });
 
   test('drops compose text over the cap', () => {
     expect(guestMessageSchema.safeParse({
-      channel: OPENCHAMBER_SDK_CHANNEL,
+      channel: MAGIO_SDK_CHANNEL,
       v: 1,
       type: 'compose',
-      id: 'oc-3',
+      id: 'mg-3',
       payload: { text: 'x'.repeat(GUEST_COMPOSE_TEXT_MAX + 1) },
     }).success).toBe(false);
   });
@@ -798,26 +798,26 @@ describe('parseGuestMessage', () => {
 describe('readHostMessage', () => {
   test('accepts a host push and a result on the envelope alone', () => {
     const ready = parseHostMessage({
-      channel: OPENCHAMBER_SDK_CHANNEL,
-      v: OPENCHAMBER_SDK_API_VERSION,
+      channel: MAGIO_SDK_CHANNEL,
+      v: MAGIO_SDK_API_VERSION,
       type: 'directory',
       payload: { directory: '/repo' },
     });
     expect(readHostMessage(ready)).toEqual(ready);
     const failed = readHostMessage({
-      channel: OPENCHAMBER_SDK_CHANNEL,
-      v: OPENCHAMBER_SDK_API_VERSION,
+      channel: MAGIO_SDK_CHANNEL,
+      v: MAGIO_SDK_API_VERSION,
       type: 'result',
-      id: 'oc-1',
+      id: 'mg-1',
       ok: false,
       error: 'nope',
       code: 'made-up',
     });
     expect(failed).toEqual({
-      channel: OPENCHAMBER_SDK_CHANNEL,
-      v: OPENCHAMBER_SDK_API_VERSION,
+      channel: MAGIO_SDK_CHANNEL,
+      v: MAGIO_SDK_API_VERSION,
       type: 'result',
-      id: 'oc-1',
+      id: 'mg-1',
       ok: false,
       error: 'nope',
       code: 'HOST_REJECTED',
@@ -828,14 +828,14 @@ describe('readHostMessage', () => {
     expect(readHostMessage(null)).toBeNull();
     expect(readHostMessage('hello')).toBeNull();
     expect(readHostMessage({ channel: 'other', v: 1, type: 'directory', payload: {} })).toBeNull();
-    expect(readHostMessage({ channel: OPENCHAMBER_SDK_CHANNEL, v: OPENCHAMBER_SDK_API_VERSION, type: 'nope', payload: {} })).toBeNull();
-    expect(readHostMessage({ channel: OPENCHAMBER_SDK_CHANNEL, v: OPENCHAMBER_SDK_API_VERSION, type: 'result', ok: true })).toBeNull();
-    expect(readHostMessage({ channel: OPENCHAMBER_SDK_CHANNEL, v: OPENCHAMBER_SDK_API_VERSION, type: 'result', id: 'x', ok: false })).toBeNull();
+    expect(readHostMessage({ channel: MAGIO_SDK_CHANNEL, v: MAGIO_SDK_API_VERSION, type: 'nope', payload: {} })).toBeNull();
+    expect(readHostMessage({ channel: MAGIO_SDK_CHANNEL, v: MAGIO_SDK_API_VERSION, type: 'result', ok: true })).toBeNull();
+    expect(readHostMessage({ channel: MAGIO_SDK_CHANNEL, v: MAGIO_SDK_API_VERSION, type: 'result', id: 'x', ok: false })).toBeNull();
   });
 });
 
 describe('actions, commands, and badge wire shapes', () => {
-  const envelope = { channel: OPENCHAMBER_SDK_CHANNEL, v: OPENCHAMBER_SDK_API_VERSION };
+  const envelope = { channel: MAGIO_SDK_CHANNEL, v: MAGIO_SDK_API_VERSION };
   const messageItem = {
     kind: 'message',
     action: 'create-task',
@@ -912,7 +912,7 @@ describe('actions, commands, and badge wire shapes', () => {
   });
 
   test('shells messages parse, including every scope, and refuse out-of-range bounds', () => {
-    const envelope = { channel: OPENCHAMBER_SDK_CHANNEL, v: OPENCHAMBER_SDK_API_VERSION };
+    const envelope = { channel: MAGIO_SDK_CHANNEL, v: MAGIO_SDK_API_VERSION };
     expect(parseGuestMessage({ ...envelope, type: 'shells-subscribe', id: 'c1', payload: { subscriptionId: 's1', scope: { kind: 'session', sessionId: 'ses_1' } } })?.type).toBe('shells-subscribe');
     expect(parseGuestMessage({ ...envelope, type: 'shells-subscribe', id: 'c1p', payload: { subscriptionId: 's1', scope: { kind: 'project', projectId: 'p1' } } })?.type).toBe('shells-subscribe');
     expect(parseGuestMessage({ ...envelope, type: 'shells-subscribe', id: 'c1g', payload: { subscriptionId: 's1', scope: { kind: 'global' } } })?.type).toBe('shells-subscribe');

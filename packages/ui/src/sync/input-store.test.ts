@@ -81,6 +81,22 @@ describe("input-store composer restore", () => {
     expect(useInputStore.getState().consumePendingInputText()).toEqual({ text: "ordinary insertion", mode: "append" })
     expect(useInputStore.getState().consumePendingComposerRestore(target)).toBe(pending)
   })
+
+  test("carries confirmed mentions with the text they belong to, once", () => {
+    useInputStore.getState().setPendingInputText("@docs/my notes.md", "append-inline", null, ["docs/my notes.md"])
+    expect(useInputStore.getState().consumePendingInputText()).toEqual({
+      text: "@docs/my notes.md",
+      mode: "append-inline",
+      mentions: ["docs/my notes.md"],
+    })
+    expect(useInputStore.getState().pendingInputMentions).toBeNull()
+    expect(useInputStore.getState().consumePendingInputText()).toBeNull()
+
+    // Text that carries no mention must not inherit one from a previous queue.
+    useInputStore.getState().setPendingInputText("plain text", "append")
+    expect(useInputStore.getState().pendingInputMentions).toBeNull()
+    expect(useInputStore.getState().consumePendingInputText()).toEqual({ text: "plain text", mode: "append" })
+  })
 })
 
 describe("input-store attachments", () => {
@@ -90,6 +106,7 @@ describe("input-store attachments", () => {
     useInputStore.setState({
       pendingInputText: null,
       pendingInputMode: "replace",
+      pendingInputMentions: null,
       pendingSyntheticParts: null,
       pendingGuestIssue: null,
       pendingBtwComposerRequest: null,

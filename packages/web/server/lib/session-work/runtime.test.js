@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { mergeMetadataPatch } from '../openchamber-sessions/session-metadata-store.js';
+import { mergeMetadataPatch } from '../magio-sessions/session-metadata-store.js';
 import { decideAssist, decideOpen } from './questions.js';
 import { createSessionWorkRuntime } from './runtime.js';
 import { createSessionLineage } from '../session-lineage.js';
@@ -51,7 +51,7 @@ const makeRuntime = ({ metadata = {}, answers = {}, askError = null, settings = 
     jev,
     readMetadata: async (id) => records.get(id) ?? {},
     updateMetadata,
-    chatRoots: ['/home/me/.config/openchamber/chats'],
+    chatRoots: ['/home/me/.config/magio/chats'],
     lineage,
     now: () => time++,
   });
@@ -93,18 +93,18 @@ describe('session work runtime: a message was sent', () => {
     const { runtime, jev, records } = makeRuntime({ answers: { change: { noul: 0.95 }, toward_change: { noul: 0.9 } } });
 
     runtime.processPayload(sent());
-    await settle(() => records.get('ses_1').openchamber);
+    await settle(() => records.get('ses_1').magio);
 
     const [request] = jev.ask.mock.calls[0];
     expect(request.state.request).toBe('Now fix the header');
     expect(request.state.history.map((entry) => entry.role)).toEqual(['user', 'assistant']);
     expect(Object.keys(request.questions)).toEqual(['change', 'toward_change']);
-    expect(records.get('ses_1')).toMatchObject({ openchamber: { work: { state: 'open', openedBy: 'jev' } } });
+    expect(records.get('ses_1')).toMatchObject({ magio: { work: { state: 'open', openedBy: 'jev' } } });
   });
 
   it('does not ask again for a session already in work, or for the same message twice', async () => {
     stubOpenCode();
-    const open = makeRuntime({ metadata: { openchamber: { work: { state: 'open' } } } });
+    const open = makeRuntime({ metadata: { magio: { work: { state: 'open' } } } });
     open.runtime.processPayload(sent());
     await new Promise((resolve) => setTimeout(resolve, 30));
     expect(open.jev.ask).not.toHaveBeenCalled();
@@ -142,8 +142,8 @@ describe('session work runtime: a message was sent', () => {
       { runtime: { settings: { autoOpen: false } } },
       { runtime: { endpoint: null } },
       { session: { parentID: 'ses_parent' } },
-      { session: { metadata: { openchamber: { kind: 'review', originalSessionID: 'ses_0' } } } },
-      { session: { location: { directory: '/home/me/.config/openchamber/chats/2026-09-27/hello' } } },
+      { session: { metadata: { magio: { kind: 'review', originalSessionID: 'ses_0' } } } },
+      { session: { location: { directory: '/home/me/.config/magio/chats/2026-09-27/hello' } } },
     ]) {
       stubOpenCode({ session: setup.session });
       const { runtime, jev } = makeRuntime({ answers: { change: { noul: 1 } }, ...setup.runtime });
@@ -168,13 +168,13 @@ describe('session work runtime: a turn ended', () => {
     expect(Object.keys(jev.ask.mock.calls[0][0].questions).sort()).toEqual(['change', 'next_step', 'recap', 'review_ready', 'toward_change']);
     expect(jev.ask.mock.calls[0][0].state).toMatchObject({ request: 'Implement it', answer: 'Done, try it.' });
     expect(gate).toEqual({ recap: true, suggestion: false });
-    expect(records.get('ses_1')).toMatchObject({ openchamber: { work: { state: 'open' } } });
+    expect(records.get('ses_1')).toMatchObject({ magio: { work: { state: 'open' } } });
   });
 
   it('asks only about the end of the work and a review in a session already in work, and a new turn retires the hint', async () => {
     stubOpenCode();
     const { runtime, jev, records, updateMetadata } = makeRuntime({
-      metadata: { openchamber: { work: { state: 'open', openedAt: 1 } } },
+      metadata: { magio: { work: { state: 'open', openedAt: 1 } } },
       answers: { wrap_up: { noul: 0.93 } },
     });
 
@@ -182,29 +182,29 @@ describe('session work runtime: a turn ended', () => {
 
     expect(Object.keys(jev.ask.mock.calls[0][0].questions)).toEqual(['wrap_up', 'review_ready']);
     expect(gate).toBeNull();
-    expect(records.get('ses_1').openchamber.work.suggestDoneAt).toBeTypeOf('number');
+    expect(records.get('ses_1').magio.work.suggestDoneAt).toBeTypeOf('number');
 
     const busy = { type: 'session.status', properties: { sessionID: 'ses_1', status: { type: 'busy' } } };
     runtime.processPayload(busy);
     runtime.processPayload(busy);
-    await settle(() => records.get('ses_1').openchamber.work.suggestDoneAt === undefined);
-    expect(records.get('ses_1').openchamber.work).not.toHaveProperty('suggestDoneAt');
+    await settle(() => records.get('ses_1').magio.work.suggestDoneAt === undefined);
+    expect(records.get('ses_1').magio.work).not.toHaveProperty('suggestDoneAt');
     // One write for the hint, one to retire it: the second busy found nothing to retire.
     expect(updateMetadata).toHaveBeenCalledTimes(2);
   });
 
   it('offers a review after a turn that changed the project, and looks done wins over it', async () => {
     stubOpenCode();
-    const open = { openchamber: { work: { state: 'open', openedAt: 1 } } };
+    const open = { magio: { work: { state: 'open', openedAt: 1 } } };
     const review = makeRuntime({ metadata: open, answers: { wrap_up: { noul: 0.2 }, review_ready: { noul: 0.75 } } });
     await review.runtime.evaluateTurnEnd({ sessionId: 'ses_1', directory: '/repo', assist: { recap: false, suggestion: false } });
-    expect(review.records.get('ses_1').openchamber.reviewOffer.at).toBeTypeOf('number');
-    expect(review.records.get('ses_1').openchamber.work).not.toHaveProperty('suggestDoneAt');
+    expect(review.records.get('ses_1').magio.reviewOffer.at).toBeTypeOf('number');
+    expect(review.records.get('ses_1').magio.work).not.toHaveProperty('suggestDoneAt');
 
     const both = makeRuntime({ metadata: open, answers: { wrap_up: { noul: 0.9 }, review_ready: { noul: 0.9 } } });
     await both.runtime.evaluateTurnEnd({ sessionId: 'ses_1', directory: '/repo', assist: { recap: false, suggestion: false } });
-    expect(both.records.get('ses_1').openchamber.work.suggestDoneAt).toBeTypeOf('number');
-    expect(both.records.get('ses_1').openchamber).not.toHaveProperty('reviewOffer');
+    expect(both.records.get('ses_1').magio.work.suggestDoneAt).toBeTypeOf('number');
+    expect(both.records.get('ses_1').magio).not.toHaveProperty('reviewOffer');
   });
 
   it('offers a review without In work, asks nothing about it when it is off, and a new turn retires it', async () => {
@@ -212,10 +212,10 @@ describe('session work runtime: a turn ended', () => {
     const solo = makeRuntime({ settings: { enabled: false }, answers: { review_ready: { noul: 0.8 } } });
     await solo.runtime.evaluateTurnEnd({ sessionId: 'ses_1', directory: '/repo', assist: { recap: false, suggestion: false } });
     expect(Object.keys(solo.jev.ask.mock.calls[0][0].questions)).toEqual(['review_ready']);
-    expect(solo.records.get('ses_1')).toEqual({ openchamber: { reviewOffer: { at: expect.any(Number) } } });
+    expect(solo.records.get('ses_1')).toEqual({ magio: { reviewOffer: { at: expect.any(Number) } } });
     solo.runtime.processPayload({ type: 'session.status', properties: { sessionID: 'ses_1', status: { type: 'busy' } } });
-    await settle(() => !solo.records.get('ses_1').openchamber?.reviewOffer);
-    expect(solo.records.get('ses_1').openchamber).not.toHaveProperty('reviewOffer');
+    await settle(() => !solo.records.get('ses_1').magio?.reviewOffer);
+    expect(solo.records.get('ses_1').magio).not.toHaveProperty('reviewOffer');
 
     const off = makeRuntime({ settings: { reviewOffer: false }, answers: { change: { noul: 0.1 } } });
     await off.runtime.evaluateTurnEnd({ sessionId: 'ses_1', directory: '/repo', assist: { recap: false, suggestion: false } });
@@ -225,7 +225,7 @@ describe('session work runtime: a turn ended', () => {
   it('drops a late done answer once the next turn started', async () => {
     stubOpenCode();
     const { runtime, jev, records } = makeRuntime({
-      metadata: { openchamber: { work: { state: 'open', openedAt: 1 } } },
+      metadata: { magio: { work: { state: 'open', openedAt: 1 } } },
     });
     let answer;
     jev.ask.mockImplementation(() => new Promise((resolve) => { answer = resolve; }));
@@ -241,7 +241,7 @@ describe('session work runtime: a turn ended', () => {
       runtime.processPayload(busy);
       answer({ answers: { wrap_up: { noul: 0.99 } }, ms: 5 });
       await pending;
-      expect(records.get('ses_1').openchamber.work).not.toHaveProperty('suggestDoneAt');
+      expect(records.get('ses_1').magio.work).not.toHaveProperty('suggestDoneAt');
     }
 
     // A check nobody overtook still writes its hint.
@@ -250,17 +250,17 @@ describe('session work runtime: a turn ended', () => {
     await settle(() => answer !== undefined);
     answer({ answers: { wrap_up: { noul: 0.99 } }, ms: 5 });
     await current;
-    expect(records.get('ses_1').openchamber.work.suggestDoneAt).toBeTypeOf('number');
+    expect(records.get('ses_1').magio.work.suggestDoneAt).toBeTypeOf('number');
   });
 
   it('never closes: a closing turn in a session in work only hints', async () => {
     stubOpenCode();
     const { runtime, records } = makeRuntime({
-      metadata: { openchamber: { work: { state: 'open', openedAt: 1 } } },
+      metadata: { magio: { work: { state: 'open', openedAt: 1 } } },
       answers: { wrap_up: { noul: 0.99 }, change: { noul: 0 } },
     });
     await runtime.evaluateTurnEnd({ sessionId: 'ses_1', directory: '/repo', assist: { recap: false, suggestion: false } });
-    expect(records.get('ses_1').openchamber.work.state).toBe('open');
+    expect(records.get('ses_1').magio.work.state).toBe('open');
   });
 
   it('answers unknown on a Jev failure and changes nothing', async () => {

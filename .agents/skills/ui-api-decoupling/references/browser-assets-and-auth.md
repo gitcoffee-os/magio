@@ -20,23 +20,23 @@ Do not prebuild a browser URL and then immediately call `runtimeFetch` with it. 
 
 ## URL Tokens
 
-Browser-owned URLs cannot attach the normal `Authorization` header. Use short-lived scoped `oc_url_token` minted through runtime auth helpers.
+Browser-owned URLs cannot attach the normal `Authorization` header. Use short-lived scoped `mg_url_token` minted through runtime auth helpers.
 
-- Never manually append `oc_url_token`.
+- Never manually append `mg_url_token`.
 - Never place a long-lived client bearer token in a URL.
-- Treat `oc_client_token` query use as legacy stripping/rejection only.
+- Treat `mg_client_token` query use as legacy stripping/rejection only.
 - Add browser-readable GET or realtime paths to the narrow allowlist in `packages/web/server/lib/ui-auth/ui-auth.js`.
 - Add allowlist tests; never allow arbitrary `/api/*` URL-token access.
 
 ## Showing Somebody Else's Page
 
-OpenChamber does not rewrite third-party HTML to display it. Rewriting a page to
+Magio does not rewrite third-party HTML to display it. Rewriting a page to
 serve it under our origin and a path prefix breaks every absolute URL on it, and
 recovering from that means encoding knowledge of each framework's dev-server
 internals — which ages badly and fails silently.
 
 - The in-app browser renders a real Chromium `<webview>` (`packages/ui/src/components/browser/`).
-- A dev server on a remote OpenChamber host is reached by binding a local port
+- A dev server on a remote Magio host is reached by binding a local port
   and tunnelling raw bytes (`packages/web/server/lib/dev-tunnel/`), so the page
   keeps its own origin at the root of its own host.
 - Runtimes without a Chromium host fall back to a plain iframe that can display

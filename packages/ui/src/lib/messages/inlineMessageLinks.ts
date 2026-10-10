@@ -1,6 +1,6 @@
-const SKILL_LINK_PREFIX = '#openchamber-skill:';
-const AGENT_LINK_PREFIX = '#openchamber-agent:';
-const ATTACHMENT_LINK_PREFIX = '#openchamber-attachment:';
+const SKILL_LINK_PREFIX = '#magio-skill:';
+const AGENT_LINK_PREFIX = '#magio-agent:';
+const ATTACHMENT_LINK_PREFIX = '#magio-attachment:';
 
 /** encodeURIComponent leaves `(`, `)` and `'` alone, and `)` would end a Markdown link target. */
 const encodeHrefPart = (value: string): string =>
@@ -21,7 +21,7 @@ export const INLINE_REFERENCE_CHIP_CLASS =
 export const INTERACTIVE_REFERENCE_CHIP_CLASS = `${INLINE_REFERENCE_CHIP_CLASS} cursor-pointer transition-colors hover:border-foreground/40`;
 
 /** Sprite symbol for the skill chip icon (the `book-open` app icon). */
-export const SKILL_CHIP_ICON_HREF = '#oc-book-open';
+export const SKILL_CHIP_ICON_HREF = '#mg-book-open';
 
 export type AttachmentCitationLink = {
     filename: string;

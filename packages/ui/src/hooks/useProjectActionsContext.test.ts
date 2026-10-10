@@ -3,7 +3,7 @@ import { describe, expect, test } from 'bun:test';
 import { resolveProjectActionsOwner } from './useProjectActionsContext';
 
 const projects = [
-  { id: 'openchamber', path: '/workspace/openchamber', label: 'OpenChamber' },
+  { id: 'magio', path: '/workspace/magio', label: 'Magio' },
 ];
 
 describe('resolveProjectActionsOwner', () => {
@@ -11,14 +11,14 @@ describe('resolveProjectActionsOwner', () => {
     const owner = resolveProjectActionsOwner({
       projects,
       worktreesByProject: new Map([
-        ['/workspace/openchamber', [{
-          path: '/workspace/openchamber-feature',
-          projectDirectory: '/workspace/openchamber',
+        ['/workspace/magio', [{
+          path: '/workspace/magio-feature',
+          projectDirectory: '/workspace/magio',
           branch: 'feature',
           label: 'feature',
         }]],
       ]),
-      directory: '/workspace/openchamber-feature',
+      directory: '/workspace/magio-feature',
       activeProjectId: null,
     });
 
@@ -29,7 +29,7 @@ describe('resolveProjectActionsOwner', () => {
     const owner = resolveProjectActionsOwner({
       projects,
       worktreesByProject: new Map(),
-      directory: '/workspace/openchamber/packages/ui',
+      directory: '/workspace/magio/packages/ui',
       activeProjectId: null,
     });
 
@@ -41,7 +41,7 @@ describe('resolveProjectActionsOwner', () => {
       projects,
       worktreesByProject: new Map(),
       directory: '/some/other/project',
-      activeProjectId: 'openchamber',
+      activeProjectId: 'magio',
     });
 
     expect(owner).toEqual(projects[0]);
@@ -52,14 +52,14 @@ describe('resolveProjectActionsOwner', () => {
       projects,
       worktreesByProject: new Map(),
       directory: '',
-      activeProjectId: 'openchamber',
+      activeProjectId: 'magio',
     })).toEqual(projects[0]);
 
     expect(resolveProjectActionsOwner({
       projects,
       worktreesByProject: new Map(),
       directory: null,
-      activeProjectId: 'openchamber',
+      activeProjectId: 'magio',
     })).toEqual(projects[0]);
   });
 

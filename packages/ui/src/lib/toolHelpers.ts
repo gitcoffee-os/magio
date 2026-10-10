@@ -198,29 +198,29 @@ const TOOL_METADATA: Record<string, ToolMetadata> = {
        ]
      },
 
-    openchamber: {
-      displayName: 'OpenChamber',
+    magio: {
+      displayName: 'Magio',
       category: 'system',
       outputLanguage: 'json',
       inputFields: []
     },
 
-    openchamber_web: {
-      displayName: 'OpenChamber Web',
+    magio_web: {
+      displayName: 'Magio Web',
       category: 'system',
       outputLanguage: 'json',
       inputFields: []
     },
 
-    openchamber_memory: {
-      displayName: 'OpenChamber Memory',
+    magio_memory: {
+      displayName: 'Magio Memory',
       category: 'system',
       outputLanguage: 'json',
       inputFields: []
     },
 
-    openchamber_notify: {
-      displayName: 'OpenChamber Notify',
+    magio_notify: {
+      displayName: 'Magio Notify',
       category: 'system',
       outputLanguage: 'json',
       inputFields: []

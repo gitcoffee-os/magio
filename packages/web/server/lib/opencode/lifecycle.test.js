@@ -276,7 +276,7 @@ describe('OpenCode lifecycle', () => {
   });
 
   it('warms only the last-used directory after a successful bootstrap', async () => {
-    const root = await fs.mkdtemp(path.join(os.tmpdir(), 'oc-warm-'));
+    const root = await fs.mkdtemp(path.join(os.tmpdir(), 'mg-warm-'));
     const lastUsed = path.join(root, 'worktree-a');
     const otherProject = path.join(root, 'project-b');
     await fs.mkdir(lastUsed);
@@ -316,7 +316,7 @@ describe('OpenCode lifecycle', () => {
   });
 
   it('answers null once the warmed default directory is no longer usable', async () => {
-    const root = await fs.mkdtemp(path.join(os.tmpdir(), 'oc-stale-'));
+    const root = await fs.mkdtemp(path.join(os.tmpdir(), 'mg-stale-'));
     const stale = path.join(root, 'worktree-a');
     await fs.mkdir(stale);
     globalThis.fetch = vi.fn(async () => ({
@@ -354,7 +354,7 @@ describe('OpenCode lifecycle', () => {
   });
 
   it('advances to a currently-valid warmup directory when the cached default goes stale', async () => {
-    const root = await fs.mkdtemp(path.join(os.tmpdir(), 'oc-replace-'));
+    const root = await fs.mkdtemp(path.join(os.tmpdir(), 'mg-replace-'));
     const stale = path.join(root, 'gone');
     const surviving = path.join(root, 'still-here');
     await fs.mkdir(stale);
@@ -388,7 +388,7 @@ describe('OpenCode lifecycle', () => {
   });
 
   it('re-resolves the settings-backed default when the cached one is stale', async () => {
-    const root = await fs.mkdtemp(path.join(os.tmpdir(), 'oc-refresh-'));
+    const root = await fs.mkdtemp(path.join(os.tmpdir(), 'mg-refresh-'));
     const stale = path.join(root, 'old-project');
     const navigated = path.join(root, 'new-project');
     await fs.mkdir(stale);
@@ -430,7 +430,7 @@ describe('OpenCode lifecycle', () => {
   // Windows chmod only toggles the read-only attribute, and root ignores the
   // permission bits, so neither can take read/execute away from a directory.
   it.skipIf(process.platform === 'win32' || process.getuid?.() === 0)('treats a directory without read/execute permission as unusable', async () => {
-    const root = await fs.mkdtemp(path.join(os.tmpdir(), 'oc-perm-'));
+    const root = await fs.mkdtemp(path.join(os.tmpdir(), 'mg-perm-'));
     const locked = path.join(root, 'locked');
     await fs.mkdir(locked);
     globalThis.fetch = vi.fn(async () => ({
@@ -465,7 +465,7 @@ describe('OpenCode lifecycle', () => {
   });
 
   it('does not scope the restart agent check to a directory that went stale', async () => {
-    const root = await fs.mkdtemp(path.join(os.tmpdir(), 'oc-agent-'));
+    const root = await fs.mkdtemp(path.join(os.tmpdir(), 'mg-agent-'));
     const stale = path.join(root, 'worktree-a');
     await fs.mkdir(stale);
     const requested = [];
@@ -928,7 +928,7 @@ describe('OpenCode lifecycle', () => {
   it('strips AppImage ARGV0 from managed OpenCode launch env', async () => {
     delete process.env.OPENCODE_BINARY;
     const previousArgv0 = process.env.ARGV0;
-    process.env.ARGV0 = '/path/to/OpenChamber/OpenChamber-1.17.2-linux-x86_64.AppImage';
+    process.env.ARGV0 = '/path/to/Magio/Magio-1.17.2-linux-x86_64.AppImage';
     const child = createMockChild();
     spawnMock.mockImplementationOnce(() => {
       queueMicrotask(() => {
@@ -959,7 +959,7 @@ describe('OpenCode lifecycle', () => {
     }
   });
 
-  it('passes the user variables to OpenCode under the variables OpenChamber owns', async () => {
+  it('passes the user variables to OpenCode under the variables Magio owns', async () => {
     const child = createMockChild();
     spawnMock.mockImplementationOnce(() => {
       queueMicrotask(() => {
@@ -971,9 +971,9 @@ describe('OpenCode lifecycle', () => {
       DATABASE_URL: 'postgres://db',
       PATH: '/opt/tools/bin',
       OPENCODE_PASSWORD: 'user-password',
-      OPENCHAMBER_AGENT_TOOL_TOKEN: 'user-token',
+      MAGIO_AGENT_TOOL_TOKEN: 'user-token',
     }));
-    const getManagedOpenCodeEnv = vi.fn(async () => ({ OPENCHAMBER_AGENT_TOOL_TOKEN: 'ephemeral' }));
+    const getManagedOpenCodeEnv = vi.fn(async () => ({ MAGIO_AGENT_TOOL_TOKEN: 'ephemeral' }));
 
     const runtime = createRuntime({ getUserEnvironment, getManagedOpenCodeEnv });
     const server = await runtime.startOpenCode();
@@ -982,13 +982,13 @@ describe('OpenCode lifecycle', () => {
     expect(options.env.DATABASE_URL).toBe('postgres://db');
     expect(options.env.PATH).toBe('/opt/tools/bin:/home/user/.bun/bin:/usr/local/bin:/usr/bin');
     expect(options.env.OPENCODE_PASSWORD).toBe('password');
-    expect(options.env.OPENCHAMBER_AGENT_TOOL_TOKEN).toBe('ephemeral');
+    expect(options.env.MAGIO_AGENT_TOOL_TOKEN).toBe('ephemeral');
     expect(runtime.getManagedOpenCodeProcessEnv().DATABASE_URL).toBe('postgres://db');
 
     await server.close();
   });
 
-  it('adds managed OpenChamber tool environment without allowing it to replace launch invariants', async () => {
+  it('adds managed Magio tool environment without allowing it to replace launch invariants', async () => {
     const child = createMockChild();
     spawnMock.mockImplementationOnce(() => {
       queueMicrotask(() => {
@@ -998,7 +998,7 @@ describe('OpenCode lifecycle', () => {
     });
     const getManagedOpenCodeEnv = vi.fn(async () => ({
       OPENCODE_CONFIG_CONTENT: '{"plugin":["file:///tool.js"]}',
-      OPENCHAMBER_AGENT_TOOL_TOKEN: 'ephemeral',
+      MAGIO_AGENT_TOOL_TOKEN: 'ephemeral',
       PATH: '/untrusted/path',
       OPENCODE_PASSWORD: 'untrusted-password',
       OPENCODE_SERVER_PASSWORD: 'untrusted-password',
@@ -1010,7 +1010,7 @@ describe('OpenCode lifecycle', () => {
 
     expect(getManagedOpenCodeEnv).toHaveBeenCalledOnce();
     expect(options.env.OPENCODE_CONFIG_CONTENT).toBe('{"plugin":["file:///tool.js"]}');
-    expect(options.env.OPENCHAMBER_AGENT_TOOL_TOKEN).toBe('ephemeral');
+    expect(options.env.MAGIO_AGENT_TOOL_TOKEN).toBe('ephemeral');
     expect(options.env.PATH).toBe('/home/user/.bun/bin:/usr/local/bin:/usr/bin');
     expect(options.env.OPENCODE_PASSWORD).toBe('password');
     expect(options.env.OPENCODE_SERVER_PASSWORD).toBe('password');

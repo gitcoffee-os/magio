@@ -131,7 +131,7 @@ const startLoopbackOrigin = () =>
         res.end(JSON.stringify({
           ok: true,
           service: 'stub',
-          relayConn: req.headers['x-openchamber-relay-connection'] || null,
+          relayConn: req.headers['x-magio-relay-connection'] || null,
           origin: req.headers.origin,
         }));
         return;
@@ -298,9 +298,9 @@ describe('relay host-client integration', () => {
     expect(result.status).toBe(200);
     for (const role of ['host-control', 'host-data']) {
       expect(relay.state.apps.get(role)).toEqual({
-        appId: 'openchamber',
+        appId: 'magio',
         appVersion: expect.stringMatching(/^\d+\.\d+\.\d+/),
-        platform: process.env.OPENCHAMBER_RUNTIME || 'web',
+        platform: process.env.MAGIO_RUNTIME || 'web',
       });
     }
     expect(result.body.ok).toBe(true);

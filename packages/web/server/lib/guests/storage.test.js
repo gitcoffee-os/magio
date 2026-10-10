@@ -7,7 +7,7 @@ import { runGuestStorage, removeGuestStorage } from './storage.js';
 const roots = [];
 afterEach(async () => { await Promise.all(roots.splice(0).map((root) => fs.rm(root, { recursive: true, force: true }))); });
 const fixture = async () => {
-  const root = await fs.mkdtemp(path.join(os.tmpdir(), 'oc-storage-'));
+  const root = await fs.mkdtemp(path.join(os.tmpdir(), 'mg-storage-'));
   roots.push(root);
   const persistPath = path.join(root, 'extensions.json');
   return { root, persistPath, run: (request, id = 'board') => runGuestStorage(persistPath, id, request, async () => {}) };

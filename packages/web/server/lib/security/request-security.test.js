@@ -11,7 +11,7 @@ describe('request security runtime', () => {
 
     expect(await runtime.isRequestOriginAllowed({
       headers: {
-        origin: 'openchamber-ui://app',
+        origin: 'magio-ui://app',
         host: '192.168.1.130:1202',
       },
       socket: {},
@@ -52,8 +52,8 @@ describe('request security runtime', () => {
 
     expect(await runtime.isRequestOriginAllowed({
       headers: {
-        origin: 'https://devchamber.example.com',
-        host: 'devchamber.example.com',
+        origin: 'https://devmagio.example.com',
+        host: 'devmagio.example.com',
         'x-forwarded-proto': 'http',
       },
       socket: {},
@@ -65,7 +65,7 @@ describe('request security runtime', () => {
     const request = {
       headers: {
         host: '127.0.0.1:3000',
-        'x-forwarded-host': 'devchamber.example.com',
+        'x-forwarded-host': 'devmagio.example.com',
         'x-forwarded-proto': 'http',
       },
       socket: {},
@@ -73,7 +73,7 @@ describe('request security runtime', () => {
 
     expect(await runtime.isRequestOriginAllowed({
       ...request,
-      headers: { ...request.headers, origin: 'https://devchamber.example.com' },
+      headers: { ...request.headers, origin: 'https://devmagio.example.com' },
     })).toBe(true);
     expect(await runtime.isRequestOriginAllowed({
       ...request,
@@ -88,7 +88,7 @@ describe('request security runtime', () => {
     const req = {
       headers: {
         host: '192.168.0.1:3001',
-        cookie: 'oc_ui_session_3000=token-a; oc_ui_session_3001=token-b',
+        cookie: 'mg_ui_session_3000=token-a; mg_ui_session_3001=token-b',
       },
     };
     expect(runtime.getUiSessionTokenFromRequest(req)).toBe('token-b');
@@ -99,7 +99,7 @@ describe('request security runtime', () => {
     // Reaching :3001 with only the :3000 cookie in the jar must NOT borrow the
     // other instance's session — it stays unauthenticated for this port.
     const req = {
-      headers: { host: '192.168.0.1:3001', cookie: 'oc_ui_session_3000=token-a' },
+      headers: { host: '192.168.0.1:3001', cookie: 'mg_ui_session_3000=token-a' },
     };
     expect(runtime.getUiSessionTokenFromRequest(req)).toBeNull();
   });
@@ -107,14 +107,14 @@ describe('request security runtime', () => {
   test('reads the bare cookie for a host without an explicit port', () => {
     const runtime = createRuntime();
     const req = {
-      headers: { host: '192.168.0.1', cookie: 'oc_ui_session=token-bare' },
+      headers: { host: '192.168.0.1', cookie: 'mg_ui_session=token-bare' },
     };
     expect(runtime.getUiSessionTokenFromRequest(req)).toBe('token-bare');
   });
 
   test('returns null when no session cookie is present', () => {
     const runtime = createRuntime();
-    const req = { headers: { host: '192.168.0.1:3000', cookie: 'theme=dark; oc_url_token=x' } };
+    const req = { headers: { host: '192.168.0.1:3000', cookie: 'theme=dark; mg_url_token=x' } };
     expect(runtime.getUiSessionTokenFromRequest(req)).toBeNull();
   });
 
@@ -125,8 +125,8 @@ describe('request security runtime', () => {
     expect(await devRuntime.isRequestOriginAllowed(devPage)).toBe(true);
 
     expect(allowsLocalDevOrigins({})).toBe(false);
-    expect(allowsLocalDevOrigins({ OPENCHAMBER_ALLOW_DEV_ORIGINS: '1' })).toBe(true);
-    expect(allowsLocalDevOrigins({ OPENCHAMBER_ELECTRON_DEV: '1' })).toBe(true);
+    expect(allowsLocalDevOrigins({ MAGIO_ALLOW_DEV_ORIGINS: '1' })).toBe(true);
+    expect(allowsLocalDevOrigins({ MAGIO_ELECTRON_DEV: '1' })).toBe(true);
   });
 
   test('without a UI password, refuses a socket a foreign page opens and keeps non-browser clients', async () => {
@@ -139,13 +139,13 @@ describe('request security runtime', () => {
     expect(await allowed({ origin: 'http://localhost:5173', host: '127.0.0.1:3000' })).toBe(false);
     // The app itself, the desktop shell and the relay host's loopback dial pass.
     expect(await allowed({ origin: 'http://127.0.0.1:3000', host: '127.0.0.1:3000' })).toBe(true);
-    expect(await allowed({ origin: 'openchamber-ui://app', host: '127.0.0.1:3000' })).toBe(true);
+    expect(await allowed({ origin: 'magio-ui://app', host: '127.0.0.1:3000' })).toBe(true);
     // A client that is not a page sends no origin.
     expect(await allowed({ host: '127.0.0.1:3000' })).toBe(true);
   });
 
   test('lets only the app, its shells and named embedders frame it', () => {
-    expect(buildFrameAncestorsPolicy()).toBe("frame-ancestors 'self' openchamber-ui://app capacitor://localhost https://localhost");
+    expect(buildFrameAncestorsPolicy()).toBe("frame-ancestors 'self' magio-ui://app capacitor://localhost https://localhost");
     expect(buildFrameAncestorsPolicy({ allowLocalDevOrigins: true })).toContain('http://127.0.0.1:*');
     expect(buildFrameAncestorsPolicy({ extra: 'https://dash.example.com, *' })).toMatch(/ https:\/\/dash\.example\.com \*$/);
     // Anything that is not a plain origin stays out of the policy.

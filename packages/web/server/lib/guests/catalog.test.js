@@ -10,8 +10,8 @@ const writeBuiltGuest = async (root) => {
   await fs.writeFile(path.join(root, 'panel', 'index.html'), '<script src="./main.js"></script>');
   await fs.writeFile(path.join(root, 'panel', 'main.js'), 'console.log("hello")');
   await fs.writeFile(path.join(root, 'package.json'), JSON.stringify({
-    name: '@openchamber/hello',
-    openchamber: {
+    name: '@magio/hello',
+    magio: {
       apiVersion: 1,
       contributes: {
         panel: { id: 'hello', name: 'Hello', icon: 'window', entry: 'panel/index.html' },
@@ -23,7 +23,7 @@ const writeBuiltGuest = async (root) => {
 
 describe('resolveGuestAssetPath', () => {
   test('stays inside the package and rejects escapes', async () => {
-    const root = await fs.mkdtemp(path.join(os.tmpdir(), 'oc-guest-'));
+    const root = await fs.mkdtemp(path.join(os.tmpdir(), 'mg-guest-'));
     await fs.writeFile(path.join(root, 'index.html'), '<html></html>');
     await fs.mkdir(path.join(root, 'panel'));
     await fs.writeFile(path.join(root, 'panel', 'index.html'), '<html></html>');
@@ -48,14 +48,14 @@ describe('guestAssetContentType', () => {
 
 describe('listInstalledGuests', () => {
   test('does not auto-install the repo sample', async () => {
-    const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'oc-guest-'));
+    const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'mg-guest-'));
     const persistPath = path.join(dir, 'extensions.json');
     expect(await listInstalledGuests({ persistPath })).toEqual([]);
     await fs.rm(dir, { recursive: true, force: true });
   });
 
   test('serves a path-installed guest', async () => {
-    const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'oc-guest-'));
+    const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'mg-guest-'));
     const persistPath = path.join(dir, 'extensions.json');
     const guestRoot = path.join(dir, 'hello');
     await writeBuiltGuest(guestRoot);
@@ -121,14 +121,14 @@ describe('listInstalledGuests', () => {
   });
 
   test('skips a missing folder and keeps the rest', async () => {
-    const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'oc-guest-'));
+    const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'mg-guest-'));
     const persistPath = path.join(dir, 'extensions.json');
     const guestRoot = path.join(dir, 'clone');
     await fs.mkdir(path.join(guestRoot, 'panel'), { recursive: true });
     await fs.writeFile(path.join(guestRoot, 'panel', 'index.html'), '<html></html>');
     await fs.writeFile(path.join(guestRoot, 'package.json'), JSON.stringify({
-      name: '@openchamber/clone-hello',
-      openchamber: {
+      name: '@magio/clone-hello',
+      magio: {
         apiVersion: 1,
         contributes: {
           panel: { id: 'clone-hello', name: 'Clone', icon: 'window', entry: 'panel/index.html' },
@@ -145,15 +145,15 @@ describe('listInstalledGuests', () => {
   });
 
   test('skips a package whose entry script was never built', async () => {
-    const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'oc-guest-'));
+    const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'mg-guest-'));
     const persistPath = path.join(dir, 'extensions.json');
     const guestRoot = path.join(dir, 'source-only');
     await fs.mkdir(path.join(guestRoot, 'panel'), { recursive: true });
     await fs.writeFile(path.join(guestRoot, 'panel', 'index.html'), '<script src="./main.js"></script>');
     await fs.writeFile(path.join(guestRoot, 'panel', 'main.ts'), 'console.log(1)');
     await fs.writeFile(path.join(guestRoot, 'package.json'), JSON.stringify({
-      name: '@openchamber/source-only',
-      openchamber: {
+      name: '@magio/source-only',
+      magio: {
         apiVersion: 1,
         contributes: {
           panel: { id: 'source-only', name: 'Source', icon: 'window', entry: 'panel/index.html' },
@@ -168,12 +168,12 @@ describe('listInstalledGuests', () => {
   });
 
   test('checks a declared dialog entry like panel.entry and exposes it on the public row', async () => {
-    const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'oc-guest-'));
+    const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'mg-guest-'));
     const guestRoot = path.join(dir, 'tasks');
     const writeManifest = async () => fs.writeFile(path.join(guestRoot, 'package.json'), JSON.stringify({
-      name: '@openchamber/tasks',
+      name: '@magio/tasks',
       version: '1.0.0',
-      openchamber: {
+      magio: {
         apiVersion: 1,
         contributes: {
           panel: { id: 'tasks', name: 'Tasks', icon: 'window', entry: 'panel/index.html' },
@@ -186,13 +186,13 @@ describe('listInstalledGuests', () => {
     await fs.writeFile(path.join(guestRoot, 'panel', 'main.js'), 'console.log("main")');
     await writeManifest();
 
-    expect(await inspectGuestPackage(guestRoot, { openchamberVersion: '1.0.0' })).toEqual({ ok: false, code: 'invalid-manifest' });
+    expect(await inspectGuestPackage(guestRoot, { magioVersion: '1.0.0' })).toEqual({ ok: false, code: 'invalid-manifest' });
 
     await fs.writeFile(path.join(guestRoot, 'panel', 'attach.html'), '<script src="./attach.js"></script>');
-    expect(await inspectGuestPackage(guestRoot, { openchamberVersion: '1.0.0' })).toEqual({ ok: false, code: 'missing-build' });
+    expect(await inspectGuestPackage(guestRoot, { magioVersion: '1.0.0' })).toEqual({ ok: false, code: 'missing-build' });
 
     await fs.writeFile(path.join(guestRoot, 'panel', 'attach.js'), 'console.log("attach")');
-    const inspected = await inspectGuestPackage(guestRoot, { openchamberVersion: '1.0.0' });
+    const inspected = await inspectGuestPackage(guestRoot, { magioVersion: '1.0.0' });
     expect(inspected.ok).toBe(true);
     if (inspected.ok) {
       expect(inspected.guest.attach).toBe('dialog');
@@ -207,16 +207,16 @@ describe('listInstalledGuests', () => {
   });
 
   test('a page docked beside a shared surface reaches the public row with its edge and size', async () => {
-    const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'oc-guest-'));
+    const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'mg-guest-'));
     const guestRoot = path.join(dir, 'sim');
     await fs.mkdir(path.join(guestRoot, 'panel'), { recursive: true });
     await fs.writeFile(path.join(guestRoot, 'panel', 'index.html'), '<script src="./main.js"></script>');
     await fs.writeFile(path.join(guestRoot, 'panel', 'main.js'), 'console.log("strip")');
     await fs.writeFile(path.join(guestRoot, 'service.js'), 'console.log("service")');
     await fs.writeFile(path.join(guestRoot, 'package.json'), JSON.stringify({
-      name: '@openchamber/sim',
+      name: '@magio/sim',
       version: '1.0.0',
-      openchamber: {
+      magio: {
         apiVersion: 1,
         contributes: {
           panel: { id: 'sim', name: 'Sim', icon: 'window', entry: 'panel/index.html', dock: 'right', size: 240 },
@@ -225,7 +225,7 @@ describe('listInstalledGuests', () => {
       },
     }));
 
-    const inspected = await inspectGuestPackage(guestRoot, { openchamberVersion: '1.0.0' });
+    const inspected = await inspectGuestPackage(guestRoot, { magioVersion: '1.0.0' });
     expect(inspected.ok).toBe(true);
     if (inspected.ok) {
       expect(toPublicGuest({ ...inspected.guest, source: 'path', path: guestRoot })).toMatchObject({
@@ -242,11 +242,11 @@ describe('listInstalledGuests', () => {
 
 describe('page-less packages', () => {
   test('validates full-screen HTML and built scripts and publishes its title', async () => {
-    const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'oc-page-'));
+    const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'mg-page-'));
     try {
       await fs.mkdir(path.join(dir, 'panel'));
       await fs.writeFile(path.join(dir, 'panel/index.html'), '<p>Panel</p>');
-      await fs.writeFile(path.join(dir, 'package.json'), JSON.stringify({ version: '1.0.0', openchamber: {
+      await fs.writeFile(path.join(dir, 'package.json'), JSON.stringify({ version: '1.0.0', magio: {
         apiVersion: 1, contributes: { panel: { id: 'board', name: 'Board', icon: 'window', entry: 'panel/index.html' }, page: { entry: 'panel/page.html', title: 'Tasks' } },
       } }));
       expect(await inspectGuestPackage(dir)).toMatchObject({ ok: false, code: 'invalid-manifest' });
@@ -259,9 +259,9 @@ describe('page-less packages', () => {
     } finally { await fs.rm(dir, { recursive: true, force: true }); }
   });
   test('a status-section-only package validates its HTML and scripts and publishes title and height without a panel entry', async () => {
-    const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'oc-status-'));
+    const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'mg-status-'));
     try {
-      await fs.writeFile(path.join(dir, 'package.json'), JSON.stringify({ version: '1.0.0', openchamber: {
+      await fs.writeFile(path.join(dir, 'package.json'), JSON.stringify({ version: '1.0.0', magio: {
         apiVersion: 1, contributes: {
           panel: { id: 'git-graph', name: 'Git graph', icon: 'git-commit' },
           statusSection: { entry: 'status/index.html', title: 'Recent commits', height: 160, defaultExpanded: false, requiresProject: true },
@@ -281,11 +281,11 @@ describe('page-less packages', () => {
   });
 
   test('a file-editor-only package validates each editor page, publishes the editors, and counts as a frame', async () => {
-    const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'oc-file-editor-'));
+    const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'mg-file-editor-'));
     try {
       const editor = { id: 'canvas', title: 'Excalidraw', match: ['*.excalidraw'], entry: 'editor/index.html' };
       const sheets = { id: 'sheets', title: 'Sheets', match: ['*.xlsx'], entry: 'editor/index.html', content: 'binary' };
-      await fs.writeFile(path.join(dir, 'package.json'), JSON.stringify({ version: '1.0.0', openchamber: {
+      await fs.writeFile(path.join(dir, 'package.json'), JSON.stringify({ version: '1.0.0', magio: {
         apiVersion: 1, contributes: { panel: { id: 'excalidraw', name: 'Excalidraw', icon: 'pencil-ruler-2' }, fileEditors: [editor, sheets] },
       } }));
       expect(await inspectGuestPackage(dir)).toMatchObject({ ok: false, code: 'invalid-manifest' });
@@ -304,16 +304,16 @@ describe('page-less packages', () => {
   });
 
   test('installs a tools-only package without entry, omits entry from the row, and never serves it a frame', async () => {
-    const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'oc-guest-'));
+    const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'mg-guest-'));
     const guestRoot = path.join(dir, 'tools-only');
     await fs.mkdir(path.join(guestRoot, 'icons'), { recursive: true });
     await fs.writeFile(path.join(guestRoot, 'icons', 'tool.svg'), '<svg xmlns="http://www.w3.org/2000/svg"/>');
     await fs.writeFile(path.join(guestRoot, 'stray.html'), '<script src="./stray.js"></script>');
     await fs.writeFile(path.join(guestRoot, 'stray.js'), 'console.log(1)');
     await fs.writeFile(path.join(guestRoot, 'package.json'), JSON.stringify({
-      name: '@openchamber/tools-only',
+      name: '@magio/tools-only',
       version: '1.0.0',
-      openchamber: {
+      magio: {
         apiVersion: 1,
         contributes: {
           panel: { id: 'tools-only', name: 'Tools Only', icon: 'tools' },
@@ -322,7 +322,7 @@ describe('page-less packages', () => {
       },
     }));
 
-    const inspected = await inspectGuestPackage(guestRoot, { openchamberVersion: '1.0.0' });
+    const inspected = await inspectGuestPackage(guestRoot, { magioVersion: '1.0.0' });
     expect(inspected).toEqual({
       ok: true,
       guest: {
@@ -352,13 +352,13 @@ describe('page-less packages', () => {
   });
 
   test('refuses a page-less package that declares a page-only contribution', async () => {
-    const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'oc-guest-'));
+    const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'mg-guest-'));
     const guestRoot = path.join(dir, 'no-entry');
     await fs.mkdir(guestRoot, { recursive: true });
     await fs.writeFile(path.join(guestRoot, 'package.json'), JSON.stringify({
-      name: '@openchamber/no-entry',
+      name: '@magio/no-entry',
       version: '1.0.0',
-      openchamber: {
+      magio: {
         apiVersion: 1,
         contributes: {
           panel: { id: 'no-entry', name: 'No Entry', icon: 'tools' },
@@ -366,23 +366,23 @@ describe('page-less packages', () => {
         },
       },
     }));
-    expect(await inspectGuestPackage(guestRoot, { openchamberVersion: '1.0.0' })).toEqual({ ok: false, code: 'invalid-manifest' });
+    expect(await inspectGuestPackage(guestRoot, { magioVersion: '1.0.0' })).toEqual({ ok: false, code: 'invalid-manifest' });
     await fs.rm(dir, { recursive: true, force: true });
   });
 });
 
 describe('actions and commands on the public row', () => {
   test('copies declared actions and commands and asks for conversation when a session action wants messages', async () => {
-    const root = await fs.mkdtemp(path.join(os.tmpdir(), 'oc-guest-'));
+    const root = await fs.mkdtemp(path.join(os.tmpdir(), 'mg-guest-'));
     await writeBuiltGuest(root);
     const pkg = JSON.parse(await fs.readFile(path.join(root, 'package.json'), 'utf8'));
     pkg.version = '1.0.0';
-    pkg.openchamber.contributes.actions = [
+    pkg.magio.contributes.actions = [
       { id: 'create-task', label: 'Create task', where: 'message', roles: ['assistant'] },
       { id: 'summarize', label: 'Summarize', where: 'session', payload: ['messages'] },
     ];
-    pkg.openchamber.contributes.commands = [{ name: 'task', description: 'Attach a task' }];
-    pkg.openchamber.contributes.tools = [
+    pkg.magio.contributes.commands = [{ name: 'task', description: 'Attach a task' }];
+    pkg.magio.contributes.tools = [
       { match: 'mcp.tasks.*', name: 'Tasks', icon: 'checkbox-circle', title: '{input.id}', output: 'table', columns: ['id', 'title'] },
     ];
     await fs.writeFile(path.join(root, 'package.json'), JSON.stringify(pkg));
@@ -391,13 +391,13 @@ describe('actions and commands on the public row', () => {
     expect(inspected.ok).toBe(true);
     if (inspected.ok) {
       const row = toPublicGuest({ ...inspected.guest, source: 'path', path: root, capabilityGrants: [] });
-      expect(row.actions).toEqual(pkg.openchamber.contributes.actions);
-      expect(row.commands).toEqual(pkg.openchamber.contributes.commands);
-      expect(row.tools).toEqual(pkg.openchamber.contributes.tools);
+      expect(row.actions).toEqual(pkg.magio.contributes.actions);
+      expect(row.commands).toEqual(pkg.magio.contributes.commands);
+      expect(row.tools).toEqual(pkg.magio.contributes.tools);
       expect(row.capabilities).toEqual({ requested: ['conversation'], granted: [] });
     }
 
-    pkg.openchamber.contributes.actions = [{ id: 'x', label: 'X', where: 'message', payload: ['messages'] }];
+    pkg.magio.contributes.actions = [{ id: 'x', label: 'X', where: 'message', payload: ['messages'] }];
     await fs.writeFile(path.join(root, 'package.json'), JSON.stringify(pkg));
     expect(await inspectGuestPackage(root)).toMatchObject({ ok: false, code: 'invalid-manifest' });
 
@@ -411,9 +411,9 @@ describe('grant scopes', () => {
     await fs.writeFile(path.join(root, 'panel', 'index.html'), '<script src="./main.js"></script>');
     await fs.writeFile(path.join(root, 'panel', 'main.js'), 'console.log("hello")');
     await fs.writeFile(path.join(root, 'package.json'), JSON.stringify({
-      name: '@openchamber/scoped',
+      name: '@magio/scoped',
       version: '1.0.0',
-      openchamber: {
+      magio: {
         apiVersion: 1,
         contributes: {
           panel: { id: 'scoped', name: 'Scoped', icon: 'window', entry: 'panel/index.html' },
@@ -425,7 +425,7 @@ describe('grant scopes', () => {
   };
 
   test('a widened filesystem list drops that grant until the user approves again', async () => {
-    const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'oc-guest-'));
+    const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'mg-guest-'));
     const persistPath = path.join(dir, 'extensions.json');
     const root = path.join(dir, 'scoped');
     try {
@@ -449,7 +449,7 @@ describe('grant scopes', () => {
 
 describe('catalog cache under a store write', () => {
   test('a listing that started before a withdrawal is not cached as current', async () => {
-    const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'oc-guest-'));
+    const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'mg-guest-'));
     const persistPath = path.join(dir, 'extensions.json');
     const root = path.join(dir, 'hello');
     try {

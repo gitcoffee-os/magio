@@ -227,7 +227,7 @@ function SelectContent({
     let frame = 0;
     const measure = () => {
       const styles = getComputedStyle(document.documentElement);
-      const inset = (side: string) => Math.max(0, Number.parseFloat(styles.getPropertyValue(`--oc-safe-area-${side}`)) || 0) + 8;
+      const inset = (side: string) => Math.max(0, Number.parseFloat(styles.getPropertyValue(`--mg-safe-area-${side}`)) || 0) + 8;
       const next = { top: inset('top'), right: inset('right'), bottom: inset('bottom'), left: inset('left') };
       setCollisionPadding((previous) => previous.top === next.top && previous.right === next.right
         && previous.bottom === next.bottom && previous.left === next.left ? previous : next);
@@ -280,7 +280,7 @@ function SelectContent({
             color: 'var(--surface-elevated-foreground)',
           }}
           className={cn(
-            "oc-glass-popover oc-glass-floating pointer-events-auto transition-all duration-150 ease-out data-[starting-style]:opacity-0 data-[starting-style]:scale-95 data-[ending-style]:opacity-0 data-[ending-style]:scale-95 relative z-[120] max-h-[var(--available-height)] min-w-[8rem] origin-[var(--transform-origin)] overflow-x-hidden rounded-xl",
+            "mg-glass-popover mg-glass-floating pointer-events-auto transition-all duration-150 ease-out data-[starting-style]:opacity-0 data-[starting-style]:scale-95 data-[ending-style]:opacity-0 data-[ending-style]:scale-95 relative z-[120] max-h-[var(--available-height)] min-w-[8rem] origin-[var(--transform-origin)] overflow-x-hidden rounded-xl",
             !alignItemWithTrigger &&
               "data-[side=bottom]:translate-y-1 data-[side=left]:-translate-x-1 data-[side=right]:translate-x-1 data-[side=top]:-translate-y-1",
             fitContent && "w-max min-w-0",

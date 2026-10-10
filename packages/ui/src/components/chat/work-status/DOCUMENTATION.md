@@ -26,7 +26,7 @@ It is **not** a context-panel surface. It is not registered in
 `lib/surfaces/registry.ts`, has no rail icon, no tab, no persisted width and no
 resizer. It is a card floating inside the chat column — rounded border, faint
 fill, its own margin — rather than a docked pane flush against the window edge.
-When it overlays the transcript, it uses the shared `oc-glass-panel` surface;
+When it overlays the transcript, it uses the shared `mg-glass-panel` surface;
 the inline card keeps its lighter, non-blurred fill instead.
 
 ## Placement
@@ -476,7 +476,7 @@ each write replaces the whole list, so one write per item would keep only the
 last.
 
 Stored in session metadata as a **snapshot** (`lib/linkedIssues.ts`, namespace
-`openchamber.linked_issues`), riding the same `patchSessionMetadata` channel as
+`magio.linked_issues`), riding the same `patchSessionMetadata` channel as
 pinned messages. Number, title, url, author and avatar only — the body,
 comments and state belong to GitHub, and mirroring them would mean owning their
 staleness. The stored title can drift; that is the price of a store that never
@@ -527,7 +527,7 @@ the quota loader treats a working proxy as a transient disconnected runtime
 and skips the initial load.
 
 Quotas, MCP status, skills, agent memory and the Linear/GitHub logins are all
-served by whichever OpenChamber instance is connected, and each was cached
+served by whichever Magio instance is connected, and each was cached
 globally or by directory alone — which two instances can share. A switch left
 the previous instance's answers on screen, and its Linear login usable against
 a runtime that has no Linear. `apps/runtimeEndpointReset.ts` now drops all of

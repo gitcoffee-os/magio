@@ -44,7 +44,7 @@ describe('environment runtime', () => {
   });
 
   beforeEach(() => {
-    root = fs.mkdtempSync(path.join(os.tmpdir(), 'oc-environment-runtime-'));
+    root = fs.mkdtempSync(path.join(os.tmpdir(), 'mg-environment-runtime-'));
     projectPath = path.join(root, 'repo');
     fs.mkdirSync(path.join(projectPath, '.git'), { recursive: true });
     fs.mkdirSync(path.join(projectPath, 'src'), { recursive: true });

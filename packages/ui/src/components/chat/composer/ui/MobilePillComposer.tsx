@@ -115,7 +115,7 @@ export function MobilePillComposer(props: MobilePillComposerProps) {
                 // The morph measures and animates this box (see mobileComposerMorph).
                 data-composer-box="true"
                 className={cn(
-                    'oc-glass-composer flex min-w-0 flex-col border border-border/80',
+                    'mg-glass-composer flex min-w-0 flex-col border border-border/80',
                     topRow || bottomRow ? 'rounded-[1.5rem]' : 'rounded-full',
                 )}
             >
@@ -228,7 +228,7 @@ export function MobilePillComposer(props: MobilePillComposerProps) {
             >
                 <button
                     type="button"
-                    className="oc-glass-composer flex h-11 w-11 cursor-pointer items-center justify-center rounded-full border border-border/80 text-primary hover:text-primary"
+                    className="mg-glass-composer flex h-11 w-11 cursor-pointer items-center justify-center rounded-full border border-border/80 text-primary hover:text-primary"
                     onClick={onQueueMessage}
                     disabled={!showTrailingSendAction}
                     tabIndex={showTrailingSendAction ? undefined : -1}

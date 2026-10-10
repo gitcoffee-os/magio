@@ -42,9 +42,9 @@ import { GitPage } from '@/components/sections/git-identities/GitPage';
 import { IntegrationsPage } from '@/components/sections/integrations/IntegrationsPage';
 import { RoutingPage } from '@/components/sections/routing/RoutingPage';
 import { ExtensionsPage } from '@/components/sections/extensions/ExtensionsPage';
-import type { OpenChamberSection } from '@/components/sections/openchamber/types';
-import { OpenChamberPage } from '@/components/sections/openchamber/OpenChamberPage';
-import { AboutSettings } from '@/components/sections/openchamber/AboutSettings';
+import type { MagioSection } from '@/components/sections/magio/types';
+import { MagioPage } from '@/components/sections/magio/MagioPage';
+import { AboutSettings } from '@/components/sections/magio/AboutSettings';
 import { SettingsPageLayout } from '@/components/sections/shared/SettingsPageLayout';
 import { SettingsScrollbarTopClearanceContext } from '@/components/sections/shared/settingsScrollbarClearance';
 import {
@@ -70,7 +70,7 @@ import { buildSettingsSearchResults, type SettingsSearchResult } from '@/lib/set
 const SETTINGS_SPLIT_SIDEBAR_WIDTH = 280;
 // The desktop close button: top-1 offset plus its h-7 height.
 const SETTINGS_CLOSE_BUTTON_CLEARANCE = 32;
-const SETTINGS_DETAIL_HISTORY_KEY = '__openchamberSettingsDetail';
+const SETTINGS_DETAIL_HISTORY_KEY = '__magioSettingsDetail';
 /** How long (in frames, ~0.5 s) a search result or a link waits for its item to render. */
 const PENDING_ITEM_MAX_FRAMES = 30;
 
@@ -104,7 +104,7 @@ interface SettingsViewProps {
 }
 
 const pageOrder: SettingsPageSlug[] = [
-  // 'general' group — OpenChamber
+  // 'general' group — Magio
   'general',
   'appearance',
   'chat',
@@ -222,13 +222,13 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ onClose, forceMobile
     return isDesktopShell() && isDesktopLocalOriginActive();
   }, []);
   const isMac = React.useMemo(() => {
-    return isDesktopShell() && window.__OPENCHAMBER_PLATFORM__ === 'darwin';
+    return isDesktopShell() && window.__MAGIO_PLATFORM__ === 'darwin';
   }, []);
   const isWindows = React.useMemo(() => {
-    return isDesktopShell() && window.__OPENCHAMBER_PLATFORM__ === 'win32';
+    return isDesktopShell() && window.__MAGIO_PLATFORM__ === 'win32';
   }, []);
   const isLinux = React.useMemo(() => {
-    return isDesktopShell() && window.__OPENCHAMBER_PLATFORM__ === 'linux';
+    return isDesktopShell() && window.__MAGIO_PLATFORM__ === 'linux';
   }, []);
 
   // keep platform check available for future window chrome tweaks
@@ -314,7 +314,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ onClose, forceMobile
 
   // Nav is always open (collapsed state removed)
 
-  const openChamberSectionBySlug: Partial<Record<SettingsPageSlug, OpenChamberSection>> = React.useMemo(() => ({
+  const magioSectionBySlug: Partial<Record<SettingsPageSlug, MagioSection>> = React.useMemo(() => ({
     general: 'general',
     appearance: 'visual',
     chat: 'chat',
@@ -381,7 +381,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ onClose, forceMobile
       case 'tunnel':
         return t('settings.page.tunnel.title');
       case 'isolated-spaces':
-        return t('settings.openchamber.spaces.title');
+        return t('settings.magio.spaces.title');
       case 'about':
         return t('settings.page.about.title');
       case 'home':
@@ -522,7 +522,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ onClose, forceMobile
     }
     if (result.id === 'plugins.create') {
       window.setTimeout(() => {
-        window.dispatchEvent(new CustomEvent('openchamber:settings-open-plugin-add'));
+        window.dispatchEvent(new CustomEvent('magio:settings-open-plugin-add'));
       }, 50);
     }
   }, [isMobile, openPage, prepareSettingsSearchTarget]);
@@ -710,14 +710,14 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ onClose, forceMobile
       case 'voice':
       case 'tunnel':
       case 'isolated-spaces': {
-        const section = openChamberSectionBySlug[slug] ?? 'visual';
-        return <OpenChamberPage section={section} />;
+        const section = magioSectionBySlug[slug] ?? 'visual';
+        return <MagioPage section={section} />;
       }
       case 'home':
       default:
         return null;
     }
-  }, [openChamberSectionBySlug, renderUnavailable, runtimeCtx, t]);
+  }, [magioSectionBySlug, renderUnavailable, runtimeCtx, t]);
 
   // Mobile: if opened via deep-link / palette to a non-home page, jump into it once.
   React.useEffect(() => {
@@ -868,7 +868,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ onClose, forceMobile
     return (
       <div className="flex h-full flex-col overflow-hidden">
         <div className="px-4 pt-3">
-          <div className="oc-surface-elevated flex h-10 items-center gap-1.5 rounded-md border border-border bg-surface-elevated/70 px-2 text-muted-foreground focus-within:ring-2 focus-within:ring-ring sm:h-8">
+          <div className="mg-surface-elevated flex h-10 items-center gap-1.5 rounded-md border border-border bg-surface-elevated/70 px-2 text-muted-foreground focus-within:ring-2 focus-within:ring-ring sm:h-8">
             <Icon name="search" className="h-4 w-4 shrink-0" />
             <input
               value={settingsSearchQuery}
@@ -1095,7 +1095,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ onClose, forceMobile
       {isMobile ? (
         <div
           className={cn(
-            'flex h-[var(--oc-header-height,56px)] shrink-0 items-center gap-2 px-3',
+            'flex h-[var(--mg-header-height,56px)] shrink-0 items-center gap-2 px-3',
             // The root nav list reads as a single quiet page — no divider and
             // no back arrow (the X on the right is the only way out); subpages
             // keep both.

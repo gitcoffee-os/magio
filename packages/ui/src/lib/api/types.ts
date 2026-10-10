@@ -991,7 +991,7 @@ export interface RemoveGitWorktreePayload {
   deleteLocalBranch?: boolean;
 }
 
-/** Private ref (`refs/openchamber/runs/<group>/<session>`) holding a worktree snapshot. */
+/** Private ref (`refs/magio/runs/<group>/<session>`) holding a worktree snapshot. */
 export interface GitWorktreeSnapshotPayload {
   ref: string;
 }

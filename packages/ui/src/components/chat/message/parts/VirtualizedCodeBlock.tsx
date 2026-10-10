@@ -64,7 +64,7 @@ export const VirtualizedCodeBlock: React.FC<VirtualizedCodeBlockProps> = React.m
   if (!shouldVirtualize) {
     return (
       <div
-        className="oc-surface-code bg-[var(--syntax-background)] typography-code font-mono w-full min-w-0"
+        className="mg-surface-code bg-[var(--syntax-background)] typography-code font-mono w-full min-w-0"
         style={{ ...(syntaxVars as React.CSSProperties), maxHeight, overflow: 'auto' }}
       >
         {lines.map((line, idx) => (
@@ -127,7 +127,7 @@ const VirtualizedRows: React.FC<VirtualizedRowsProps> = React.memo(({
   return (
     <div
       ref={parentRef}
-      className="oc-surface-code bg-[var(--syntax-background)] typography-code font-mono w-full min-w-0"
+      className="mg-surface-code bg-[var(--syntax-background)] typography-code font-mono w-full min-w-0"
       style={{ ...(syntaxVars as React.CSSProperties), height: viewportHeight, maxHeight, overflow: 'auto' }}
     >
       <div style={{ height: virtualizer.getTotalSize(), position: 'relative' }}>

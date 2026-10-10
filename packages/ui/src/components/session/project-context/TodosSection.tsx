@@ -225,7 +225,7 @@ export const TodosSection: React.FC<{
           spellCheck={false}
           autoComplete="off"
           className={cn(
-            'oc-surface-elevated block min-h-8 max-h-[calc(8lh+0.75rem)] w-full min-w-0 resize-none field-sizing-content rounded-lg bg-[var(--surface-elevated)] px-3 py-1.5 typography-markdown md:typography-ui-label text-foreground outline-none placeholder:text-muted-foreground',
+            'mg-surface-elevated block min-h-8 max-h-[calc(8lh+0.75rem)] w-full min-w-0 resize-none field-sizing-content rounded-lg bg-[var(--surface-elevated)] px-3 py-1.5 typography-markdown md:typography-ui-label text-foreground outline-none placeholder:text-muted-foreground',
             'ring-1 ring-inset ring-border/60 transition duration-200 ease-out focus:ring-2 focus:ring-[var(--interactive-focus-ring)] focus-visible:outline-none',
             'disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50',
           )}

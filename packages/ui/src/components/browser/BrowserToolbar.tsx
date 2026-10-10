@@ -185,7 +185,7 @@ export const BrowserToolbar: React.FC<BrowserToolbarProps> = ({
           autoComplete="off"
           role="combobox"
           aria-expanded={visibleSuggestions.length > 0}
-          aria-controls="openchamber-browser-address-suggestions"
+          aria-controls="magio-browser-address-suggestions"
           className={cn(
             'h-6 w-full rounded-full border border-border/50 bg-[var(--surface-elevated)] px-3',
             addressMark && 'pl-8',
@@ -193,7 +193,7 @@ export const BrowserToolbar: React.FC<BrowserToolbarProps> = ({
           )}
           aria-label={t('contextPanel.browser.addressAria')}
         />
-        <div id="openchamber-browser-address-suggestions">
+        <div id="magio-browser-address-suggestions">
           <BrowserAddressSuggestions
             entries={visibleSuggestions}
             activeIndex={activeSuggestion}

@@ -1,5 +1,5 @@
-import { HostRequestError, type GuestStorageRequest, type GuestStorageResult } from '@openchamber/sdk';
-import { guestStorageResultSchema } from '@openchamber/sdk/schemas';
+import { HostRequestError, type GuestStorageRequest, type GuestStorageResult } from '@magio/sdk';
+import { guestStorageResultSchema } from '@magio/sdk/schemas';
 import { runtimeFetch } from '@/lib/runtime-fetch';
 import { runDeviceGuestStorage } from './device-storage';
 

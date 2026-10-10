@@ -23,7 +23,7 @@ const createRuntime = () => createStaticRoutesRuntime({
 const createServingRuntime = (distPath) => createStaticRoutesRuntime({
   fs,
   path,
-  process: { env: { OPENCHAMBER_DIST_DIR: distPath } },
+  process: { env: { MAGIO_DIST_DIR: distPath } },
   __dirname: '/server',
   express,
   resolveProjectDirectory: () => '',
@@ -38,7 +38,7 @@ describe('static file caching', () => {
   let distPath;
 
   beforeAll(() => {
-    distPath = fs.mkdtempSync(path.join(os.tmpdir(), 'oc-static-routes-'));
+    distPath = fs.mkdtempSync(path.join(os.tmpdir(), 'mg-static-routes-'));
     fs.mkdirSync(path.join(distPath, 'assets'));
     fs.writeFileSync(path.join(distPath, 'index.html'), '<!doctype html>');
     fs.writeFileSync(path.join(distPath, 'sw.js'), '');
@@ -82,9 +82,9 @@ describe('static routes runtime', () => {
     const response = await request(app).get('/sessions/abc').set('Accept', 'text/html');
 
     expect(response.status).toBe(200);
-    expect(response.text).toContain('OpenChamber is running in headless mode');
-    expect(response.text).toContain('Open it from the OpenChamber desktop or mobile app');
-    expect(response.text).toContain('openchamber connect-url --help');
+    expect(response.text).toContain('Magio is running in headless mode');
+    expect(response.text).toContain('Open it from the Magio desktop or mobile app');
+    expect(response.text).toContain('magio connect-url --help');
     expect(response.text).toContain('Copy command');
   });
 
@@ -98,7 +98,7 @@ describe('static routes runtime', () => {
     expect(response.body).toEqual({
       ok: true,
       mode: 'api-only',
-      message: 'OpenChamber is running in API-only mode',
+      message: 'Magio is running in API-only mode',
     });
   });
 
@@ -110,8 +110,8 @@ describe('static routes runtime', () => {
     const auth = await request(app).get('/auth/session');
     const health = await request(app).get('/health');
 
-    expect(api.body).not.toEqual({ ok: true, mode: 'api-only', message: 'OpenChamber is running in API-only mode' });
-    expect(auth.body).not.toEqual({ ok: true, mode: 'api-only', message: 'OpenChamber is running in API-only mode' });
-    expect(health.body).not.toEqual({ ok: true, mode: 'api-only', message: 'OpenChamber is running in API-only mode' });
+    expect(api.body).not.toEqual({ ok: true, mode: 'api-only', message: 'Magio is running in API-only mode' });
+    expect(auth.body).not.toEqual({ ok: true, mode: 'api-only', message: 'Magio is running in API-only mode' });
+    expect(health.body).not.toEqual({ ok: true, mode: 'api-only', message: 'Magio is running in API-only mode' });
   });
 });

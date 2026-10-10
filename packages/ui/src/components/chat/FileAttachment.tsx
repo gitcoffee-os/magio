@@ -551,11 +551,11 @@ interface FilePart {
 }
 
 const GITHUB_ISSUE_LINK_MIME = 'application/vnd.github.issue-link';
-const GITLAB_ISSUE_LINK_MIME = 'application/vnd.openchamber.gitlab-issue-link';
+const GITLAB_ISSUE_LINK_MIME = 'application/vnd.magio.gitlab-issue-link';
 const GITHUB_PR_LINK_MIME = 'application/vnd.github.pull-request-link';
-const LINEAR_ISSUE_LINK_MIME = 'application/vnd.openchamber.linear-issue-link';
-const GUEST_ISSUE_LINK_MIME = 'application/vnd.openchamber.guest-issue-link';
-const GUEST_PR_LINK_MIME = 'application/vnd.openchamber.guest-pr-link';
+const LINEAR_ISSUE_LINK_MIME = 'application/vnd.magio.linear-issue-link';
+const GUEST_ISSUE_LINK_MIME = 'application/vnd.magio.guest-issue-link';
+const GUEST_PR_LINK_MIME = 'application/vnd.magio.guest-pr-link';
 
 type IssueLinkKind = 'github-issue' | 'gitlab-issue' | 'github-pr' | 'linear-issue' | 'guest-issue' | 'guest-pr';
 

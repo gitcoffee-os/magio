@@ -136,7 +136,7 @@ const WEBKIT_SCROLL_FIX_CSS = `
      row highlight is the feedback; the native blue text selection on top of
      it reads as double-selection, so it is painted transparent for the drag's
      duration only (single-line selections keep the normal look for copying). */
-  :host([data-oc-comment-drag]) {
+  :host([data-mg-comment-drag]) {
     user-select: none;
     -webkit-user-select: none;
   }
@@ -282,8 +282,8 @@ const WEBKIT_SCROLL_FIX_CSS = `
   /* Partial diffs get no expand buttons from Pierre (the lines are not
      loaded). When the owner can load them on demand, the gutter separator
      itself becomes the button and shows the same glyphs as the real one. */
-  :host([data-oc-expand-on-demand]) [data-diff-type="single"] [data-gutter] [data-separator-wrapper],
-  :host([data-oc-expand-on-demand]) [data-diff-type="split"] [data-deletions] [data-gutter] [data-separator-wrapper] {
+  :host([data-mg-expand-on-demand]) [data-diff-type="single"] [data-gutter] [data-separator-wrapper],
+  :host([data-mg-expand-on-demand]) [data-diff-type="split"] [data-deletions] [data-gutter] [data-separator-wrapper] {
     cursor: pointer;
 
     &::before {
@@ -297,15 +297,15 @@ const WEBKIT_SCROLL_FIX_CSS = `
     }
   }
 
-  :host([data-oc-expand-on-demand]) [data-diff-type="single"] [data-gutter] [data-separator-first] [data-separator-wrapper]::before,
-  :host([data-oc-expand-on-demand]) [data-diff-type="split"] [data-deletions] [data-gutter] [data-separator-first] [data-separator-wrapper]::before {
+  :host([data-mg-expand-on-demand]) [data-diff-type="single"] [data-gutter] [data-separator-first] [data-separator-wrapper]::before,
+  :host([data-mg-expand-on-demand]) [data-diff-type="split"] [data-deletions] [data-gutter] [data-separator-first] [data-separator-wrapper]::before {
     content: '\\2191';
   }
 
   /* Full file requested: the glyph becomes a spinner and the separators stop
      taking clicks until the highlighted full diff replaces this one. */
-  :host([data-oc-expand-loading]) [data-diff-type="single"] [data-gutter] [data-separator-wrapper],
-  :host([data-oc-expand-loading]) [data-diff-type="split"] [data-deletions] [data-gutter] [data-separator-wrapper] {
+  :host([data-mg-expand-loading]) [data-diff-type="single"] [data-gutter] [data-separator-wrapper],
+  :host([data-mg-expand-loading]) [data-diff-type="split"] [data-deletions] [data-gutter] [data-separator-wrapper] {
     cursor: default;
     pointer-events: none;
     opacity: 0.6;
@@ -318,11 +318,11 @@ const WEBKIT_SCROLL_FIX_CSS = `
       border-radius: 50%;
       border: 1.5px solid currentColor;
       border-right-color: transparent;
-      animation: oc-expand-spin 0.8s linear infinite;
+      animation: mg-expand-spin 0.8s linear infinite;
     }
   }
 
-  @keyframes oc-expand-spin {
+  @keyframes mg-expand-spin {
     to { transform: rotate(360deg); }
   }
   `;
@@ -938,8 +938,8 @@ const PierreDiffViewerBody: React.FC<Omit<PierreDiffViewerProps, 'hideWhitespace
       // recalculation between neighboring hunks.
       for (const { target, offset } of placements) {
         const value = `${offset}px`;
-        if (target.style.getPropertyValue('--oc-hunk-action-offset') !== value) {
-          target.style.setProperty('--oc-hunk-action-offset', value);
+        if (target.style.getPropertyValue('--mg-hunk-action-offset') !== value) {
+          target.style.setProperty('--mg-hunk-action-offset', value);
         }
       }
     }
@@ -991,8 +991,8 @@ const PierreDiffViewerBody: React.FC<Omit<PierreDiffViewerProps, 'hideWhitespace
     const setDragAttribute = (active: boolean) => {
       const host = root.querySelector('diffs-container');
       if (!(host instanceof HTMLElement)) return;
-      if (active) host.setAttribute('data-oc-comment-drag', '');
-      else host.removeAttribute('data-oc-comment-drag');
+      if (active) host.setAttribute('data-mg-comment-drag', '');
+      else host.removeAttribute('data-mg-comment-drag');
     };
 
     const lineFromPoint = (clientX: number, clientY: number): { line: number; side: AnnotationSide; numberColumn: boolean } | null => {
@@ -1639,8 +1639,8 @@ const PierreDiffViewerBody: React.FC<Omit<PierreDiffViewerProps, 'hideWhitespace
     return waitForDiffReady(container, () => {
       const host = container.querySelector('diffs-container');
       if (!(host instanceof HTMLElement)) return;
-      host.toggleAttribute('data-oc-expand-on-demand', expandOnDemand);
-      host.toggleAttribute('data-oc-expand-loading', expandLoading);
+      host.toggleAttribute('data-mg-expand-on-demand', expandOnDemand);
+      host.toggleAttribute('data-mg-expand-loading', expandLoading);
     });
   }, [expandLoading, expandOnDemand, fileDiff]);
 

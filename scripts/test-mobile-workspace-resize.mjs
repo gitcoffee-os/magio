@@ -9,7 +9,7 @@ import { CdpClient, createPageTarget, evaluateValue, launchChrome, reservePort, 
 const [url, output] = process.argv.slice(2);
 assert(url && output, 'Provide an isolated server URL and an evidence directory');
 await mkdir(output, { recursive: true });
-const profileDir = await mkdtemp(join(tmpdir(), 'oc-fold-resize-'));
+const profileDir = await mkdtemp(join(tmpdir(), 'mg-fold-resize-'));
 const port = await reservePort();
 const chrome = launchChrome({ chrome: resolveChrome(), profileDir, port, headless: true });
 let client;
@@ -62,7 +62,7 @@ try {
       focused: document.activeElement === resizeEditor,
       draft: resizeEditor.textContent.includes('UNSAVED_FOLD_DRAFT'),
       fileOpen: !!Array.from(document.querySelectorAll('h2')).find(e=>e.textContent==='fold-resize.txt'),
-      tabletSidebar: !!document.querySelector('.oc-mobile-app-shell > aside:first-child')
+      tabletSidebar: !!document.querySelector('.mg-mobile-app-shell > aside:first-child')
     })`);
     results.push({ name, ...state });
     const shot = await client.send('Page.captureScreenshot');

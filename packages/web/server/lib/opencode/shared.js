@@ -150,7 +150,7 @@ function writeMdFile(filePath, frontmatter, body, { flag = 'w' } = {}) {
  * Project config files in the order OpenCode 2 lets them win: a file under
  * `.opencode/` overrides the one beside it at the project root, and
  * `opencode.json` overrides `opencode.jsonc`. When several exist, the
- * highest-priority one is the file OpenChamber reads and writes for the
+ * highest-priority one is the file Magio reads and writes for the
  * project scope (OpenCode merges them all; an entry that lives only in a
  * lower file is visible through the resolved catalog but not editable here).
  */
@@ -351,7 +351,7 @@ function readConfig(workingDirectory) {
  * read from the merged OpenCode configuration on the canonical checkout. Keeps
  * the `worktree.directory` rule in one place (`worktree-directory.js`) and
  * returns null when the setting is unset, so the caller can fall back to
- * OpenChamber's data-dir location.
+ * Magio's data-dir location.
  */
 function readWorktreeDirectorySetting(workingDirectory, primaryWorktree = workingDirectory) {
   const { mergedConfig } = readConfigLayers(workingDirectory);
@@ -534,7 +534,7 @@ function writeConfig(config, filePath = CONFIG_FILE) {
         existingParse = parseConfigResult(existingRaw.trim(), filePath);
       }
 
-      const backupFile = `${filePath}.openchamber.backup`;
+      const backupFile = `${filePath}.magio.backup`;
       fs.copyFileSync(filePath, backupFile);
       console.log(`Created config backup: ${backupFile}`);
     }

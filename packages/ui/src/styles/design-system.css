@@ -2,27 +2,27 @@
   :root {
     color-scheme: light;
     -webkit-font-smoothing: antialiased;
-    --oc-safe-area-top: 0px;
-    --oc-safe-area-right: 0px;
-    --oc-safe-area-bottom: 0px;
-    --oc-safe-area-bottom-visual: 0px;
-    --oc-safe-area-left: 0px;
-    --oc-header-height: 56px;
-    --oc-visual-viewport-offset-top: 0px;
-    --oc-visual-viewport-height: 100dvh;
-    --oc-wco-left-inset: 0px;
-    --oc-wco-right-inset: 0px;
-    --oc-wco-titlebar-height: 0px;
+    --mg-safe-area-top: 0px;
+    --mg-safe-area-right: 0px;
+    --mg-safe-area-bottom: 0px;
+    --mg-safe-area-bottom-visual: 0px;
+    --mg-safe-area-left: 0px;
+    --mg-header-height: 56px;
+    --mg-visual-viewport-offset-top: 0px;
+    --mg-visual-viewport-height: 100dvh;
+    --mg-wco-left-inset: 0px;
+    --mg-wco-right-inset: 0px;
+    --mg-wco-titlebar-height: 0px;
     --ui-regular-font-weight: 400;
-    --oc-scrollbar-thumb: oklch(0.32 0.03 50 / 0.4);
-    --oc-scrollbar-thumb-hover: oklch(0.32 0.03 50 / 0.6);
+    --mg-scrollbar-thumb: oklch(0.32 0.03 50 / 0.4);
+    --mg-scrollbar-thumb-hover: oklch(0.32 0.03 50 / 0.6);
     --padding-scale: 1;
     /* Shared glass surfaces. Semantic surface tokens provide each tint. */
-    --oc-glass-blur: 22px;
-    --oc-glass-opacity: 52%;
-    --oc-glass-popover-opacity: 50%;
-    --oc-glass-tooltip-opacity: 62%;
-    --oc-glass-saturation: 1.24;
+    --mg-glass-blur: 22px;
+    --mg-glass-opacity: 52%;
+    --mg-glass-popover-opacity: 50%;
+    --mg-glass-tooltip-opacity: 62%;
+    --mg-glass-saturation: 1.24;
 
     /* Semantic typography defaults (must match SEMANTIC_TYPOGRAPHY) */
     --text-markdown: 0.875rem;
@@ -34,7 +34,7 @@
     --text-settings-page-title: 1.0625rem;
 
     /* Text selection colour shared by native ::selection and the comment overlay */
-    --oc-text-selection: var(--interactive-selection);
+    --mg-text-selection: var(--interactive-selection);
 
     /* Default Light Theme */
     --background: oklch(0.97 0.02 85); /* Warm sand background */
@@ -73,11 +73,11 @@
   }
 
   .dark {
-    --oc-glass-blur: 26px;
-    --oc-glass-opacity: 50%;
-    --oc-glass-popover-opacity: 52%;
-    --oc-glass-tooltip-opacity: 64%;
-    --oc-glass-saturation: 1.16;
+    --mg-glass-blur: 26px;
+    --mg-glass-opacity: 50%;
+    --mg-glass-popover-opacity: 52%;
+    --mg-glass-tooltip-opacity: 64%;
+    --mg-glass-saturation: 1.16;
     /* Default Dark Theme - using OKLCH color space */
     --background: oklch(0.16 0.01 30); /* #151313 */
     --foreground: oklch(0.85 0.02 90); /* #cdccc3 */
@@ -282,19 +282,19 @@
 @layer components {
   /* A painted surface owns its text context too. Neutral children using
      text-foreground inherit the surface's foreground, not the canvas color. */
-  .oc-surface-elevated,
+  .mg-surface-elevated,
   .bg-surface-elevated,
   [class~="bg-[var(--surface-elevated)]"],
   .bg-card,
   .bg-popover,
-  .oc-glass-popover,
-  .oc-glass-tooltip,
-  .oc-glass-composer {
+  .mg-glass-popover,
+  .mg-glass-tooltip,
+  .mg-glass-composer {
     --foreground: var(--surface-elevated-foreground);
     color: var(--foreground);
   }
 
-  .oc-surface-canvas,
+  .mg-surface-canvas,
   .bg-background,
   .bg-surface-background,
   [class~="bg-[var(--surface-background)]"],
@@ -302,12 +302,12 @@
   .bg-surface-muted,
   [class~="bg-[var(--surface-muted)]"],
   .bg-sidebar,
-  .oc-glass-panel {
+  .mg-glass-panel {
     --foreground: var(--surface-foreground);
     color: var(--foreground);
   }
 
-  .oc-surface-code,
+  .mg-surface-code,
   [class~="bg-[var(--syntax-background)]"] {
     --foreground: var(--syntax-foreground);
     color: var(--foreground);
@@ -321,36 +321,36 @@
   /* Shared translucent surfaces. Each variant only chooses its semantic tint;
      blur, accessibility fallbacks, and floating-surface elevation stay common.
      Utilities remain able to opt an individual consumer out. */
-  .oc-glass-popover,
-.oc-glass-tooltip,
-.oc-glass-panel,
-.oc-glass-composer {
-  background-color: color-mix(in srgb, var(--oc-glass-color) var(--oc-glass-opacity), transparent);
-  -webkit-backdrop-filter: blur(var(--oc-glass-blur)) saturate(var(--oc-glass-saturation));
-  backdrop-filter: blur(var(--oc-glass-blur)) saturate(var(--oc-glass-saturation));
+  .mg-glass-popover,
+.mg-glass-tooltip,
+.mg-glass-panel,
+.mg-glass-composer {
+  background-color: color-mix(in srgb, var(--mg-glass-color) var(--mg-glass-opacity), transparent);
+  -webkit-backdrop-filter: blur(var(--mg-glass-blur)) saturate(var(--mg-glass-saturation));
+  backdrop-filter: blur(var(--mg-glass-blur)) saturate(var(--mg-glass-saturation));
 }
 
-.oc-glass-popover {
-  --oc-glass-color: var(--surface-elevated);
-  --oc-glass-opacity: var(--oc-glass-popover-opacity);
+.mg-glass-popover {
+  --mg-glass-color: var(--surface-elevated);
+  --mg-glass-opacity: var(--mg-glass-popover-opacity);
 }
 
-.oc-glass-tooltip {
-  --oc-glass-color: var(--surface-elevated);
-  --oc-glass-opacity: var(--oc-glass-tooltip-opacity);
+.mg-glass-tooltip {
+  --mg-glass-color: var(--surface-elevated);
+  --mg-glass-opacity: var(--mg-glass-tooltip-opacity);
 }
 
-.oc-glass-panel {
-  --oc-glass-color: var(--surface-muted);
+.mg-glass-panel {
+  --mg-glass-color: var(--surface-muted);
 }
 
 /* The chat composer floating over the transcript. */
-.oc-glass-composer {
-  --oc-glass-color: var(--surface-elevated);
-  --oc-glass-opacity: var(--oc-glass-popover-opacity);
+.mg-glass-composer {
+  --mg-glass-color: var(--surface-elevated);
+  --mg-glass-opacity: var(--mg-glass-popover-opacity);
 }
 
-.oc-glass-floating {
+.mg-glass-floating {
   box-shadow:
     inset 0 1px 0 0 rgb(255 255 255 / 0.8),
     inset 0 0 0 1px rgb(0 0 0 / 0.04),
@@ -360,7 +360,7 @@
     0 12px 20px -4px rgb(0 0 0 / 0.08);
 }
 
-.dark .oc-glass-floating {
+.dark .mg-glass-floating {
   box-shadow:
     inset 0 1px 0 0 rgb(255 255 255 / 0.12),
     inset 0 0 0 1px rgb(255 255 255 / 0.08),
@@ -372,14 +372,14 @@
 
 /* A modal window (dialogs, the command palette, Settings) lifts off the
    dimmed page: a wide soft shadow plus a tighter one under the edge. */
-.oc-modal-shadow {
+.mg-modal-shadow {
   box-shadow:
     0 2px 6px -1px rgb(0 0 0 / 0.08),
     0 12px 28px -6px rgb(0 0 0 / 0.16),
     0 32px 72px -12px rgb(0 0 0 / 0.24);
 }
 
-.dark .oc-modal-shadow {
+.dark .mg-modal-shadow {
   box-shadow:
     0 2px 6px -1px rgb(0 0 0 / 0.3),
     0 12px 28px -6px rgb(0 0 0 / 0.45),
@@ -395,13 +395,13 @@
    stays the glass. Mobile: the overlay is mounted beside the pill/box in
    [data-dictation-host], so those siblings hide and the overlay's inner
    [data-dictation-glass] layer is the glass. */
-.oc-glass-composer:has(.oc-dictation-overlay)
-  *:not(.oc-dictation-overlay, .oc-dictation-overlay *, :has(.oc-dictation-overlay)),
-[data-dictation-host]:has(> .oc-dictation-overlay) > :not(.oc-dictation-overlay) {
+.mg-glass-composer:has(.mg-dictation-overlay)
+  *:not(.mg-dictation-overlay, .mg-dictation-overlay *, :has(.mg-dictation-overlay)),
+[data-dictation-host]:has(> .mg-dictation-overlay) > :not(.mg-dictation-overlay) {
   opacity: 0;
 }
 
-.oc-glass-backdrop {
+.mg-glass-backdrop {
   -webkit-backdrop-filter: blur(4px);
   backdrop-filter: blur(4px);
 }
@@ -409,41 +409,41 @@
 /* The recap hint floats in the band above the composer; a panel docked
    there (queue, suggestion, BTW) would push it up over the transcript, so it
    hides while any panel is mounted. See ComposerFloatingPanel. */
-[data-composer-bound][data-floating-panel] .oc-recap-hint {
+[data-composer-bound][data-floating-panel] .mg-recap-hint {
   opacity: 0;
 }
 
 /* The same goes for a composer taller than at rest (a top row, more lines of
    text): the hint rides its top edge and would land on the transcript.
    See the composer slot observer in ChatContainer. */
-[data-composer-bound][data-composer-grown] .oc-recap-hint {
+[data-composer-bound][data-composer-grown] .mg-recap-hint {
   opacity: 0;
 }
 
 @supports not ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
-  .oc-glass-popover,
-  .oc-glass-tooltip,
-  .oc-glass-panel,
-  .oc-glass-composer {
-    background-color: var(--oc-glass-color);
+  .mg-glass-popover,
+  .mg-glass-tooltip,
+  .mg-glass-panel,
+  .mg-glass-composer {
+    background-color: var(--mg-glass-color);
   }
 }
 
 @media (prefers-reduced-transparency: reduce) {
-  .oc-glass-popover,
-  .oc-glass-tooltip,
-  .oc-glass-panel,
-  .oc-glass-composer,
-  .oc-glass-backdrop {
+  .mg-glass-popover,
+  .mg-glass-tooltip,
+  .mg-glass-panel,
+  .mg-glass-composer,
+  .mg-glass-backdrop {
     -webkit-backdrop-filter: none;
     backdrop-filter: none;
   }
 
-  .oc-glass-popover,
-  .oc-glass-tooltip,
-  .oc-glass-panel,
-  .oc-glass-composer {
-    background-color: var(--oc-glass-color);
+  .mg-glass-popover,
+  .mg-glass-tooltip,
+  .mg-glass-panel,
+  .mg-glass-composer {
+    background-color: var(--mg-glass-color);
   }
 }
 }

@@ -11,9 +11,9 @@
  * while the pane is open.
  */
 
-import type { SurfaceHostMessage, SurfaceViewerMessage } from '@openchamber/sdk/schemas';
-import { surfaceHostMessageSchema } from '@openchamber/sdk/schemas';
-import type { SurfaceController, SurfaceInputEvent } from '@openchamber/sdk';
+import type { SurfaceHostMessage, SurfaceViewerMessage } from '@magio/sdk/schemas';
+import { surfaceHostMessageSchema } from '@magio/sdk/schemas';
+import type { SurfaceController, SurfaceInputEvent } from '@magio/sdk';
 
 import { openRuntimeWebSocket } from '@/lib/relay/runtime-socket';
 import type { RelayTunnelWebSocket } from '@/lib/relay/tunnel-client';

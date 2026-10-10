@@ -2,8 +2,8 @@ import { z } from 'zod';
 import {
   type GuestStorageRequest,
   type GuestStorageResult,
-} from '@openchamber/sdk';
-import { guestStorageRequestSchema } from '@openchamber/sdk/schemas';
+} from '@magio/sdk';
+import { guestStorageRequestSchema } from '@magio/sdk/schemas';
 import {
   decodeDeviceStorageNamespace,
   deviceStorageNamespaceKey,
@@ -16,7 +16,7 @@ import {
 
 type DeviceGuestStorageIdentity = { runtimeKey: string; guestId: string; storageId: string };
 
-const DATABASE = 'openchamber-guest-device-storage';
+const DATABASE = 'magio-guest-device-storage';
 const VERSION = 1;
 const NAMESPACES = 'namespaces';
 const META = 'meta';

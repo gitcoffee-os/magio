@@ -22,8 +22,8 @@ import {
 } from './dispatcher.js';
 
 // The UI auth keeps its signing secret in the data directory, and reads that path when it loads.
-const dataDir = fs.mkdtempSync(path.join(os.tmpdir(), 'openchamber-dispatcher-test-'));
-process.env.OPENCHAMBER_DATA_DIR = dataDir;
+const dataDir = fs.mkdtempSync(path.join(os.tmpdir(), 'magio-dispatcher-test-'));
+process.env.MAGIO_DATA_DIR = dataDir;
 
 const ID = 'a1b2c3d4e5f6';
 const OTHER = '0f0f0f0f0f0f';
@@ -231,8 +231,8 @@ describe('space dispatcher', () => {
 
   it('forwards a prefixed request with the prefix and the user\'s credentials removed, and the space session added', async () => {
     await start();
-    const response = await fetch(host.url(`/api/spaces/${ID}/echo?a=1&oc_url_token=secret-url&b=2&oc_client_token=secret-client`), {
-      headers: { cookie: 'oc_ui_session_3000=user-cookie', authorization: 'Bearer user-bearer', 'x-custom': 'kept', origin: 'https://app.example' },
+    const response = await fetch(host.url(`/api/spaces/${ID}/echo?a=1&mg_url_token=secret-url&b=2&mg_client_token=secret-client`), {
+      headers: { cookie: 'mg_ui_session_3000=user-cookie', authorization: 'Bearer user-bearer', 'x-custom': 'kept', origin: 'https://app.example' },
     });
 
     expect(response.status).toBe(200);
@@ -241,7 +241,7 @@ describe('space dispatcher', () => {
     const [request] = inside.seen;
     expect(request.headers.authorization).toBeUndefined();
     expect(request.headers.origin).toBeUndefined();
-    expect(request.headers.cookie).toMatch(/^oc_ui_session_27600=[^;]+$/);
+    expect(request.headers.cookie).toMatch(/^mg_ui_session_27600=[^;]+$/);
     expect(request.headers.cookie).not.toContain('user-cookie');
     expect(request.headers.host).toBe('127.0.0.1:27600');
     expect(request.headers['x-custom']).toBe('kept');

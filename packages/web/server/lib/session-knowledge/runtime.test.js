@@ -42,8 +42,8 @@ const createMetadataStub = (initial = {}) => {
     readSessionMetadata: async (sessionId) => state[sessionId] ?? {},
     persistSessionMetadata: async (sessionId, directory, patch) => {
       patches.push({ sessionId, directory, patch });
-      const openchamber = { ...(state[sessionId]?.openchamber ?? {}), ...(patch.openchamber ?? {}) };
-      state[sessionId] = { ...(state[sessionId] ?? {}), openchamber };
+      const magio = { ...(state[sessionId]?.magio ?? {}), ...(patch.magio ?? {}) };
+      state[sessionId] = { ...(state[sessionId] ?? {}), magio };
     },
   };
 };
@@ -263,17 +263,17 @@ describe('reading what a session was told', () => {
     const runtime = createRuntime();
 
     expect(runtime.readPins({
-      metadata: { openchamber: { project_context_pins: { notes: ['n1'], plans: [] } } },
+      metadata: { magio: { project_context_pins: { notes: ['n1'], plans: [] } } },
     })).toEqual({ notes: ['n1'], plans: [] });
     expect(runtime.readPins({
-      metadata: { openchamber: { project_context_pins: { notes: [], plans: ['p1'] } } },
+      metadata: { magio: { project_context_pins: { notes: [], plans: ['p1'] } } },
     })).toEqual({ notes: [], plans: ['p1'] });
     expect(runtime.readPins({})).toEqual({ notes: [], plans: [] });
   });
 
-  test('pins into OpenChamber\'s own store and invalidates the delivered signature', async () => {
+  test('pins into Magio\'s own store and invalidates the delivered signature', async () => {
     const store = createMetadataStub({
-      ses_a: { openchamber: { project_context_pins: { notes: [], plans: [] }, knowledge_context_delivered: 'old' } },
+      ses_a: { magio: { project_context_pins: { notes: [], plans: [] }, knowledge_context_delivered: 'old' } },
     });
     const runtime = createRuntime(store);
 
@@ -283,7 +283,7 @@ describe('reading what a session was told', () => {
       sessionId: 'ses_a',
       directory: DIRECTORY,
       patch: {
-        openchamber: {
+        magio: {
           project_context_pins: { notes: ['n1'], plans: [] },
           knowledge_context_delivered: '',
         },
@@ -293,7 +293,7 @@ describe('reading what a session was told', () => {
 
   test('unpins the same way', async () => {
     const store = createMetadataStub({
-      ses_a: { openchamber: { project_context_pins: { notes: ['n1', 'n2'], plans: [] } } },
+      ses_a: { magio: { project_context_pins: { notes: ['n1', 'n2'], plans: [] } } },
     });
     const runtime = createRuntime(store);
 
@@ -309,7 +309,7 @@ describe('reading what a session was told', () => {
     expect(store.patches).toEqual([{
       sessionId: 'ses_a',
       directory: DIRECTORY,
-      patch: { openchamber: { knowledge_context_delivered: 'sig-1' } },
+      patch: { magio: { knowledge_context_delivered: 'sig-1' } },
     }]);
   });
 
@@ -323,7 +323,7 @@ describe('reading what a session was told', () => {
     const runtime = createRuntime();
 
     expect(runtime.readDeliveredSignature({
-      metadata: { openchamber: { knowledge_context_delivered: 'sig' } },
+      metadata: { magio: { knowledge_context_delivered: 'sig' } },
     })).toBe('sig');
   });
 

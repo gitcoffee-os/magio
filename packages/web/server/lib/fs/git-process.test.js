@@ -18,7 +18,7 @@ const noisyGit = `
 describe('filesystem Git process ownership', () => {
   for (const operation of ['search', 'list']) {
     it(`${operation} completes repeated checks with more diagnostics than an OS pipe can hold`, async () => {
-      const root = await fs.mkdtemp(path.join(os.tmpdir(), 'oc-git-pipes-'));
+      const root = await fs.mkdtemp(path.join(os.tmpdir(), 'mg-git-pipes-'));
       const children = [];
       const exits = [];
       const launch = (binary, args, options) => {
@@ -43,7 +43,7 @@ describe('filesystem Git process ownership', () => {
           ...dependencies, os, crypto, normalizeDirectoryPath: (value) => value,
           resolveProjectDirectory: async () => ({ directory: root }),
           buildAugmentedPath: () => process.env.PATH,
-          openchamberUserConfigRoot: root,
+          magioUserConfigRoot: root,
           gitCheckIgnoreTimeoutMs: 10_000,
         });
         const work = Array.from({ length: 12 }, async () => {

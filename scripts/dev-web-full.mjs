@@ -197,7 +197,15 @@ waitForFirstBuildSuccess(build)
       return;
     }
     console.log('[dev:web:full] Initial frontend build ready, starting API watcher...');
-    api = run('api', bunExecutable, ['run', '--cwd', 'packages/web', 'dev:server:watch']);
+    api = run('api', bunExecutable, ['run', '--cwd', 'packages/web', 'dev:server:watch'], {
+      // Same contract as dev-web-hmr.mjs: a dev instance validates its relay
+      // against a local Airlay, never against the production endpoint. An
+      // explicit MAGIO_RELAY_URL still wins.
+      env: {
+        ...process.env,
+        MAGIO_RELAY_URL: process.env.MAGIO_RELAY_URL || 'ws://127.0.0.1:8787/ws',
+      },
+    });
     api.on('exit', onChildExit('api'));
   })
   .catch((error) => {

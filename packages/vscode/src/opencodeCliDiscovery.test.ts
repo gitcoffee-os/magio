@@ -24,7 +24,7 @@ afterEach(() => {
 });
 
 test('Windows prefers the npm CLI on PATH over a standard installation', () => {
-  const home = fs.mkdtempSync(path.join(os.tmpdir(), 'oc-vscode-cli-'));
+  const home = fs.mkdtempSync(path.join(os.tmpdir(), 'mg-vscode-cli-'));
   directories.push(home);
   const officialCli = path.join(home, '.opencode', 'bin', 'opencode.exe');
   const npmDirectory = path.join(home, 'npm-global');
@@ -56,7 +56,7 @@ test('Windows prefers the npm CLI on PATH over a standard installation', () => {
 });
 
 test('Unix finds an executable CLI on PATH', () => {
-  const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'oc-vscode-cli-'));
+  const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'mg-vscode-cli-'));
   directories.push(directory);
   const cli = path.join(directory, 'opencode');
   fs.writeFileSync(cli, '', { mode: 0o755 });

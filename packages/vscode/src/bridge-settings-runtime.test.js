@@ -10,9 +10,9 @@ mock.module('vscode', () => ({
   },
 }));
 
-// Keep any import-time config materialisation out of the real OpenChamber
+// Keep any import-time config materialisation out of the real Magio
 // config, mirroring bridge-config-runtime.test.js.
-const scratchConfigRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'openchamber-vscode-settings-'));
+const scratchConfigRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'magio-vscode-settings-'));
 process.env.XDG_CONFIG_HOME = path.join(scratchConfigRoot, 'xdg');
 process.env.OPENCODE_CONFIG_DIR = '';
 
@@ -45,7 +45,7 @@ const stubSkillListResponse = (data) => {
 
 describe('fetchOpenCodeSkillsFromApi payload mapping', () => {
   test('reads the v2 `path` field, keeps the v1 `location` fallback, and drops unlocated items', async () => {
-    const projectRoot = path.join(os.tmpdir(), `oc-vscode-skills-${Date.now()}`);
+    const projectRoot = path.join(os.tmpdir(), `mg-vscode-skills-${Date.now()}`);
     const workspaces = [
       { id: 'v2-path-skill', name: 'v2-path-skill', path: path.join(projectRoot, '.agents', 'skills', 'v2-path-skill'), description: 'v2 path', content: 'content-v2' },
       { id: 'v1-location-skill', name: 'v1-location-skill', location: path.join(projectRoot, '.agents', 'skills', 'v1-location-skill'), description: 'v1 location', content: 'content-v1' },

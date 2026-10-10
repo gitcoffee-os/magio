@@ -39,9 +39,9 @@ describe('gatekeeper channel: the program', () => {
       spaceId: ID,
       argv: [
         '/bin/sh', '-c',
-        'PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin; mkdir -p /tmp/openchamber-gatekeeper'
-        + " && printf '%s' \"$1\" > /tmp/openchamber-gatekeeper/bind.new && mv /tmp/openchamber-gatekeeper/bind.new /tmp/openchamber-gatekeeper/bind"
-        + ' && cat > /tmp/openchamber-gatekeeper/gatekeeper.cjs.new && mv /tmp/openchamber-gatekeeper/gatekeeper.cjs.new /tmp/openchamber-gatekeeper/gatekeeper.cjs',
+        'PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin; mkdir -p /tmp/magio-gatekeeper'
+        + " && printf '%s' \"$1\" > /tmp/magio-gatekeeper/bind.new && mv /tmp/magio-gatekeeper/bind.new /tmp/magio-gatekeeper/bind"
+        + ' && cat > /tmp/magio-gatekeeper/gatekeeper.cjs.new && mv /tmp/magio-gatekeeper/gatekeeper.cjs.new /tmp/magio-gatekeeper/gatekeeper.cjs',
         'sh', '172.19.0.2',
       ],
       options: { stdin: GATEKEEPER_PROGRAM, target: 'gatekeeper' },

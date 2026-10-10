@@ -31,8 +31,8 @@ let listCount = 0;
 export const mountList = (root: Element, initial: ListProps): ListHandle => {
   ensureStyle(UI_CSS);
   let props = initial;
-  const uid = `oc-sdk-list-${listCount += 1}`;
-  const list = el('div', 'oc-sdk oc-sdk-list');
+  const uid = `mg-sdk-list-${listCount += 1}`;
+  const list = el('div', 'mg-sdk mg-sdk-list');
   list.setAttribute('role', 'listbox');
   list.tabIndex = 0;
   root.append(list);
@@ -61,28 +61,28 @@ export const mountList = (root: Element, initial: ListProps): ListHandle => {
     clearNode(list);
     setAttr(list, 'aria-label', props.ariaLabel);
     if (props.items.length === 0) {
-      list.append(span('oc-sdk-list-empty', props.emptyText ?? 'Nothing here'));
+      list.append(span('mg-sdk-list-empty', props.emptyText ?? 'Nothing here'));
       setActive(null);
       return;
     }
     for (const item of props.items) {
-      const row = button('oc-sdk-row');
+      const row = button('mg-sdk-row');
       row.id = rowId(item.id);
       row.setAttribute('role', 'option');
       row.setAttribute('aria-selected', item.id === props.selectedId ? 'true' : 'false');
       row.disabled = Boolean(item.disabled);
       row.tabIndex = -1;
-      if (item.leading) row.append(span('oc-sdk-row-lead', item.leading));
-      const main = el('span', 'oc-sdk-row-main');
-      main.append(span('oc-sdk-row-title', item.title));
-      if (item.subtitle) main.append(span('oc-sdk-row-sub', item.subtitle));
+      if (item.leading) row.append(span('mg-sdk-row-lead', item.leading));
+      const main = el('span', 'mg-sdk-row-main');
+      main.append(span('mg-sdk-row-title', item.title));
+      if (item.subtitle) main.append(span('mg-sdk-row-sub', item.subtitle));
       row.append(main);
       if (item.badge) {
-        const badge = span('oc-sdk-badge', item.badge.label);
+        const badge = span('mg-sdk-badge', item.badge.label);
         applyTone(badge, item.badge.tone);
         row.append(badge);
       }
-      if (item.meta) row.append(span('oc-sdk-row-meta', item.meta));
+      if (item.meta) row.append(span('mg-sdk-row-meta', item.meta));
       row.addEventListener('click', () => props.onSelect(item.id));
       list.append(row);
     }

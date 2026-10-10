@@ -838,7 +838,7 @@ describe('openNewSessionDraft project binding', () => {
     // A chat session leaves its managed scratch directory current; the project
     // to reopen on can only come from the recorded target.
     useDirectoryStore.getState().setDirectory(
-      '/Users/tester/.config/openchamber/chats/ses_chat',
+      '/Users/tester/.config/magio/chats/ses_chat',
       { showOverlay: false },
     );
 
@@ -876,7 +876,7 @@ describe('openNewSessionDraft project binding', () => {
     // session's directory even when that session is a chat; its scratch
     // directory names no project.
     useSessionUIStore.getState().openNewSessionDraft({
-      directoryOverride: '/Users/tester/.config/openchamber/chats/ses_chat',
+      directoryOverride: '/Users/tester/.config/magio/chats/ses_chat',
     });
     const draft = useSessionUIStore.getState().newSessionDraft;
 
@@ -891,7 +891,7 @@ describe('openNewSessionDraft project binding', () => {
     );
 
     useSessionUIStore.getState().openNewSessionDraft({
-      directoryOverride: '/Users/tester/.config/openchamber/chats/ses_chat',
+      directoryOverride: '/Users/tester/.config/magio/chats/ses_chat',
     });
 
     expect(useSessionUIStore.getState().newSessionDraft.target).toBe('chat');
@@ -1534,7 +1534,7 @@ describe('routeMessage skill invocation', () => {
       arguments: 'auth flow',
       files: [contextFile],
     });
-    expect(sendCommandCalls[0].context[0].metadata.openchamberContext.kind).toBe('code-comment');
+    expect(sendCommandCalls[0].context[0].metadata.magioContext.kind).toBe('code-comment');
   });
 
   test('includes pinned knowledge with the skill prompt', async () => {
@@ -1774,12 +1774,12 @@ describe('goal objective directory scoping', () => {
       metadataWrites.push({ sessionId, patch, directory });
       return { id: sessionId, ...patch };
     };
-    // Session metadata is OpenChamber-owned on v2: it travels through the
+    // Session metadata is Magio-owned on v2: it travels through the
     // server's metadata route, not OpenCode. Every other fetch fails, so the
     // file-backed objective write falls back to the inline objective.
     globalThis.fetch = async (input, init) => {
       const url = typeof input === 'string' ? input : input instanceof URL ? input.href : input.url;
-      const match = /\/api\/openchamber\/sessions\/([^/]+)\/metadata$/.exec(url);
+      const match = /\/api\/magio\/sessions\/([^/]+)\/metadata$/.exec(url);
       if (!match || init?.method !== 'POST') return new Response('', { status: 500 });
       const { patch } = JSON.parse(init.body);
       metadataWrites.push({ sessionId: decodeURIComponent(match[1]), patch, directory: '/repo/worktree' });
@@ -1813,7 +1813,7 @@ describe('goal objective directory scoping', () => {
 
     expect(metadataWrites).toHaveLength(1);
     expect(metadataWrites[0].directory).toBe('/repo/worktree');
-    expect(metadataWrites[0].patch.openchamber.goal.objective).toBe('Worktree inspects auth flow.');
+    expect(metadataWrites[0].patch.magio.goal.objective).toBe('Worktree inspects auth flow.');
   });
 });
 
@@ -2072,7 +2072,7 @@ describe('missing session directory recovery', () => {
   });
 
   test('never probes a session that lives in its project root or in a managed chat directory', async () => {
-    const chatDirectory = '/Users/tester/.config/openchamber/chats/2026-09-05/session-abc';
+    const chatDirectory = '/Users/tester/.config/magio/chats/2026-09-05/session-abc';
     useGlobalSessionsStore.setState({
       activeSessions: [worktreeSession('in-root', projectDirectory), worktreeSession('chat', chatDirectory)],
       archivedSessions: [],

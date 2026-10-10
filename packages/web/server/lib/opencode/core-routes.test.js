@@ -17,7 +17,7 @@ describe('core-routes', () => {
         shutdownOpts = opts;
       }),
       getHealthSnapshot: () => ({ status: 'ok' }),
-      openchamberVersion: '1.0.0',
+      magioVersion: '1.0.0',
       runtimeName: 'test',
       express,
     };
@@ -70,7 +70,7 @@ describe('core-routes', () => {
     const dependencies = {
       gracefulShutdown: vi.fn(async () => {}),
       getHealthSnapshot: () => ({ status: 'ok' }),
-      openchamberVersion: '1.0.0',
+      magioVersion: '1.0.0',
       runtimeName: 'test',
       express,
       tunnelAuthController: {
@@ -97,7 +97,7 @@ describe('core-routes', () => {
     const dependencies = {
       gracefulShutdown: vi.fn(async () => {}),
       getHealthSnapshot: () => ({ status: 'ok' }),
-      openchamberVersion: '1.0.0',
+      magioVersion: '1.0.0',
       runtimeName: 'test',
       express,
       tunnelAuthController: {
@@ -124,7 +124,7 @@ describe('core-routes', () => {
     const dependencies = {
       gracefulShutdown: vi.fn(async () => {}),
       getHealthSnapshot: () => ({ status: 'ok' }),
-      openchamberVersion: '1.0.0',
+      magioVersion: '1.0.0',
       runtimeName: 'test',
       express,
       tunnelAuthController: {
@@ -415,7 +415,7 @@ describe('core-routes', () => {
         redeemPairingSession: vi.fn(async () => ({
           pairing: { fingerprint: 'ABCD-1234' },
           client: { id: 'client-1', label: 'Phone', authMethod: 'pairing' },
-          token: 'oc_client_token',
+          token: 'mg_client_token',
         })),
       },
       readSettingsFromDiskMigrated: vi.fn(async () => ({})),
@@ -451,14 +451,14 @@ describe('core-routes', () => {
 
     const response = await request(app)
       .post('/api/client-auth/pairing/sessions')
-      .set('Host', 'chamber.example.com')
+      .set('Host', 'magio.example.com')
       .set('X-Forwarded-Proto', 'https')
       .send({ label: 'Pair phone', serverUrl: 'http://192.168.1.20:2606' })
       .expect(201);
 
     expect(response.body.server.candidates).toEqual([
       { type: 'lan', url: 'http://192.168.1.20:2606', priority: 10 },
-      { type: 'tunnel', url: 'https://chamber.example.com', priority: 20 },
+      { type: 'tunnel', url: 'https://magio.example.com', priority: 20 },
     ]);
   });
 
@@ -553,9 +553,9 @@ describe('core-routes', () => {
     expect(response.headers['cache-control']).toBe('no-store');
     expect(response.body).toMatchObject({
       ok: true,
-      server: { label: 'OpenChamber', url: 'http://runtime.example', fingerprint: 'ABCD-1234' },
+      server: { label: 'Magio', url: 'http://runtime.example', fingerprint: 'ABCD-1234' },
       client: { id: 'client-1', authMethod: 'pairing' },
-      clientToken: 'oc_client_token',
+      clientToken: 'mg_client_token',
     });
     expect(dependencies.clientPairingRuntime.redeemPairingSession).toHaveBeenCalledWith(expect.objectContaining({
       pairingId: 'pair_1',
@@ -641,12 +641,12 @@ describe('core-routes', () => {
     // The preview proxy is gone; the token that used to bypass the auth gate
     // must no longer open a hole for any route that happens to match the path.
     await request(app)
-      .get('/api/preview/proxy/abc123/?oc_preview_token=preview-secret')
+      .get('/api/preview/proxy/abc123/?mg_preview_token=preview-secret')
       .expect(401, 'Authentication required');
 
     await request(app)
       .get('/api/preview/proxy/abc123/')
-      .set('Cookie', 'oc_preview_token=preview-secret')
+      .set('Cookie', 'mg_preview_token=preview-secret')
       .expect(401, 'Authentication required');
 
     expect(requireAuth).toHaveBeenCalledTimes(2);
@@ -694,7 +694,7 @@ describe('client auth routes', () => {
             clientKind: clientKind || null,
           };
           clients.push(client);
-          return { client, token: 'oc_client_secret' };
+          return { client, token: 'mg_client_secret' };
         },
         revokeClient: async (id) => {
           const client = clients.find((entry) => entry.id === id);
@@ -725,7 +725,7 @@ describe('client auth routes', () => {
       .post('/api/client-auth/clients')
       .send({ label: 'Laptop' });
     expect(created.status).toBe(201);
-    expect(created.body.token).toBe('oc_client_secret');
+    expect(created.body.token).toBe('mg_client_secret');
     expect(created.headers['cache-control']).toBe('no-store');
 
     const listed = await request(app).get('/api/client-auth/clients');
@@ -805,7 +805,7 @@ describe('client auth routes', () => {
 
     const current = await request(app)
       .post('/api/client-auth/clients')
-      .send({ label: 'OpenChamber Desktop', clientKind: 'desktop-local' });
+      .send({ label: 'Magio Desktop', clientKind: 'desktop-local' });
     const other = await request(app)
       .post('/api/client-auth/clients')
       .send({ label: 'Other device' });
@@ -840,7 +840,7 @@ describe('client auth routes', () => {
 
     const desktop = await request(app)
       .post('/api/client-auth/clients')
-      .send({ label: 'OpenChamber Desktop', clientKind: 'desktop-local' });
+      .send({ label: 'Magio Desktop', clientKind: 'desktop-local' });
     const other = await request(app)
       .post('/api/client-auth/clients')
       .send({ label: 'Other device' });
@@ -873,7 +873,7 @@ describe('client auth routes', () => {
 
     const desktop = await request(app)
       .post('/api/client-auth/clients')
-      .send({ label: 'OpenChamber Desktop', clientKind: 'desktop-local' });
+      .send({ label: 'Magio Desktop', clientKind: 'desktop-local' });
     const remote = await request(app)
       .post('/api/client-auth/clients')
       .send({ label: 'Phone' });
@@ -944,7 +944,7 @@ describe('client auth routes', () => {
       serverStartedAt: '2026-01-01T00:00:00.000Z',
       gracefulShutdown: vi.fn(async () => {}),
       getHealthSnapshot: () => ({ status: 'ok' }),
-      openchamberVersion: '1.0.0',
+      magioVersion: '1.0.0',
       runtimeName: 'test',
       express,
       uiAuthController: signedIn,
@@ -952,7 +952,7 @@ describe('client auth routes', () => {
 
     const response = await request(app).get('/api/system/info');
     expect(response.status).toBe(200);
-    expect(response.body.openchamberVersion).toBe('1.0.0');
+    expect(response.body.magioVersion).toBe('1.0.0');
     expect(response.body.runtime).toBe('test');
     expect(response.body.pid).toBeTypeOf('number');
     expect(response.body.startedAt).toBeTypeOf('string');
@@ -967,7 +967,7 @@ describe('client auth routes', () => {
       serverStartedAt: '2026-01-01T00:00:00.000Z',
       gracefulShutdown: vi.fn(async () => {}),
       getHealthSnapshot: () => ({ status: 'ok' }),
-      openchamberVersion: '1.0.0',
+      magioVersion: '1.0.0',
       runtimeName: 'test',
       express,
       getServerPort: () => 9988,
@@ -988,7 +988,7 @@ describe('client auth routes', () => {
       serverStartedAt: '2026-01-01T00:00:00.000Z',
       gracefulShutdown: vi.fn(async () => {}),
       getHealthSnapshot: () => ({ status: 'ok' }),
-      openchamberVersion: '1.0.0',
+      magioVersion: '1.0.0',
       runtimeName: 'test',
       express,
       getServerPort: () => 9988,

@@ -49,9 +49,9 @@ describe('isAppLinkUrl', () => {
     expect(isAppLinkUrl('shell:AppsFolder')).toBe(false);
   });
 
-  test('rejects OpenChamber and Capacitor self-deep-links', () => {
-    expect(isAppLinkUrl('openchamber://connect?host=x')).toBe(false);
-    expect(isAppLinkUrl('openchamber-ui://app/index.html')).toBe(false);
+  test('rejects Magio and Capacitor self-deep-links', () => {
+    expect(isAppLinkUrl('magio://connect?host=x')).toBe(false);
+    expect(isAppLinkUrl('magio-ui://app/index.html')).toBe(false);
     expect(isAppLinkUrl('capacitor://localhost/index.html')).toBe(false);
   });
 

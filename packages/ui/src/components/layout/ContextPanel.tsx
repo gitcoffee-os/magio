@@ -36,7 +36,7 @@ import { ContextPanelContent } from './ContextSidebarTab';
 import { BrowserPane } from '@/components/browser/BrowserPane';
 import { browserUrlLabel } from '@/lib/browser/url';
 import { registerBrowserOpener, registerSleepingBrowserTab, setShownBrowserTab } from '@/lib/browser/controlClient';
-import { subscribeOpenchamberEvents } from '@/lib/openchamberEvents';
+import { subscribemagioEvents } from '@/lib/magioEvents';
 import { Icon } from "@/components/icon/Icon";
 import { GuestIcon } from './GuestRailIcon';
 import { ChatView } from '@/components/views/ChatView';
@@ -80,7 +80,7 @@ const GuestSurfacePane = React.lazy(() => import('./GuestSurfacePane').then((mod
 import { useGuestsStore } from '@/lib/guests/store';
 import { guestHasSharedSurface, guestSurfaceDocking, type GuestSurfaceDocking } from '@/lib/guests/surfaces';
 import { FALLBACK_GUEST_ICON } from '@/lib/guests/icon';
-import { GUEST_SURFACE_DOCK_SIZE_MIN } from '@openchamber/sdk';
+import { GUEST_SURFACE_DOCK_SIZE_MIN } from '@magio/sdk';
 import { isPluginContextPanelMode, pluginIdFromMode, type PluginContextPanelMode } from '@/lib/surfaces/modes';
 import { getContextSurfaceWidthFraction } from '@/lib/surfaces/registry';
 import { isEditorEventTarget } from '@/lib/editorFocus';
@@ -335,7 +335,7 @@ const EditorTreeColumn: React.FC<{ visible: boolean; active: boolean; fill?: boo
       return;
     }
     column.style.width = `${nextWidth}px`;
-    column.style.setProperty('--oc-editor-tree-width', `${nextWidth}px`);
+    column.style.setProperty('--mg-editor-tree-width', `${nextWidth}px`);
   }, []);
 
   const handlePointerDown = (event: React.PointerEvent) => {
@@ -396,7 +396,7 @@ const EditorTreeColumn: React.FC<{ visible: boolean; active: boolean; fill?: boo
       style={{
         width: `${isResizing ? (liveWidthRef.current ?? appliedWidth) : appliedWidth}px`,
         maxWidth: fill ? '100%' : undefined,
-        ['--oc-editor-tree-width' as string]: `${isResizing ? (liveWidthRef.current ?? width) : width}px`,
+        ['--mg-editor-tree-width' as string]: `${isResizing ? (liveWidthRef.current ?? width) : width}px`,
         overflowX: 'clip',
         transitionProperty: isResizing ? 'none' : 'width',
         transitionDuration: '200ms',
@@ -429,7 +429,7 @@ const EditorTreeColumn: React.FC<{ visible: boolean; active: boolean; fill?: boo
           isResizing && 'pointer-events-none',
           !visible && 'pointer-events-none select-none opacity-0'
         )}
-        style={{ width: 'var(--oc-editor-tree-width)', maxWidth: fill ? '100%' : undefined }}
+        style={{ width: 'var(--mg-editor-tree-width)', maxWidth: fill ? '100%' : undefined }}
         aria-hidden={!visible}
       >
         <SidebarFilesTree visible={visible && active} />
@@ -533,7 +533,7 @@ export const ContextPanel: React.FC = () => {
   // the user had, on purpose: the agent is pointing at a result, and the prior
   // tab is one click away.
   const openContextFile = useUIStore((state) => state.openContextFile);
-  React.useEffect(() => subscribeOpenchamberEvents((event) => {
+  React.useEffect(() => subscribemagioEvents((event) => {
     if (event.type !== 'file-open-request') return;
     const directory = event.directory ?? effectiveDirectory;
     if (!directory) return;
@@ -654,7 +654,7 @@ export const ContextPanel: React.FC = () => {
     if (!panel || next === null) {
       return;
     }
-    panel.style.setProperty('--oc-context-panel-width', `${next}px`);
+    panel.style.setProperty('--mg-context-panel-width', `${next}px`);
   }, []);
 
   React.useEffect(() => () => {
@@ -937,7 +937,7 @@ export const ContextPanel: React.FC = () => {
   React.useEffect(() => {
     // Only a Chromium host mounts views that agents can drive, so only it may
     // offer to wake a tab; anywhere else a claimed action could never run.
-    if (!window.__OPENCHAMBER_ELECTRON__) return;
+    if (!window.__MAGIO_ELECTRON__) return;
     const unregister = browserTabs
       .filter((tab) => !loadedBrowserTabs.includes(tab))
       .map((tab) => registerSleepingBrowserTab({
@@ -1151,7 +1151,7 @@ export const ContextPanel: React.FC = () => {
   // jumps) so the 200ms width transition matches the sidebars.
   const panelStyle: React.CSSProperties = !isOpen
     ? {
-        ['--oc-context-panel-width' as string]: `${width}px`,
+        ['--mg-context-panel-width' as string]: `${width}px`,
         width: 0,
         maxWidth: '100%',
         overflowX: 'clip',
@@ -1160,15 +1160,15 @@ export const ContextPanel: React.FC = () => {
       ? {
           // px, not '100%': px↔% width changes do not interpolate, which
           // would make the expand/collapse width snap instead of animating.
-          ['--oc-context-panel-width' as string]: availablePanelAreaWidth !== null ? `${availablePanelAreaWidth}px` : '100%',
+          ['--mg-context-panel-width' as string]: availablePanelAreaWidth !== null ? `${availablePanelAreaWidth}px` : '100%',
           width: availablePanelAreaWidth !== null ? `${availablePanelAreaWidth}px` : '100%',
           maxWidth: '100%',
         }
       : {
-          width: 'min(var(--oc-context-panel-width), 100%)',
+          width: 'min(var(--mg-context-panel-width), 100%)',
           maxWidth: '100%',
           overflowX: 'clip',
-          ['--oc-context-panel-width' as string]: `${width}px`,
+          ['--mg-context-panel-width' as string]: `${width}px`,
         };
 
   return (
@@ -1228,7 +1228,7 @@ export const ContextPanel: React.FC = () => {
         style={{
           width: isExpanded
             ? (availablePanelAreaWidth !== null ? `${availablePanelAreaWidth}px` : '100%')
-            : 'var(--oc-context-panel-width)',
+            : 'var(--mg-context-panel-width)',
         }}
         aria-hidden={!isOpen}
       >

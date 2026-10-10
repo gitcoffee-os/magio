@@ -25,7 +25,7 @@ const withDesktopBridge = async <T>(handler: (cmd: string, args: Record<string, 
   Object.defineProperty(globalThis, 'window', {
     configurable: true,
     value: {
-      __OPENCHAMBER_DESKTOP__: {
+      __MAGIO_DESKTOP__: {
         invoke: handler,
       },
     },
@@ -146,11 +146,11 @@ describe('remote host update', () => {
     const calls: Array<{ cmd: string; args: unknown }> = [];
     const result = await withDesktopBridge(async (cmd, args) => {
       calls.push({ cmd, args });
-      return { status: 'failed', error: 'Run openchamber update on the server.' };
+      return { status: 'failed', error: 'Run magio update on the server.' };
     }, () => desktopHostUpdateServer('remote-1'));
 
     expect(calls).toEqual([{ cmd: 'desktop_host_update_server', args: { hostId: 'remote-1' } }]);
-    expect(result).toEqual({ status: 'failed', error: 'Run openchamber update on the server.' });
+    expect(result).toEqual({ status: 'failed', error: 'Run magio update on the server.' });
   });
 
   test('reads an unexpected or failed shell answer as a failure without a reason', async () => {

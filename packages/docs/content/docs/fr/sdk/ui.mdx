@@ -1,18 +1,18 @@
 ---
 title: Kit UI
-description: Boutons, champs, listes déroulantes, onglets, listes et autres composants de @openchamber/sdk/ui pour qu'une extension ressemble au reste d'OpenChamber.
+description: Boutons, champs, listes déroulantes, onglets, listes et autres composants de @magio/sdk/ui pour qu'une extension ressemble au reste d'Magio.
 ---
 
 # Kit UI
 
-`@openchamber/sdk/ui` est un ensemble de contrôles prêts à l'emploi qui utilisent les couleurs, polices et espacements de l'application, pour que votre extension ressemble au reste d'OpenChamber sans copier ses styles. Chaque contrôle est une fonction : vous lui donnez un élément qui vous appartient et ses réglages, il se dessine dedans et renvoie `{ update, dispose }`. Vous assemblez les contrôles en un écran et vous gardez la main sur les données. Le kit n'appelle jamais votre fournisseur ni OpenChamber ; c'est toujours vous qui appelez `host.request`, `host.attach` et le reste. Vous pouvez écrire votre propre HTML et CSS pour tout ce que le kit ne couvre pas, mais commencez par le kit : ses contrôles suivent automatiquement le thème, les espacements et les habitudes clavier de l'utilisateur, donc un panneau construit avec eux se sent partie intégrante d'OpenChamber plutôt qu'un site web à l'intérieur.
+`@magio/sdk/ui` est un ensemble de contrôles prêts à l'emploi qui utilisent les couleurs, polices et espacements de l'application, pour que votre extension ressemble au reste d'Magio sans copier ses styles. Chaque contrôle est une fonction : vous lui donnez un élément qui vous appartient et ses réglages, il se dessine dedans et renvoie `{ update, dispose }`. Vous assemblez les contrôles en un écran et vous gardez la main sur les données. Le kit n'appelle jamais votre fournisseur ni Magio ; c'est toujours vous qui appelez `host.request`, `host.attach` et le reste. Vous pouvez écrire votre propre HTML et CSS pour tout ce que le kit ne couvre pas, mais commencez par le kit : ses contrôles suivent automatiquement le thème, les espacements et les habitudes clavier de l'utilisateur, donc un panneau construit avec eux se sent partie intégrante d'Magio plutôt qu'un site web à l'intérieur.
 
 ## Appelez `applyHostReady` en premier
 
 Les contrôles lisent leurs couleurs dans des variables CSS que `applyHostReady` écrit sur la page. Il applique aussi la police et la couleur de texte de l'application à la racine de la page, donc le HTML brut que vous ajoutez vous-même s'affiche correctement lui aussi. Appelez-le dans `host.onReady` avant le premier montage, et les couleurs suivront le thème de l'application quand l'utilisateur en change.
 
 ```ts
-import { applyHostReady } from "@openchamber/sdk/ui";
+import { applyHostReady } from "@magio/sdk/ui";
 
 let mounted = false;
 host.onReady((ctx) => {
@@ -25,7 +25,7 @@ host.onReady((ctx) => {
 
 Le kit utilise les couleurs de texte calculées par l'hôte pour les boutons teintés, badges, titres d'avis, messages de validation et liens. Vous n'avez pas besoin de calculer le contraste.
 
-Pour votre propre CSS, `applyHostReady` fournit `--primary-text`, `--success-text`, `--warning-text`, `--error-text` et `--info-text`, ainsi que les alias `--oc-*-text` correspondants. Utilisez-les pour le texte sur des fonds neutres ou légèrement teintés. Gardez les couleurs de base pour les fonds et utilisez `--oc-primary-fg` pour le texte sur un aplat `--oc-primary`. Appliquez chaque instantané `onReady` pour garder les couleurs à jour.
+Pour votre propre CSS, `applyHostReady` fournit `--primary-text`, `--success-text`, `--warning-text`, `--error-text` et `--info-text`, ainsi que les alias `--mg-*-text` correspondants. Utilisez-les pour le texte sur des fonds neutres ou légèrement teintés. Gardez les couleurs de base pour les fonds et utilisez `--mg-primary-fg` pour le texte sur un aplat `--mg-primary`. Appliquez chaque instantané `onReady` pour garder les couleurs à jour.
 
 `onReady` peut s'exécuter plusieurs fois pendant que le panneau est ouvert, notamment quand le contexte de session change. Appliquez le thème à chaque appel, mais montez les contrôles et inscrivez les listeners une seule fois. Gardez les brouillons hors des fonctions de rendu. Lors d'un changement d'onglet, masquez les panneaux existants ou restaurez leurs valeurs depuis votre état.
 
@@ -36,7 +36,7 @@ Pour votre propre CSS, `applyHostReady` fournit `--primary-text`, `--success-tex
 Montez ces contrôles une fois dans le `root` existant du panneau :
 
 ```ts
-import { mountSelect, mountTabs } from "@openchamber/sdk/ui";
+import { mountSelect, mountTabs } from "@magio/sdk/ui";
 
 let activeId = "convert";
 const tabs = mountTabs(root, {
@@ -87,7 +87,7 @@ Trois helpers simples sont livrés à côté des contrôles. `filterSelectOption
 ## Une liste avec recherche
 
 ```ts
-import { applyHostReady, mountEmpty, mountList, mountSearchField } from "@openchamber/sdk/ui";
+import { applyHostReady, mountEmpty, mountList, mountSearchField } from "@magio/sdk/ui";
 
 let mounted = false;
 host.onReady((ctx) => {
@@ -138,10 +138,10 @@ host.onReady((ctx) => {
 
 ## Liens dans le texte du fournisseur
 
-Votre page tourne dans un sandbox et ne peut pas ouvrir un nouvel onglet toute seule. Quand vous utilisez `mountText`, passez `onOpenUrl` et confiez le lien à OpenChamber :
+Votre page tourne dans un sandbox et ne peut pas ouvrir un nouvel onglet toute seule. Quand vous utilisez `mountText`, passez `onOpenUrl` et confiez le lien à Magio :
 
 ```ts
-import { mountText } from "@openchamber/sdk/ui";
+import { mountText } from "@magio/sdk/ui";
 
 mountText(root, {
   text: comment.body,

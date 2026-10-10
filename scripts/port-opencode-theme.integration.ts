@@ -107,7 +107,7 @@ test('CLI works outside the repo, dry-run writes nothing, and errors are nonzero
   const directory = await mkdtemp(join(tmpdir(), 'app-theme-cli-test-'));
   const run = (...args: string[]) => spawnSync('bun', [cli, ...args], { cwd: directory, encoding: 'utf8' });
   try {
-    const dry = run('--theme', 'oc-2', '--mode', 'dark', '--dry-run', '--output', join(directory, 'output'));
+    const dry = run('--theme', 'mg-2', '--mode', 'dark', '--dry-run', '--output', join(directory, 'output'));
     assert.equal(dry.status, 0, dry.stderr);
     assert.match(dry.stdout, /Validated 1 variants/);
     assert.deepEqual(await readdir(directory), []);

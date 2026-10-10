@@ -1,4 +1,4 @@
-import { HostRequestError, type GuestStatusControl, type GuestStatusControlEvent } from '@openchamber/sdk';
+import { HostRequestError, type GuestStatusControl, type GuestStatusControlEvent } from '@magio/sdk';
 
 export type GuestStatusControlBinding = {
   controls: GuestStatusControl[];

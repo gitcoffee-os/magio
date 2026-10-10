@@ -18,7 +18,7 @@ export const applyTone = (node: Element, tone: Tone | undefined): void => {
 export const mountBadge = (root: Element, initial: BadgeProps): BadgeHandle => {
   ensureStyle(UI_CSS);
   let props = initial;
-  const node = el('span', 'oc-sdk oc-sdk-badge');
+  const node = el('span', 'mg-sdk mg-sdk-badge');
   root.append(node);
 
   const paint = (): void => {

@@ -1,5 +1,5 @@
 // The dispatcher: a thin layer in front of the host's routes that forwards a request addressed
-// to a space to the OpenChamber server inside that space, over the place's `connect` channel.
+// to a space to the Magio server inside that space, over the place's `connect` channel.
 //
 // The client addresses the space. A request goes to a space only when its path starts with
 // `/api/spaces/<id>/` and the id is in the label-derived list of spaces. The dispatcher reads the
@@ -72,7 +72,7 @@ const HOST_ONLY_ROUTES = Object.freeze([
   '/api/system',
   '/api/push',
   '/api/notifications',
-  '/api/openchamber/tunnel',
+  '/api/magio/tunnel',
 ]);
 
 // Route families refused across the boundary: they would move something between the host and
@@ -132,7 +132,10 @@ const FORWARDED_RESPONSE_HEADERS = new Set([
 ]);
 
 // Query parameters that carry the user's credentials on browser-owned URLs.
-const DROPPED_QUERY_PARAMETERS = ['oc_url_token', 'oc_client_token'];
+const DROPPED_QUERY_PARAMETERS = ['mg_url_token', 'mg_client_token', 'oc_url_token', 'oc_client_token'];
+// The oc_* names are not branding: clients built before the rename still send them
+// (the checked-in mobile bundle does), and this list is what keeps a token out of a
+// forwarded URL. Dropping the old names would leak an old client's credential.
 
 // Content types a browser would render as a page, with the space's script in it, under the
 // app's origin. A response from a space with one of these is served as plain text instead.

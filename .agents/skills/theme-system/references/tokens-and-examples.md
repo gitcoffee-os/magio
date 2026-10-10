@@ -89,11 +89,11 @@ Input footers stay transparent over the elevated input surface.
 Inputs, cards, dropdowns and dialogs use the elevated role. Component-level
 opacity is allowed; it changes the strength of the same semantic surface.
 
-`oc-surface-elevated` establishes the elevated text context for children that use
+`mg-surface-elevated` establishes the elevated text context for children that use
 `text-foreground`. Glass popovers, tooltips and composers do this automatically,
 as do the semantic `bg-surface-elevated`, `bg-card` and `bg-popover` classes.
 An opaque `bg-background` or `bg-surface-background` restores canvas text.
-Use `oc-surface-code` for code text and `syntax.background` for its painted body.
+Use `mg-surface-code` for code text and `syntax.background` for its painted body.
 Fields retain their elevated base on hover and layer `interactive.hover` over it;
 `subtle` is neither hover nor disabled state. Dividers use `interactive.border`.
 

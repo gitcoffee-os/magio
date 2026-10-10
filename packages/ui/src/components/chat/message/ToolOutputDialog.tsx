@@ -381,7 +381,7 @@ const ImagePreviewDialog: React.FC<{
                 className={cn(
                     // Same scrim as DialogOverlay, so the image viewer sits on
                     // the app the way every other dialog does.
-                    'oc-glass-backdrop absolute inset-0 bg-surface-overlay/60',
+                    'mg-glass-backdrop absolute inset-0 bg-surface-overlay/60',
                     isTransitioning && 'transition-opacity duration-150 ease-out',
                     isVisible ? 'opacity-100' : 'opacity-0'
                 )}

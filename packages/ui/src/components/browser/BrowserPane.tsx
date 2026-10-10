@@ -74,14 +74,14 @@ export type BrowserPaneProps = {
  * page but cannot inspect one, rather than pretending otherwise.
  */
 const isChromiumHost = (): boolean => (
-  typeof window !== 'undefined' && Boolean(window.__OPENCHAMBER_ELECTRON__)
+  typeof window !== 'undefined' && Boolean(window.__MAGIO_ELECTRON__)
 );
 
 /** Chromium's zoom is exponential: factor = 1.2 ^ level. */
 const ZOOM_STEP = 0.5;
 const ZOOM_MIN = -3;
 const ZOOM_MAX = 4;
-const BROWSER_PARTITION = 'persist:openchamber-browser';
+const BROWSER_PARTITION = 'persist:magio-browser';
 /**
  * A page from an isolated space gets a session of its own, in memory: the
  * desktop shell routes that session through a proxy that reaches only the
@@ -99,7 +99,7 @@ const addressMarkOf = (directory: string, address: string, label: string): { ico
 
 const browserPartitionOf = (directory: string): string => {
   const spaceId = spaceIdOfDirectory(directory);
-  return spaceId ? `openchamber-space-preview:${spaceId}` : BROWSER_PARTITION;
+  return spaceId ? `magio-space-preview:${spaceId}` : BROWSER_PARTITION;
 };
 /** Kept small: this rides along with every snapshot. */
 const CONSOLE_PROBLEM_LIMIT = 20;
@@ -736,8 +736,8 @@ const WebviewBrowser: React.FC<BrowserPaneProps> = ({ initialUrl, directory, tab
       else if (action === 'zoom-out') applyZoom(zoomLevelRef.current - ZOOM_STEP);
       else if (action === 'zoom-reset') applyZoom(0);
     };
-    window.addEventListener('openchamber:zoom', handleZoom);
-    return () => window.removeEventListener('openchamber:zoom', handleZoom);
+    window.addEventListener('magio:zoom', handleZoom);
+    return () => window.removeEventListener('magio:zoom', handleZoom);
   }, [applyZoom]);
 
   const clearBrowsingData = React.useCallback((what: 'cookies' | 'cache') => {

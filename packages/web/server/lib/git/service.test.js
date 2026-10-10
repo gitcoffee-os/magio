@@ -78,7 +78,7 @@ const tempDirs = [];
 
 /** Create a temp dir and register it for afterEach cleanup. */
 const createTempDir = () => {
-  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'openchamber-git-service-'));
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'magio-git-service-'));
   tempDirs.push(dir);
   return dir;
 };
@@ -124,7 +124,7 @@ const createRepositoryWithRemote = ({ remoteName = 'origin', defaultBranch = 're
 };
 
 const canRunGit = () => {
-  const cwd = fs.mkdtempSync(path.join(os.tmpdir(), 'openchamber-git-check-'));
+  const cwd = fs.mkdtempSync(path.join(os.tmpdir(), 'magio-git-check-'));
   try {
     execFileSync('git', ['--version'], { cwd, stdio: 'ignore' });
     return true;
@@ -150,7 +150,7 @@ afterEach(() => {
 // Registered outside tempDirs on purpose: afterEach would delete a registered
 // dir after the first test.
 const emptyGlobalGitConfig = path.join(
-  fs.mkdtempSync(path.join(os.tmpdir(), 'openchamber-git-service-config-')),
+  fs.mkdtempSync(path.join(os.tmpdir(), 'magio-git-service-config-')),
   'git-config',
 );
 fs.writeFileSync(emptyGlobalGitConfig, '');
@@ -256,7 +256,7 @@ describe('git index path validation', () => {
 });
 
 describe.runIf(canRunGit())('configureRepositoryTransport', () => {
-  const helper = "!'/data/bin/git-credential-openchamber'";
+  const helper = "!'/data/bin/git-credential-magio'";
   const helpers = (repo) => {
     try { return execFileSync('git', ['config', '--local', '--get-all', 'credential.helper'], { cwd: repo, encoding: 'utf8' }).replace(/\n$/, '').split('\n'); }
     catch { return []; }
@@ -304,7 +304,7 @@ describe.runIf(canRunGit())('configureRepositoryTransport', () => {
   it('writes and removes the managed SSH command without touching one the person wrote', async () => {
     const repo = createTempDir();
     runGit(repo, ['init', '-b', 'main']);
-    const managed = "OPENCHAMBER_GIT_SSH_KEY='/data/keys/one' '/usr/bin/bun' '/srv/ssh-wrapper.js'";
+    const managed = "MAGIO_GIT_SSH_KEY='/data/keys/one' '/usr/bin/bun' '/srv/ssh-wrapper.js'";
     await configureRepositoryTransport(repo, { sshCommand: managed });
     expect(sshCommand(repo)).toBe(managed);
     await configureRepositoryTransport(repo, { sshCommand: null });
@@ -1375,7 +1375,7 @@ describe('getWorktrees', () => {
       const created = await createWorktree(repo, {
         mode: 'new',
         worktreeName: 'published',
-        branchName: 'openchamber/published',
+        branchName: 'magio/published',
       });
       expect(events).toHaveLength(1);
       expect(events[0].directories).toContain(repo);
@@ -1631,7 +1631,7 @@ describe('createWorktree', () => {
       const created = await createWorktree(repo, {
         mode: 'new',
         worktreeName: 'hook-test',
-        branchName: 'openchamber/hook-test',
+        branchName: 'magio/hook-test',
         returnAfterDirectoryCreated: true,
       });
 
@@ -1675,7 +1675,7 @@ describe('createWorktree', () => {
       const created = await createWorktree(repo, {
         mode: 'new',
         worktreeName: 'hook-skip-test',
-        branchName: 'openchamber/hook-skip-test',
+        branchName: 'magio/hook-skip-test',
         returnAfterDirectoryCreated: true,
       });
 
@@ -1718,7 +1718,7 @@ describe('createWorktree', () => {
       const created = await createWorktree(repo, {
         mode: 'new',
         worktreeName: 'hook-fail-test',
-        branchName: 'openchamber/hook-fail-test',
+        branchName: 'magio/hook-fail-test',
         returnAfterDirectoryCreated: true,
       });
 
@@ -1925,23 +1925,23 @@ describe('createWorktree', () => {
 
       const created = await createWorktree(repository, {
         mode: 'new',
-        branchName: 'openchamber/feature',
+        branchName: 'magio/feature',
         worktreeName: 'feature-wt',
         startRef: 'remotes/origin/main',
         setUpstream: true,
         upstreamRemote: 'origin',
-        upstreamBranch: 'openchamber/feature',
+        upstreamBranch: 'magio/feature',
       });
 
-      expect(created.branch).toBe('openchamber/feature');
+      expect(created.branch).toBe('magio/feature');
 
       await expect.poll(
         () => getWorktreeBootstrapStatus(created.path).then((status) => status.status === 'ready' || status.status === 'failed'),
         { timeout: 5_000 }
       ).toBe(true);
 
-      expect(readBranchConfig(created.path, 'openchamber/feature', 'remote')).toBe('');
-      expect(readBranchConfig(created.path, 'openchamber/feature', 'merge')).toBe('');
+      expect(readBranchConfig(created.path, 'magio/feature', 'remote')).toBe('');
+      expect(readBranchConfig(created.path, 'magio/feature', 'merge')).toBe('');
     } finally {
       if (previousXdgDataHome === undefined) {
         delete process.env.XDG_DATA_HOME;
@@ -1963,17 +1963,17 @@ describe('createWorktree', () => {
 
       const created = await createWorktree(repository, {
         mode: 'new',
-        branchName: 'openchamber/fallback-wt',
+        branchName: 'magio/fallback-wt',
         worktreeName: 'fallback-wt',
         startRef: 'remotes/origin/main',
         setUpstream: true,
       });
 
       await expect.poll(
-        () => readBranchConfig(created.path, 'openchamber/fallback-wt', 'merge'),
+        () => readBranchConfig(created.path, 'magio/fallback-wt', 'merge'),
         { timeout: 5_000 }
       ).toBe('refs/heads/main');
-      expect(readBranchConfig(created.path, 'openchamber/fallback-wt', 'remote')).toBe('origin');
+      expect(readBranchConfig(created.path, 'magio/fallback-wt', 'remote')).toBe('origin');
     } finally {
       if (previousXdgDataHome === undefined) {
         delete process.env.XDG_DATA_HOME;
@@ -1993,16 +1993,16 @@ describe('createWorktree', () => {
     try {
       const { repository } = createRepositoryWithRemote({ defaultBranch: 'main' });
       runGit(repository, ['branch', '--set-upstream-to=origin/main', 'next']);
-      runGit(repository, ['remote', 'set-url', 'origin', '/nonexistent/openchamber-unreachable.git']);
+      runGit(repository, ['remote', 'set-url', 'origin', '/nonexistent/magio-unreachable.git']);
 
       const created = await createWorktree(repository, {
         mode: 'new',
-        branchName: 'openchamber/stale-ref-wt',
+        branchName: 'magio/stale-ref-wt',
         worktreeName: 'stale-ref-wt',
         startRef: 'remotes/origin/main',
       });
 
-      expect(created.branch).toBe('openchamber/stale-ref-wt');
+      expect(created.branch).toBe('magio/stale-ref-wt');
       expect(created.sourceFetchFailed).toBe(true);
       const expectedHead = runGit(repository, ['rev-parse', 'next']).trim();
       expect(runGit(created.path, ['rev-parse', 'HEAD']).trim()).toBe(expectedHead);
@@ -2054,7 +2054,7 @@ describe('createWorktree', () => {
 
         const created = await createWorktree(repository, {
           mode: 'new',
-          branchName: 'openchamber/fresh-base',
+          branchName: 'magio/fresh-base',
           worktreeName: 'fresh-base',
           startRef: 'main',
         });
@@ -2078,7 +2078,7 @@ describe('createWorktree', () => {
 
         const created = await createWorktree(repository, {
           mode: 'new',
-          branchName: 'openchamber/local-base',
+          branchName: 'magio/local-base',
           worktreeName: 'local-base',
           startRef: 'main',
         });
@@ -2091,12 +2091,12 @@ describe('createWorktree', () => {
       if (!canRunGit()) return;
       await withDataHome(async () => {
         const { repository } = createRepositoryBehindItsRemote();
-        runGit(repository, ['remote', 'set-url', 'origin', '/nonexistent/openchamber-unreachable.git']);
+        runGit(repository, ['remote', 'set-url', 'origin', '/nonexistent/magio-unreachable.git']);
         const localMain = runGit(repository, ['rev-parse', 'main']).trim();
 
         const created = await createWorktree(repository, {
           mode: 'new',
-          branchName: 'openchamber/offline-base',
+          branchName: 'magio/offline-base',
           worktreeName: 'offline-base',
           startRef: 'main',
         });
@@ -2117,11 +2117,11 @@ describe('createWorktree', () => {
     try {
       const { repository } = createRepositoryWithRemote({ defaultBranch: 'main' });
       runGit(repository, ['update-ref', '-d', 'refs/remotes/origin/main']);
-      runGit(repository, ['remote', 'set-url', 'origin', '/nonexistent/openchamber-unreachable.git']);
+      runGit(repository, ['remote', 'set-url', 'origin', '/nonexistent/magio-unreachable.git']);
 
       await expect(createWorktree(repository, {
         mode: 'new',
-        branchName: 'openchamber/never-fetched-wt',
+        branchName: 'magio/never-fetched-wt',
         worktreeName: 'never-fetched-wt',
         startRef: 'remotes/origin/main',
       })).rejects.toThrow(/does not appear to be a git repository|Could not read from remote repository/i);
@@ -2181,7 +2181,7 @@ describe('createWorktree with OpenCode worktree.directory', () => {
 
     const created = await createWorktree(repo, {
       mode: 'new',
-      branchName: 'openchamber/configured-tree',
+      branchName: 'magio/configured-tree',
       worktreeName: 'configured-tree',
     });
     expect(fs.realpathSync(created.path)).toBe(fs.realpathSync(path.join(repo, '.worktrees', 'configured-tree')));
@@ -2202,7 +2202,7 @@ describe('createWorktree with OpenCode worktree.directory', () => {
 
     const created = await createWorktree(repo, {
       mode: 'new',
-      branchName: 'openchamber/absolute-tree',
+      branchName: 'magio/absolute-tree',
       worktreeName: 'absolute-tree',
     });
     expect(fs.realpathSync(created.path)).toBe(fs.realpathSync(path.join(target, 'absolute-tree')));
@@ -2223,7 +2223,7 @@ describe('createWorktree with OpenCode worktree.directory', () => {
     try {
       const created = await createWorktree(repo, {
         mode: 'new',
-        branchName: 'openchamber/fallback-tree',
+        branchName: 'magio/fallback-tree',
         worktreeName: 'fallback-tree',
       });
 
@@ -2747,13 +2747,13 @@ describe('git remote arguments with option-like names', () => {
 
       const created = await createWorktree(repository, {
         mode: 'new',
-        branchName: 'openchamber/option-like-remote',
+        branchName: 'magio/option-like-remote',
         worktreeName: 'option-like-remote',
         ensureRemoteName: OPTION_LIKE_REMOTE,
         ensureRemoteUrl: remote,
       });
 
-      expect(created.branch).toBe('openchamber/option-like-remote');
+      expect(created.branch).toBe('magio/option-like-remote');
       expect(runGit(repository, ['remote', 'get-url', '--', OPTION_LIKE_REMOTE]).trim()).toBe(remote);
     });
   }, 30_000);
@@ -2809,12 +2809,12 @@ describe('git remote arguments with option-like names', () => {
 
       const created = await createWorktree(repository, {
         mode: 'new',
-        branchName: 'openchamber/option-like-start-ref',
+        branchName: 'magio/option-like-start-ref',
         worktreeName: 'option-like-start-ref',
         startRef: `remotes/${OPTION_LIKE_REMOTE}/feature/option-like`,
       });
 
-      expect(created.branch).toBe('openchamber/option-like-start-ref');
+      expect(created.branch).toBe('magio/option-like-start-ref');
       expect(runGit(created.path, ['rev-parse', 'HEAD']).trim()).toBe(sha);
       await expect.poll(
         () => getWorktreeBootstrapStatus(created.path).then((status) => status.status === 'ready' || status.status === 'failed'),
@@ -2983,8 +2983,8 @@ describe('removeWorktree', () => {
     const rename = fs.promises.rename.bind(fs.promises);
     let injected = false;
     const renameSpy = vi.spyOn(fs.promises, 'rename').mockImplementation(async (source, destination) => {
-      const changesGitEntry = (source === fixture.gitEntry && destination.startsWith(`${fixture.gitEntry}.openchamber-`))
-        || (destination === fixture.gitEntry && source.startsWith(`${fixture.gitEntry}.openchamber-`));
+      const changesGitEntry = (source === fixture.gitEntry && destination.startsWith(`${fixture.gitEntry}.magio-`))
+        || (destination === fixture.gitEntry && source.startsWith(`${fixture.gitEntry}.magio-`));
       if (!injected && changesGitEntry && fs.lstatSync(fixture.gitEntry).isSymbolicLink()) {
         injected = true;
         execFileSync(process.execPath, ['-e', `
@@ -3046,7 +3046,7 @@ describe('removeWorktree', () => {
       expect(injected).toBe(true);
       if (kind === 'file') expect(fs.readFileSync(fixture.gitEntry, 'utf8')).toBe(concurrentContents);
       else expect(fs.readlinkSync(fixture.gitEntry)).toBe(concurrentContents);
-      const claims = fs.readdirSync(fixture.worktree).filter(name => name.startsWith('.git.openchamber-'));
+      const claims = fs.readdirSync(fixture.worktree).filter(name => name.startsWith('.git.magio-'));
       expect(claims).toHaveLength(1);
       const claim = path.join(fixture.worktree, claims[0]);
       expect(fs.readlinkSync(claim)).toBe(originalTarget);
@@ -3097,7 +3097,7 @@ describe('removeWorktree', () => {
         deleteLocalBranch: true,
       })).rejects.toBe(installationError);
       expect(fs.lstatSync(fixture.gitEntry, { throwIfNoEntry: false })).toBeUndefined();
-      const claims = fs.readdirSync(fixture.worktree).filter(name => name.startsWith('.git.openchamber-'));
+      const claims = fs.readdirSync(fixture.worktree).filter(name => name.startsWith('.git.magio-'));
       expect(claims).toHaveLength(1);
       const claim = path.join(fixture.worktree, claims[0]);
       expect(fs.readlinkSync(claim)).toBe(originalTarget);
@@ -4085,7 +4085,7 @@ describe('snapshotWorktree', () => {
     fs.writeFileSync(path.join(repo, 'secret.env'), 'TOKEN=1\n');
     const statusBefore = runGit(repo, ['status', '--porcelain']);
 
-    const ref = 'refs/openchamber/runs/group-1/ses_abc';
+    const ref = 'refs/magio/runs/group-1/ses_abc';
     const result = await snapshotWorktree(repo, { ref });
 
     expect(result).toMatchObject({ ref, head });
@@ -4104,7 +4104,7 @@ describe('snapshotWorktree', () => {
     if (!canRunGit()) return;
     const repo = createSnapshotRepo();
     await expect(snapshotWorktree(repo, { ref: 'refs/heads/main' })).rejects.toThrow('Invalid snapshot ref');
-    await expect(snapshotWorktree(repo, { ref: 'refs/openchamber/runs/../heads' })).rejects.toThrow('Invalid snapshot ref');
+    await expect(snapshotWorktree(repo, { ref: 'refs/magio/runs/../heads' })).rejects.toThrow('Invalid snapshot ref');
   });
 
 });
@@ -5347,7 +5347,7 @@ describe('git environment through simple-git', () => {
     return { repo, readHookLog: () => fs.readFileSync(hookLog, 'utf8') };
   };
 
-  it('runs git with the environment OpenChamber builds, not the raw process env', async () => {
+  it('runs git with the environment Magio builds, not the raw process env', async () => {
     if (!canRunGit() || process.platform === 'win32') return;
     await withProcessEnv({
       GIT_TERMINAL_PROMPT: undefined,
@@ -5418,7 +5418,7 @@ describe('git environment through simple-git', () => {
       GIT_EDITOR: 'vim',
       PAGER: 'less',
       GIT_PAGER: 'less',
-      GIT_SSH_COMMAND: 'ssh -i /tmp/openchamber-test-key -o IdentitiesOnly=yes',
+      GIT_SSH_COMMAND: 'ssh -i /tmp/magio-test-key -o IdentitiesOnly=yes',
       GIT_ASKPASS: '/usr/bin/true',
       SSH_ASKPASS: '/usr/bin/true',
     };

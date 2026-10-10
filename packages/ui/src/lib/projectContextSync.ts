@@ -1,4 +1,4 @@
-import { subscribeOpenchamberEvents } from './openchamberEvents';
+import { subscribemagioEvents } from './magioEvents';
 import { resolveProjectContextId, type ProjectRef } from './projectContextApi';
 import { getRuntimeKey } from './runtime-switch';
 import { useProjectContextStore } from '@/stores/useProjectContextStore';
@@ -32,7 +32,7 @@ export const observeProjectContext = (project: ProjectRef): (() => void) => {
     });
   };
 
-  const releaseEvents = subscribeOpenchamberEvents(event => {
+  const releaseEvents = subscribemagioEvents(event => {
     if ((event.type === 'project-context-changed' && event.projectId === projectId)
       || event.type === 'event-stream-ready') refresh();
   });

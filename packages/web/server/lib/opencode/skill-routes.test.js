@@ -23,7 +23,7 @@ import {
 } from './shared.js';
 
 const createTempProject = () => {
-  const projectRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'oc-skill-routes-'));
+  const projectRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'mg-skill-routes-'));
   fs.mkdirSync(path.join(projectRoot, '.git'));
   return projectRoot;
 };
@@ -175,7 +175,7 @@ describe('skill-routes directory soft fallback', () => {
       'utf8',
     );
 
-    const cacheStamp = `oc-skill-routes-${Date.now()}`;
+    const cacheStamp = `mg-skill-routes-${Date.now()}`;
     const cacheDir = path.join(os.homedir(), '.cache', 'opencode', 'skills', cacheStamp, 'cache-list-skill');
     fs.mkdirSync(cacheDir, { recursive: true });
     fs.writeFileSync(

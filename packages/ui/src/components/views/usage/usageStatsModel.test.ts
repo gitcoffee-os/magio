@@ -64,8 +64,8 @@ test('a report with no prompts and no steps is empty', () => {
 });
 
 test('a project reads as its label, else its folder name', () => {
-  expect(projectDisplayName({ label: ' Chamber ', path: '/code/openchamber' })).toBe('Chamber');
-  expect(projectDisplayName({ path: '/code/openchamber/' })).toBe('openchamber');
+  expect(projectDisplayName({ label: ' Magio ', path: '/code/magio' })).toBe('Magio');
+  expect(projectDisplayName({ path: '/code/magio/' })).toBe('magio');
   expect(projectDisplayName({ label: '', path: 'C:\\code\\app' })).toBe('app');
 });
 

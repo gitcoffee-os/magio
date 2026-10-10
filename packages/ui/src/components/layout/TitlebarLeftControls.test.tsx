@@ -59,7 +59,7 @@ describe('TitlebarLeftControls', () => {
 
     const overlay = document.querySelector<HTMLElement>(OVERLAY_SELECTOR);
     expect(overlay).not.toBeNull();
-    expect(overlay!.style.maxWidth).toBe('var(--oc-left-sidebar-width, 100%)');
+    expect(overlay!.style.maxWidth).toBe('var(--mg-left-sidebar-width, 100%)');
   });
 
   test('drops the cap when the sidebar is closed', async () => {

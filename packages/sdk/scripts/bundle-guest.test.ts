@@ -11,7 +11,7 @@ const guestEntry = path.resolve(
 
 describe('bundle-guest', () => {
   test('builds a guest entry to a classic IIFE', async () => {
-    const dir = await mkdtemp(path.join(tmpdir(), 'oc-guest-bundle-'));
+    const dir = await mkdtemp(path.join(tmpdir(), 'mg-guest-bundle-'));
     const outfile = path.join(dir, 'main.js');
     try {
       const proc = Bun.spawn(['bun', script, guestEntry, outfile], {
@@ -23,7 +23,7 @@ describe('bundle-guest', () => {
       expect(exit).toBe(0);
       expect(stderr).toBe('');
       const text = await readFile(outfile, 'utf8');
-      expect(text).toContain('openchamber.sdk');
+      expect(text).toContain('magio.sdk');
       expect(text).toContain('HELLO-1');
     } finally {
       await rm(dir, { recursive: true, force: true });
@@ -31,7 +31,7 @@ describe('bundle-guest', () => {
   });
 
   test('--node keeps ESM for a local service entry', async () => {
-    const dir = await mkdtemp(path.join(tmpdir(), 'oc-guest-bundle-'));
+    const dir = await mkdtemp(path.join(tmpdir(), 'mg-guest-bundle-'));
     const outfile = path.join(dir, 'service.js');
     try {
       const proc = Bun.spawn(['bun', script, '--node', guestEntry, outfile], {
@@ -41,7 +41,7 @@ describe('bundle-guest', () => {
       const exit = await proc.exited;
       expect(exit).toBe(0);
       const text = await readFile(outfile, 'utf8');
-      expect(text).toContain('openchamber.sdk');
+      expect(text).toContain('magio.sdk');
       expect(text).not.toMatch(/^\(\(\) => \{/);
     } finally {
       await rm(dir, { recursive: true, force: true });

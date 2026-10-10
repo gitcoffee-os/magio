@@ -178,7 +178,7 @@ describe('delta coalescing in the global hub', () => {
       // A cursor minted by another server process must miss, never match by
       // sequence number: the bridge then reports replayReset and the client
       // repairs from HTTP instead of trusting a wrong tail.
-      const foreign = ids[0].replace(/^oc-[^-]+-/, 'oc-00000000-');
+      const foreign = ids[0].replace(/^mg-[^-]+-/, 'mg-00000000-');
       expect(foreign).not.toBe(ids[0]);
       expect(hub.replayAfter(foreign)).toBeNull();
     } finally { hub.stop(); }
@@ -340,7 +340,7 @@ describe('events of isolated spaces in the global hub', () => {
     expect(plain).toHaveLength(0);
     expect(withSpaces).toHaveLength(1);
     expect(withSpaces[0]).toMatchObject({ spaceId: 'a1b2c3d4e5f6', directory: '/spaces/a1b2c3d4e5f6/repo' });
-    expect(withSpaces[0].eventId).toMatch(/^oc-/);
+    expect(withSpaces[0].eventId).toMatch(/^mg-/);
     expect(withSpaces[0].translated()).toEqual([expect.objectContaining({ type: 'session.status' })]);
     expect(JSON.parse(withSpaces[0].serialize())).toMatchObject({ type: 'event', directory: '/spaces/a1b2c3d4e5f6/repo', payload: { type: 'session.execution.started' } });
     hub.injectEvent({ payload: { type: 'session.execution.succeeded', data: { sessionID: 's1' } }, directory: '/spaces/a1b2c3d4e5f6/repo', spaceId: 'a1b2c3d4e5f6' });

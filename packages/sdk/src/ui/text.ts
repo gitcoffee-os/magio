@@ -55,7 +55,7 @@ export const splitTextMedia = (text: string): TextPart[] => {
 export const mountText = (root: Element, initial: TextProps): TextHandle => {
   ensureStyle(UI_CSS);
   let props = initial;
-  const node = el('div', 'oc-sdk oc-sdk-text');
+  const node = el('div', 'mg-sdk mg-sdk-text');
   root.append(node);
 
   const onClick = (event: MouseEvent): void => {

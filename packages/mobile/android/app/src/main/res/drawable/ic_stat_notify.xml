@@ -1,22 +1,22 @@
-<!-- Notification small icon: a monochrome (alpha-only) silhouette of the OpenChamber cube.
-     Android tints it white in the status bar / notification, so only the shape matters. The small
-     filled diamond on the top face is a minimal stand-in for the OpenCode mark, so the tiny
-     silhouette still reads as the OpenChamber logo rather than a generic cube. -->
+<!-- Notification small icon: a monochrome (alpha-only) silhouette of the Magio C-spark.
+     Android tints it white in the status bar / notification, so only the shape matters. The
+     four-pointed star with its smaller companion star at the upper right is the Magio mark,
+     drawn solid: at 24dp the old wireframe's thin edges were already close to the minimum
+     stroke Android renders cleanly, and a filled silhouette stays crisp in the status bar. -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="24dp"
     android:height="24dp"
     android:viewportWidth="24"
     android:viewportHeight="24">
-    <!-- Cube wireframe: outer hexagon + the three edges meeting at the front vertex. -->
-    <path
-        android:fillColor="#00000000"
-        android:strokeColor="#FFFFFFFF"
-        android:strokeWidth="1.8"
-        android:strokeLineJoin="round"
-        android:strokeLineCap="round"
-        android:pathData="M12,2.02 L20.65,7.01 L20.65,16.99 L12,21.98 L3.35,16.99 L3.35,7.01 Z M3.35,7.01 L12,12 L20.65,7.01 M12,12 L12,21.98" />
-    <!-- OpenCode mark on the top face (iso-proportioned diamond). -->
+    <!-- Main star: the SVG's 1024-space art (spans x 168...881.2 including the companion,
+         y 168...856) mapped to the 24dp viewport at 0.029 units per SVG unit and centred on
+         (12,12), which lands it at 1.66...22.34 horizontally and 2.02...21.98 vertically. -->
     <path
         android:fillColor="#FFFFFFFF"
-        android:pathData="M12,5.7 L14.6,7.2 L12,8.7 L9.4,7.2 Z" />
+        android:pathData="M11.6346,2.024 C12.0986,8.172,15.4626,11.536,21.6106,12 C15.4626,12.464,12.0986,15.828,11.6346,21.976 C11.1706,15.828,7.8066,12.464,1.6586,12 C7.8066,11.536,11.1706,8.172,11.6346,2.024 Z" />
+    <!-- Companion star, upper right: the same star scaled 0.3 and translated (624.4,142.4)
+         in the SVG, baked here. -->
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M19.3486,2.749 C19.4936,4.576,20.5086,5.591,22.3356,5.736 C20.5086,5.881,19.4936,6.896,19.3486,8.723 C19.2036,6.896,18.1886,5.881,16.3616,5.736 C18.1886,5.591,19.2036,4.576,19.3486,2.749 Z" />
 </vector>

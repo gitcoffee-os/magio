@@ -8,9 +8,9 @@
  * We fold the request port into the cookie name so each port owns its own
  * cookie. Password/passkey session issuance and validation (`ui-auth.js`) and
  * notification identity extraction (`request-security.js`) share this resolver.
- * A host with no explicit port keeps the bare `oc_ui_session` name.
+ * A host with no explicit port keeps the bare `mg_ui_session` name.
  */
-export const SESSION_COOKIE_BASE = 'oc_ui_session';
+export const SESSION_COOKIE_BASE = 'mg_ui_session';
 
 const forwardedHost = (headers) => {
   const forwarded = headers?.['x-forwarded-host'];

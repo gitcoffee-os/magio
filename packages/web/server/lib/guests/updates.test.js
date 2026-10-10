@@ -31,9 +31,9 @@ const git = (cwd, args) => {
 };
 
 const manifest = (id, version, extra = {}) => JSON.stringify({
-  name: `@openchamber/${id}`,
+  name: `@magio/${id}`,
   version,
-  openchamber: {
+  magio: {
     apiVersion: 1,
     contributes: {
       panel: { id, name: id, icon: 'window', entry: 'panel/index.html' },
@@ -80,7 +80,7 @@ const pushVersion = async (work, id, version, extra) => {
 };
 
 const installFrom = async (bare, persistPath, ref) => {
-  const installed = await installGuestFromGitSource(bare, persistPath, { openchamberVersion: '1.30.0', ref });
+  const installed = await installGuestFromGitSource(bare, persistPath, { magioVersion: '1.30.0', ref });
   if (!installed.ok) {
     throw new Error(`install failed: ${installed.code}`);
   }
@@ -137,7 +137,7 @@ describe('parseGitInstallUrl', () => {
 
 describe('checkGuestUpdate', () => {
   test('reports a newer remote version and stays quiet on the same one', async () => {
-    const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'oc-upd-'));
+    const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'mg-upd-'));
     const persistPath = path.join(dir, 'data', 'extensions.json');
     const { work, bare } = await setupRemote(dir, 'upd-hello');
     await installFrom(bare, persistPath);
@@ -164,7 +164,7 @@ describe('checkGuestUpdate', () => {
   });
 
   test('follows a pinned tag and never throws on a broken remote', async () => {
-    const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'oc-upd-'));
+    const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'mg-upd-'));
     const persistPath = path.join(dir, 'data', 'extensions.json');
     const { work, bare } = await setupRemote(dir, 'upd-tag');
     git(work, ['tag', 'stable']);
@@ -192,7 +192,7 @@ describe('checkGuestUpdate', () => {
 
 describe('checkAllGuestUpdates', () => {
   test('caches per guest for an hour unless forced and feeds the catalog row', async () => {
-    const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'oc-upd-'));
+    const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'mg-upd-'));
     const persistPath = path.join(dir, 'data', 'extensions.json');
     const { work, bare } = await setupRemote(dir, 'upd-cache');
     await installFrom(bare, persistPath);
@@ -219,7 +219,7 @@ describe('checkAllGuestUpdates', () => {
 
 describe('updateGuest', () => {
   test('swaps in the new clone and keeps grants, then reports a new version', async () => {
-    const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'oc-upd-'));
+    const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'mg-upd-'));
     const persistPath = path.join(dir, 'data', 'extensions.json');
     const { work, bare } = await setupRemote(dir, 'upd-swap');
     await installFrom(bare, persistPath);
@@ -238,7 +238,7 @@ describe('updateGuest', () => {
     await checkAllGuestUpdates({ persistPath, force: true });
     expect(getCachedGuestUpdate(persistPath, 'upd-swap')).toEqual({ version: '1.1.0' });
 
-    const updated = await updateGuest({ guest: before, origin: before.gitOrigin, persistPath, openchamberVersion: '1.30.0' });
+    const updated = await updateGuest({ guest: before, origin: before.gitOrigin, persistPath, magioVersion: '1.30.0' });
     expect(updated).toEqual({ ok: true, id: 'upd-swap' });
 
     const after = await loadGuest('upd-swap', persistPath);
@@ -258,7 +258,7 @@ describe('updateGuest', () => {
   });
 
   test('a failure before the swap leaves the install untouched', async () => {
-    const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'oc-upd-'));
+    const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'mg-upd-'));
     const persistPath = path.join(dir, 'data', 'extensions.json');
     const { work, bare } = await setupRemote(dir, 'upd-keep');
     await installFrom(bare, persistPath);
@@ -271,17 +271,17 @@ describe('updateGuest', () => {
 
     // Remote now needs a host this build does not have.
     await fs.writeFile(path.join(work, 'package.json'), JSON.stringify({
-      name: '@openchamber/upd-keep',
+      name: '@magio/upd-keep',
       version: '1.1.0',
-      openchamber: {
+      magio: {
         apiVersion: 1,
-        engines: { openchamber: '>=9.9.9' },
+        engines: { magio: '>=9.9.9' },
         contributes: { panel: { id: 'upd-keep', name: 'Keep', icon: 'window', entry: 'panel/index.html' } },
       },
     }));
     commit(work, 'needs newer host');
     git(work, ['push', '-q', 'origin', 'HEAD']);
-    expect(await updateGuest({ guest, origin: guest.gitOrigin, persistPath, openchamberVersion: '1.30.0' })).toEqual({
+    expect(await updateGuest({ guest, origin: guest.gitOrigin, persistPath, magioVersion: '1.30.0' })).toEqual({
       ok: false,
       code: 'host-too-old',
       required: '9.9.9',
@@ -294,7 +294,7 @@ describe('updateGuest', () => {
     await fs.writeFile(path.join(work, 'panel', 'index.html'), '<script src="./main.js"></script>');
     commit(work, 'unbuilt');
     git(work, ['push', '-q', 'origin', 'HEAD']);
-    expect(await updateGuest({ guest, origin: guest.gitOrigin, persistPath, openchamberVersion: '1.30.0' })).toEqual({
+    expect(await updateGuest({ guest, origin: guest.gitOrigin, persistPath, magioVersion: '1.30.0' })).toEqual({
       ok: false,
       code: 'missing-build',
     });
@@ -305,7 +305,7 @@ describe('updateGuest', () => {
     await fs.writeFile(path.join(work, 'panel', 'index.html'), '<html></html>');
     commit(work, 'renamed');
     git(work, ['push', '-q', 'origin', 'HEAD']);
-    expect(await updateGuest({ guest, origin: guest.gitOrigin, persistPath, openchamberVersion: '1.30.0' })).toEqual({
+    expect(await updateGuest({ guest, origin: guest.gitOrigin, persistPath, magioVersion: '1.30.0' })).toEqual({
       ok: false,
       code: 'invalid-manifest',
     });
@@ -313,7 +313,7 @@ describe('updateGuest', () => {
 
     // Remote is gone.
     await fs.rm(bare, { recursive: true, force: true });
-    expect(await updateGuest({ guest, origin: guest.gitOrigin, persistPath, openchamberVersion: '1.30.0' })).toEqual({
+    expect(await updateGuest({ guest, origin: guest.gitOrigin, persistPath, magioVersion: '1.30.0' })).toEqual({
       ok: false,
       code: 'clone-failed',
     });

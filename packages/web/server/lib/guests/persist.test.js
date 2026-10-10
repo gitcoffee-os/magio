@@ -18,16 +18,16 @@ import {
 
 describe('extensionsPersistPath', () => {
   test('joins the instance data dir and refuses a relative path', () => {
-    const dataDir = path.join(os.tmpdir(), 'oc-instance-a');
+    const dataDir = path.join(os.tmpdir(), 'mg-instance-a');
     expect(extensionsPersistPath(dataDir)).toBe(path.join(dataDir, 'extensions.json'));
-    expect(() => extensionsPersistPath('relative')).toThrow('absolute OpenChamber data dir');
-    expect(() => extensionsPersistPath('')).toThrow('absolute OpenChamber data dir');
+    expect(() => extensionsPersistPath('relative')).toThrow('absolute Magio data dir');
+    expect(() => extensionsPersistPath('')).toThrow('absolute Magio data dir');
   });
 });
 
 describe('extension persist', () => {
   test('round-trips paths and treats a missing file as empty', async () => {
-    const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'oc-ext-'));
+    const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'mg-ext-'));
     const file = extensionsPersistPath(dir);
     expect(await readExtensionPaths(file)).toEqual([]);
     await writeExtensionPaths(['/one', '/two'], file);
@@ -36,7 +36,7 @@ describe('extension persist', () => {
   });
 
   test('keeps two instance stores apart', async () => {
-    const parent = await fs.mkdtemp(path.join(os.tmpdir(), 'oc-ext-'));
+    const parent = await fs.mkdtemp(path.join(os.tmpdir(), 'mg-ext-'));
     const a = extensionsPersistPath(path.join(parent, 'a'));
     const b = extensionsPersistPath(path.join(parent, 'b'));
     await writeExtensionPaths(['/one'], a);
@@ -47,7 +47,7 @@ describe('extension persist', () => {
   });
 
   test('reads a path-only store and keeps zip sources', async () => {
-    const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'oc-ext-'));
+    const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'mg-ext-'));
     const file = extensionsPersistPath(dir);
     await fs.writeFile(file, `${JSON.stringify({ paths: ['/one'] })}\n`, 'utf8');
     expect(await readExtensionStore(file)).toEqual({
@@ -89,7 +89,7 @@ describe('extension persist', () => {
   });
 
   test('round-trips service grants', async () => {
-    const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'oc-ext-'));
+    const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'mg-ext-'));
     const file = extensionsPersistPath(dir);
     await writeExtensionStore(file, {
       paths: ['/one'],
@@ -110,7 +110,7 @@ describe('extension persist', () => {
   });
 
   test('round-trips service socket overrides', async () => {
-    const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'oc-ext-'));
+    const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'mg-ext-'));
     const file = extensionsPersistPath(dir);
     await writeExtensionStore(file, {
       paths: ['/one'],
@@ -142,7 +142,7 @@ describe('extension persist', () => {
   });
 
   test('round-trips disabled guests', async () => {
-    const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'oc-ext-'));
+    const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'mg-ext-'));
     const file = extensionsPersistPath(dir);
     await writeExtensionStore(file, {
       paths: ['/one'],
@@ -162,7 +162,7 @@ describe('extension persist', () => {
   });
 
   test('keeps the store whole under concurrent writes', async () => {
-    const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'oc-guest-persist-'));
+    const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'mg-guest-persist-'));
     const file = extensionsPersistPath(dir);
     try {
       await Promise.all(Array.from({ length: 12 }, (_, index) => (
@@ -176,7 +176,7 @@ describe('extension persist', () => {
   });
 
   test('drops grants this build no longer knows instead of refusing the store', async () => {
-    const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'oc-ext-'));
+    const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'mg-ext-'));
     const persistPath = extensionsPersistPath(dir);
     await fs.writeFile(persistPath, JSON.stringify({
       paths: ['/tmp/old-echo', '/tmp/tasks'],
@@ -192,7 +192,7 @@ describe('extension persist', () => {
   });
 
   test('refuses a corrupt store', async () => {
-    const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'oc-ext-'));
+    const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'mg-ext-'));
     const file = extensionsPersistPath(dir);
     await fs.writeFile(file, '{"paths":[1]}', 'utf8');
     try {
@@ -206,7 +206,7 @@ describe('extension persist', () => {
   });
 
   test('keeps git origins for installed git copies and drops malformed ones', async () => {
-    const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'oc-ext-'));
+    const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'mg-ext-'));
     const file = extensionsPersistPath(dir);
     await writeExtensionStore(file, {
       paths: ['/git', '/zip', '/folder'],
@@ -240,7 +240,7 @@ describe('extension persist', () => {
 
 describe('concurrent store changes', () => {
   test('does not mint a stale installation identity and preserves unrelated concurrent changes', async () => {
-    const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'oc-guest-persist-'));
+    const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'mg-guest-persist-'));
     const file = extensionsPersistPath(dir);
     try {
       await writeExtensionStore(file, { paths: ['/old', '/other'] });
@@ -268,7 +268,7 @@ describe('concurrent store changes', () => {
   });
 
   test('two approvals at once both land', async () => {
-    const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'oc-guest-persist-'));
+    const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'mg-guest-persist-'));
     const file = extensionsPersistPath(dir);
     try {
       await writeExtensionStore(file, { paths: ['/a', '/b'] });
@@ -285,7 +285,7 @@ describe('concurrent store changes', () => {
   });
 
   test('withdrawing approval also drops the recorded scope', async () => {
-    const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'oc-guest-persist-'));
+    const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'mg-guest-persist-'));
     const file = extensionsPersistPath(dir);
     try {
       await writeExtensionStore(file, { paths: ['/a'] });
@@ -301,7 +301,7 @@ describe('concurrent store changes', () => {
   });
 
   test('drops a malformed scope entry on read instead of refusing the store', async () => {
-    const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'oc-guest-persist-'));
+    const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'mg-guest-persist-'));
     const file = extensionsPersistPath(dir);
     try {
       await fs.writeFile(file, JSON.stringify({

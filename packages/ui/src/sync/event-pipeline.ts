@@ -1,7 +1,7 @@
 /**
  * Event Pipeline — transport connection, translation, coalescing, and batched flush.
  *
- * Wire events (OpenCode v2 `/api/event`, or the OpenChamber server's WebSocket
+ * Wire events (OpenCode v2 `/api/event`, or the Magio server's WebSocket
  * bridge of that stream) are translated into `SyncEvent`s here and coalesced
  * per directory before the reducer sees them. This module must not make
  * state-dependent decisions about event validity: deciding whether a delta is
@@ -100,7 +100,7 @@ export type EventPipeline = {
   reconnect: (reason?: string) => void
 }
 
-// Frames the OpenChamber server sends on `/api/global/event/ws`. `payload` is
+// Frames the Magio server sends on `/api/global/event/ws`. `payload` is
 // the wire event as OpenCode published it; the server adds replay metadata.
 const wsFrameSchema = z.object({
   type: z.enum(["ready", "event", "error", "backpressure"]),
@@ -111,10 +111,10 @@ const wsFrameSchema = z.object({
   message: z.string().optional(),
 })
 
-// OpenChamber's own session-status bridge rides the same stream. It predates
+// Magio's own session-status bridge rides the same stream. It predates
 // OpenCode's `session.status` and carries the status in `properties`.
-const openchamberStatusSchema = z.object({
-  type: z.literal("openchamber:session-status"),
+const magioStatusSchema = z.object({
+  type: z.literal("magio:session-status"),
   properties: z.object({
     sessionID: z.string().min(1).optional(),
     sessionId: z.string().min(1).optional(),
@@ -123,19 +123,19 @@ const openchamberStatusSchema = z.object({
   }),
 })
 
-// OpenChamber owns archive state; its server announces changes on the stream.
-const openchamberArchivedSchema = z.object({
-  type: z.literal("openchamber:session-archived"),
+// Magio owns archive state; its server announces changes on the stream.
+const magioArchivedSchema = z.object({
+  type: z.literal("magio:session-archived"),
   properties: z.object({ sessionID: z.string().min(1), archivedAt: z.number().nullable() }),
 })
 
-const openchamberMetadataSchema = z.object({
-  type: z.literal("openchamber:session-metadata"),
+const magioMetadataSchema = z.object({
+  type: z.literal("magio:session-metadata"),
   properties: z.object({ sessionID: z.string().min(1), metadata: z.record(z.string(), z.unknown()) }),
 })
 
-const openchamberNotificationSchema = z.object({
-  type: z.literal("openchamber:notification"),
+const magioNotificationSchema = z.object({
+  type: z.literal("magio:notification"),
   properties: z
     .object({
       kind: z.string(),
@@ -154,8 +154,8 @@ const openchamberNotificationSchema = z.object({
 
 // The host's announcement of an isolated space's event connection. It is not an event of any
 // session, so it never enters a directory queue; the pipeline hands it to its owner.
-const openchamberSpaceStreamSchema = z.object({
-  type: z.literal("openchamber:space-stream"),
+const magioSpaceStreamSchema = z.object({
+  type: z.literal("magio:space-stream"),
   properties: z.object({
     spaceId: z.string().regex(/^[0-9a-f]{12}$/),
     status: z.enum(["connected", "disconnected"]),
@@ -164,8 +164,8 @@ const openchamberSpaceStreamSchema = z.object({
 })
 
 // A step of an isolated space's creation, announced on the host's hub the same way.
-const openchamberSpaceProgressSchema = z.object({
-  type: z.literal("openchamber:space-progress"),
+const magioSpaceProgressSchema = z.object({
+  type: z.literal("magio:space-progress"),
   properties: z.object({
     spaceId: z.string().regex(/^[0-9a-f]{12}$/),
     step: z.union([spaceCreationStepSchema, z.literal("failed")]),
@@ -173,16 +173,16 @@ const openchamberSpaceProgressSchema = z.object({
   }),
 })
 
-export type SpaceProgress = z.infer<typeof openchamberSpaceProgressSchema>["properties"]
+export type SpaceProgress = z.infer<typeof magioSpaceProgressSchema>["properties"]
 
 // The setup commands of a space moved on: the list says how.
-const openchamberSpaceSetupSchema = z.object({
-  type: z.literal("openchamber:space-setup"),
+const magioSpaceSetupSchema = z.object({
+  type: z.literal("magio:space-setup"),
   properties: z.object({ spaceId: z.string().regex(/^[0-9a-f]{12}$/) }),
 })
 
-const openchamberAutoAcceptSchema = z.object({
-  type: z.literal("openchamber:permission-auto-accept.updated"),
+const magioAutoAcceptSchema = z.object({
+  type: z.literal("magio:permission-auto-accept.updated"),
   properties: z.object({
     sessions: z.record(z.string(), z.boolean()),
     modes: z.record(z.string(), z.enum(["ask", "safety", "auto"])).optional(),
@@ -192,8 +192,8 @@ const openchamberAutoAcceptSchema = z.object({
 
 // The server's auto-answer in a `safety` or `auto` session held back or failed:
 // the request is the user's after all.
-const openchamberLeftForUserSchema = z.object({
-  type: z.literal("openchamber:permission-auto-accept.left-for-user"),
+const magioLeftForUserSchema = z.object({
+  type: z.literal("magio:permission-auto-accept.left-for-user"),
   properties: z.object({
     permissionId: z.string().min(1),
     sessionId: z.string().min(1),
@@ -210,32 +210,32 @@ const wireEventSchema = z.object({
   location: z.object({ directory: z.string() }).partial().optional(),
 })
 
-function translateOpenchamberArchived(payload: unknown): SyncEvent | null {
-  const parsed = openchamberArchivedSchema.safeParse(payload)
+function translatemagioArchived(payload: unknown): SyncEvent | null {
+  const parsed = magioArchivedSchema.safeParse(payload)
   if (!parsed.success) return null
   const { sessionID, archivedAt } = parsed.data.properties
   return { type: "session.patched", properties: { sessionID, patch: { time: { archived: archivedAt } } } }
 }
 
-function translateOpenchamberNative(payload: unknown): SyncEvent | null {
-  const metadata = openchamberMetadataSchema.safeParse(payload)
+function translatemagioNative(payload: unknown): SyncEvent | null {
+  const metadata = magioMetadataSchema.safeParse(payload)
   if (metadata.success) {
     const { sessionID } = metadata.data.properties
     // SAFETY: the server serialises this object from JSON, so every value is a JsonValue.
     const value = metadata.data.properties.metadata as Metadata
     return { type: "session.patched", properties: { sessionID, patch: { metadata: value } } }
   }
-  const notification = openchamberNotificationSchema.safeParse(payload)
-  if (notification.success) return { type: "openchamber.notification", properties: notification.data.properties }
-  const autoAccept = openchamberAutoAcceptSchema.safeParse(payload)
-  if (autoAccept.success) return { type: "openchamber.permission-auto-accept", properties: autoAccept.data.properties }
-  const leftForUser = openchamberLeftForUserSchema.safeParse(payload)
-  if (leftForUser.success) return { type: "openchamber.permission-left-for-user", properties: leftForUser.data.properties }
+  const notification = magioNotificationSchema.safeParse(payload)
+  if (notification.success) return { type: "magio.notification", properties: notification.data.properties }
+  const autoAccept = magioAutoAcceptSchema.safeParse(payload)
+  if (autoAccept.success) return { type: "magio.permission-auto-accept", properties: autoAccept.data.properties }
+  const leftForUser = magioLeftForUserSchema.safeParse(payload)
+  if (leftForUser.success) return { type: "magio.permission-left-for-user", properties: leftForUser.data.properties }
   return null
 }
 
-function translateOpenchamberStatus(payload: unknown): SyncEvent | null {
-  const parsed = openchamberStatusSchema.safeParse(payload)
+function translatemagioStatus(payload: unknown): SyncEvent | null {
+  const parsed = magioStatusSchema.safeParse(payload)
   if (!parsed.success) return null
   const { sessionID, sessionId, status, metadata } = parsed.data.properties
   const id = sessionID ?? sessionId
@@ -256,7 +256,7 @@ function translateOpenchamberStatus(payload: unknown): SyncEvent | null {
  * not name a location.
  */
 function translatePayload(payload: unknown, frameDirectory: string | undefined): Array<{ directory: string; event: SyncEvent }> {
-  const bridged = translateOpenchamberStatus(payload) ?? translateOpenchamberArchived(payload) ?? translateOpenchamberNative(payload)
+  const bridged = translatemagioStatus(payload) ?? translatemagioArchived(payload) ?? translatemagioNative(payload)
   if (bridged) return [{ directory: frameDirectory ?? GLOBAL_EVENT_DIRECTORY, event: bridged }]
   if (!wireEventSchema.safeParse(payload).success) return []
   // SAFETY: the discriminator and location were validated above; the rest of
@@ -283,7 +283,7 @@ function buildGlobalEventWsUrl(lastEventId?: string): string {
 
 // In relay mode the global-event WebSocket rides the E2EE tunnel instead of a
 // native network socket. The resolver still builds the authenticated URL (it
-// carries the oc_url_token the host replays to the loopback origin); we hand
+// carries the mg_url_token the host replays to the loopback origin); we hand
 // its path+query to the tunnel, which returns a socket-like with the exact
 // on* handler surface this pipeline uses. Direct-URL runtimes keep the native
 // WebSocket path, wrapped to the same shape so the caller holds one type.
@@ -466,7 +466,7 @@ export function createEventPipeline(input: EventPipelineInput): EventPipeline {
    * Wait between reconnect attempts. Resolves early when:
    *   - the browser fires `online` (network came back — probe immediately),
    *   - the tab becomes visible (user came back — probe immediately),
-   *   - an expired OpenChamber session becomes usable (the user logged in),
+   *   - an expired Magio session becomes usable (the user logged in),
    *   - the pipeline is being torn down (cleanup aborts).
    * Otherwise resolves after `ms` like a plain timer.
    */
@@ -601,17 +601,17 @@ export function createEventPipeline(input: EventPipelineInput): EventPipeline {
   }
 
   const enqueuePayload = (payload: unknown, frameDirectory: string | undefined) => {
-    const spaceStream = openchamberSpaceStreamSchema.safeParse(payload)
+    const spaceStream = magioSpaceStreamSchema.safeParse(payload)
     if (spaceStream.success) {
       onSpaceStream?.(spaceStream.data.properties)
       return
     }
-    const spaceProgress = openchamberSpaceProgressSchema.safeParse(payload)
+    const spaceProgress = magioSpaceProgressSchema.safeParse(payload)
     if (spaceProgress.success) {
       onSpaceProgress?.(spaceProgress.data.properties)
       return
     }
-    const spaceSetup = openchamberSpaceSetupSchema.safeParse(payload)
+    const spaceSetup = magioSpaceSetupSchema.safeParse(payload)
     if (spaceSetup.success) {
       onSpaceSetup?.(spaceSetup.data.properties.spaceId)
       return
@@ -668,7 +668,7 @@ export function createEventPipeline(input: EventPipelineInput): EventPipeline {
 
   const runWsAttempt = async (signal: AbortSignal) => {
     // A WebSocket upgrade can't carry an Authorization header, so it
-    // authenticates purely via the oc_url_token query param. The sync token
+    // authenticates purely via the mg_url_token query param. The sync token
     // getter returns "" while the token is unminted or inside its expiry skew
     // window, which would open the socket WITHOUT credentials — the server then
     // rejects it ("HTTP Authentication failed; no valid credentials available")
@@ -826,7 +826,7 @@ export function createEventPipeline(input: EventPipelineInput): EventPipeline {
           : "ws_closed_before_ready"
 
         // Closed before the socket ever opened → the server rejected the
-        // upgrade, typically an auth failure on the oc_url_token. Drop the
+        // upgrade, typically an auth failure on the mg_url_token. Drop the
         // cached token so the next attempt mints a fresh one instead of
         // replaying a token the server won't accept (which would loop).
         if (!opened) {
@@ -859,7 +859,7 @@ export function createEventPipeline(input: EventPipelineInput): EventPipeline {
 
   void (async () => {
     while (!abort.signal.aborted) {
-      // An expired OpenChamber session refuses every attempt; wait for the
+      // An expired Magio session refuses every attempt; wait for the
       // user to log in rather than retrying into 401s.
       await waitForAuthSession(abort.signal)
       if (abort.signal.aborted) return
@@ -1000,7 +1000,7 @@ export function createEventPipeline(input: EventPipelineInput): EventPipeline {
   // Use globalThis (not window) for the system-resume listener so that
   // test environments can replace globalThis.window with a stub.
   if (typeof globalThis.window !== "undefined") {
-    globalThis.window.addEventListener("openchamber:system-resume", onSystemResume)
+    globalThis.window.addEventListener("magio:system-resume", onSystemResume)
     globalThis.window.addEventListener("online", onOnline)
     globalThis.window.addEventListener("offline", onOffline)
   }
@@ -1011,7 +1011,7 @@ export function createEventPipeline(input: EventPipelineInput): EventPipeline {
       window.removeEventListener("pageshow", onPageShow)
     }
     if (typeof globalThis.window !== "undefined") {
-      globalThis.window.removeEventListener("openchamber:system-resume", onSystemResume)
+      globalThis.window.removeEventListener("magio:system-resume", onSystemResume)
       globalThis.window.removeEventListener("online", onOnline)
       globalThis.window.removeEventListener("offline", onOffline)
     }

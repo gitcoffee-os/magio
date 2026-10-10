@@ -10,7 +10,7 @@ const createRuntime = async ({
   mergePersistedSettings = (_current, changes) => changes,
   onManagedPluginSettingsChanged = undefined,
 } = {}) => {
-  const tempRoot = await fsPromises.mkdtemp(path.join(os.tmpdir(), 'oc-settings-runtime-'));
+  const tempRoot = await fsPromises.mkdtemp(path.join(os.tmpdir(), 'mg-settings-runtime-'));
   const settingsFilePath = path.join(tempRoot, 'settings.json');
   const runtime = createSettingsRuntime({
     fsPromises,
@@ -82,12 +82,12 @@ describe('settings runtime', () => {
     }
   });
 
-  it('uses OpenChamber themes when a new install has no theme preferences', async () => {
+  it('uses Magio themes when a new install has no theme preferences', async () => {
     const { runtime, cleanup } = await createRuntime();
     try {
       await expect(runtime.readSettingsFromDiskMigrated()).resolves.toMatchObject({
-        lightThemeId: 'openchamber-light',
-        darkThemeId: 'openchamber-dark',
+        lightThemeId: 'magio-light',
+        darkThemeId: 'magio-dark',
       });
     } finally {
       await cleanup();
@@ -235,7 +235,7 @@ describe('settings runtime', () => {
   });
 
   it.skipIf(process.platform !== 'win32')('falls back when Windows blocks atomic settings replacement', async () => {
-    const tempRoot = await fsPromises.mkdtemp(path.join(os.tmpdir(), 'oc-settings-runtime-'));
+    const tempRoot = await fsPromises.mkdtemp(path.join(os.tmpdir(), 'mg-settings-runtime-'));
     const settingsFilePath = path.join(tempRoot, 'settings.json');
     const wrappedFs = {
       ...fsPromises,
@@ -395,7 +395,7 @@ describe('settings runtime', () => {
   });
 
   it('removes temp file when writeSettingsToDisk encounters a write error', async () => {
-    const tempRoot = await fsPromises.mkdtemp(path.join(os.tmpdir(), 'oc-settings-runtime-'));
+    const tempRoot = await fsPromises.mkdtemp(path.join(os.tmpdir(), 'mg-settings-runtime-'));
     const settingsFilePath = path.join(tempRoot, 'settings.json');
     let capturedTmp = null;
     const wrappedFs = {
@@ -443,7 +443,7 @@ describe('settings runtime: preferences.json split', () => {
   it('seeds preferences.json from the profile keys of an existing settings.json and leaves that file intact', async () => {
     const { runtime, settingsFilePath, tempRoot, cleanup } = await createRuntime();
     try {
-      const legacy = { projects: [], fontSize: 110, themeId: 'openchamber-dark', desktopLanAccessEnabled: true };
+      const legacy = { projects: [], fontSize: 110, themeId: 'magio-dark', desktopLanAccessEnabled: true };
       await fsPromises.writeFile(settingsFilePath, JSON.stringify(legacy));
 
       const merged = await runtime.readSettingsFromDisk();

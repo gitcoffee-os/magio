@@ -86,9 +86,9 @@ async function stopChildTree(child) {
   }
 }
 
-const uiPort = process.env.OPENCHAMBER_HMR_UI_PORT || '5180';
-const backendPort = process.env.OPENCHAMBER_HMR_API_PORT || '3902';
-const hmrHost = process.env.OPENCHAMBER_HMR_HOST || '127.0.0.1';
+const uiPort = process.env.MAGIO_HMR_UI_PORT || '5180';
+const backendPort = process.env.MAGIO_HMR_API_PORT || '3902';
+const hmrHost = process.env.MAGIO_HMR_HOST || '127.0.0.1';
 
 function getLanAddresses() {
   const addresses = [];
@@ -127,10 +127,16 @@ const api = run(
     'dev:server:watch',
   ],
   {
-    OPENCHAMBER_PORT: backendPort,
+    MAGIO_PORT: backendPort,
     // Dev backends share the relay identity with the production instance; never
     // let them capture the machine's relay host on their own.
-    OPENCHAMBER_RELAY_HOST: process.env.OPENCHAMBER_RELAY_HOST || 'off',
+    MAGIO_RELAY_HOST: process.env.MAGIO_RELAY_HOST || 'off',
+    // A dev instance validates its relay against a local Airlay, never against
+    // the production endpoint: pairing a device in dev would otherwise put this
+    // checkout on relay.magio.exmay.com alongside the real one. It only matters
+    // when a dev run enables the relay deliberately (the default is `off`
+    // above), and an explicit MAGIO_RELAY_URL still wins.
+    MAGIO_RELAY_URL: process.env.MAGIO_RELAY_URL || 'ws://127.0.0.1:8787/ws',
   },
 );
 const vite = run(
@@ -138,8 +144,8 @@ const vite = run(
   bunExecutable,
   ['x', 'vite', '--force', '--host', hmrHost, '--port', uiPort, '--strictPort'],
   {
-    OPENCHAMBER_PORT: backendPort,
-    OPENCHAMBER_DISABLE_PWA_DEV: '1',
+    MAGIO_PORT: backendPort,
+    MAGIO_DISABLE_PWA_DEV: '1',
   },
   { cwd: webRoot },
 );

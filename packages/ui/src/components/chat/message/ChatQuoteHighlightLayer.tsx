@@ -31,8 +31,8 @@ import {
 import type { ChatQuoteHighlightStore } from '../hooks/chatQuoteHighlightStore';
 import { ChatQuoteMarkPopover } from './ChatQuoteMarkPopover';
 
-const MARK_HIGHLIGHT = 'oc-chat-quote';
-const FOCUS_HIGHLIGHT = 'oc-chat-quote-focus';
+const MARK_HIGHLIGHT = 'mg-chat-quote';
+const FOCUS_HIGHLIGHT = 'mg-chat-quote-focus';
 const FLASH_DURATION_MS = 1600;
 // Hover must rest on a mark before its popover opens, so reading across the
 // text does not flicker popovers; leaving gets a grace period to reach it.

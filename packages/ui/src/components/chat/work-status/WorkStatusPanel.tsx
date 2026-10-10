@@ -251,7 +251,7 @@ export const WorkStatusPanel: React.FC<Props> = ({ sessionId, directory, visible
           is frosted. The glass sits on this inner layer, away from the card's
           shadow: on one element Chromium grows the backdrop-filter layer by
           the shadow's blur and paints a grey band past the card's edge. */}
-      <div className={cn('flex min-h-0 flex-1 flex-col', overlay && 'oc-glass-panel')}>
+      <div className={cn('flex min-h-0 flex-1 flex-col', overlay && 'mg-glass-panel')}>
       {/* Overlaid rather than placed in flow: the panel has no header of its
           own, and giving it one would cost a row of height on every session. */}
       <button
@@ -271,7 +271,7 @@ export const WorkStatusPanel: React.FC<Props> = ({ sessionId, directory, visible
         size={24}
         // Sections returning null leave no DOM node, so this reserves room for
         // settings in the first rendered heading, regardless of saved order.
-        className="oc-hide-scrollbar min-h-0 flex-1 overflow-y-auto overflow-x-hidden p-2 [&>section:first-child>[data-work-status-heading]]:pr-7"
+        className="mg-hide-scrollbar min-h-0 flex-1 overflow-y-auto overflow-x-hidden p-2 [&>section:first-child>[data-work-status-heading]]:pr-7"
       >
         <WorkStatusPrimaryGroup
           sessionId={sessionId}

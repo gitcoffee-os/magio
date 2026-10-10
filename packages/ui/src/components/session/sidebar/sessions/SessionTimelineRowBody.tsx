@@ -46,7 +46,7 @@ type Props = {
   metaPaddingClass?: string;
   hideMetaOnHoverClass: string;
   /** Sets how far hover-revealed actions reach into the first line
-      (`--oc-actions-reserve`). */
+      (`--mg-actions-reserve`). */
   actionsReserveClass?: string;
   /** Fades the first line's text away under hover-revealed actions. */
   actionsMaskClass?: string;
@@ -133,7 +133,7 @@ export const SessionTimelineRowBody: React.FC<Props> = ({
       <TimelineProjectIcon project={project} />
       {projectLabel ? (
         // Starts past the 14px project icon and the 4px gap.
-        <span className={cn('min-w-0 truncate typography-micro text-muted-foreground/85 [--oc-actions-inset:18px]', actionsMaskClass)}>{projectLabel}</span>
+        <span className={cn('min-w-0 truncate typography-micro text-muted-foreground/85 [--mg-actions-inset:18px]', actionsMaskClass)}>{projectLabel}</span>
       ) : null}
       {meta}
     </div>

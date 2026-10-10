@@ -259,24 +259,24 @@ export const SortableProjectItem: React.FC<SortableProjectItemProps> = ({
   }, [onToggle]);
 
   // Hover-revealed header actions cross-fade over the label's right end
-  // (`oc-actions-mask`) instead of pushing it; the reserve is how far they
+  // (`mg-actions-mask`) instead of pushing it; the reserve is how far they
   // reach in past the header's 14px right padding: the new-session button
   // 2px from the edge, then the worktree and menu buttons (24px, 4px apart)
   // from 28px.
   const showWorktreeAction = showCreateButtons && isRepo && !hideDirectoryControls && Boolean(onNewWorktreeSession);
   const groupedHeaderActionCount = (showWorktreeAction ? 1 : 0) + (hideDirectoryControls ? 0 : 1);
   const headerActionsReserveClass = groupedHeaderActionCount === 2
-    ? '[--oc-actions-reserve:66px]'
+    ? '[--mg-actions-reserve:66px]'
     : groupedHeaderActionCount === 1 && showCreateButtons
-      ? '[--oc-actions-reserve:38px]'
+      ? '[--mg-actions-reserve:38px]'
       : showCreateButtons || groupedHeaderActionCount === 1
-        ? '[--oc-actions-reserve:12px]'
+        ? '[--mg-actions-reserve:12px]'
         : undefined;
   const headerLabelMaskClass = alwaysShowActions
     ? undefined
     : isMenuOpen
-      ? 'oc-actions-mask'
-      : 'group-hover/project:oc-actions-mask group-focus-within/project:oc-actions-mask';
+      ? 'mg-actions-mask'
+      : 'group-hover/project:mg-actions-mask group-focus-within/project:mg-actions-mask';
   const headerCoveredFadeClass = alwaysShowActions
     ? undefined
     : isMenuOpen
@@ -373,7 +373,7 @@ export const SortableProjectItem: React.FC<SortableProjectItemProps> = ({
                       isCollapsed={isCollapsed}
                       alwaysShowActions={alwaysShowActions}
                       // The label starts past the 14px icon and the 6px gap.
-                      labelClassName={cn('[--oc-actions-inset:20px]', headerLabelMaskClass)}
+                      labelClassName={cn('[--mg-actions-inset:20px]', headerLabelMaskClass)}
                     />
                     {folderMissing ? (
                       <span

@@ -27,9 +27,9 @@ const fakeRequest = ({ headers = {}, chunks = [] } = {}) => {
 
 const guestZip = (id) => buildStoreZip([
   { name: 'package.json', data: JSON.stringify({
-    name: `@openchamber/${id}`,
+    name: `@magio/${id}`,
     version: '1.0.0',
-    openchamber: {
+    magio: {
       apiVersion: 1,
       contributes: {
         panel: { id, name: 'Uploaded', icon: 'window', entry: 'panel/index.html' },
@@ -67,24 +67,24 @@ describe('readGuestUploadBody', () => {
   });
 
   test('reads the cap from the environment', () => {
-    const previous = process.env.OPENCHAMBER_GUEST_UPLOAD_MAX_BYTES;
+    const previous = process.env.MAGIO_GUEST_UPLOAD_MAX_BYTES;
     try {
-      delete process.env.OPENCHAMBER_GUEST_UPLOAD_MAX_BYTES;
+      delete process.env.MAGIO_GUEST_UPLOAD_MAX_BYTES;
       expect(guestUploadMaxBytes()).toBe(50 * 1024 * 1024);
-      process.env.OPENCHAMBER_GUEST_UPLOAD_MAX_BYTES = '1234';
+      process.env.MAGIO_GUEST_UPLOAD_MAX_BYTES = '1234';
       expect(guestUploadMaxBytes()).toBe(1234);
-      process.env.OPENCHAMBER_GUEST_UPLOAD_MAX_BYTES = 'nope';
+      process.env.MAGIO_GUEST_UPLOAD_MAX_BYTES = 'nope';
       expect(guestUploadMaxBytes()).toBe(50 * 1024 * 1024);
     } finally {
-      if (previous === undefined) delete process.env.OPENCHAMBER_GUEST_UPLOAD_MAX_BYTES;
-      else process.env.OPENCHAMBER_GUEST_UPLOAD_MAX_BYTES = previous;
+      if (previous === undefined) delete process.env.MAGIO_GUEST_UPLOAD_MAX_BYTES;
+      else process.env.MAGIO_GUEST_UPLOAD_MAX_BYTES = previous;
     }
   });
 });
 
 describe('installGuestFromZipBuffer', () => {
   test('installs from bytes, lists with source zip, and reinstalls only with replace', async () => {
-    const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'oc-ext-upload-'));
+    const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'mg-ext-upload-'));
     const persistPath = path.join(dir, 'extensions.json');
     const buffer = guestZip('upload-hello');
 
@@ -117,7 +117,7 @@ describe('installGuestFromZipBuffer', () => {
   });
 
   test('answers extract-failed for bytes that are not a zip and leaves nothing behind', async () => {
-    const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'oc-ext-upload-'));
+    const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'mg-ext-upload-'));
     const persistPath = path.join(dir, 'extensions.json');
 
     const result = await installGuestFromZipBuffer(Buffer.from('this is a text file, not a zip'), persistPath);

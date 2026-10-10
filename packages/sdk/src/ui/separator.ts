@@ -10,7 +10,7 @@ export type SeparatorHandle = Handle<SeparatorProps>;
 export const mountSeparator = (root: Element, initial: SeparatorProps = {}): SeparatorHandle => {
   ensureStyle(UI_CSS);
   let props = initial;
-  const node = el('div', 'oc-sdk oc-sdk-separator');
+  const node = el('div', 'mg-sdk mg-sdk-separator');
   node.setAttribute('role', 'separator');
   const label = el('span');
   node.append(label);

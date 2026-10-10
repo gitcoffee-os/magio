@@ -1134,7 +1134,7 @@ const getFileIdentity = async (filePath: string): Promise<string | null> => {
   }
 };
 
-// OpenChamber places managed worktrees under a deep data-dir path
+// Magio places managed worktrees under a deep data-dir path
 // (`<XDG_DATA_HOME>/opencode/worktree/<40-char project id>/<name>/`). On
 // Windows that prefix plus a deeply nested repo file routinely exceeds
 // MAX_PATH (260). Git can check those paths out when core.longpaths is
@@ -1153,7 +1153,7 @@ const formatWorktreePopulateError = (message: string | null | undefined): string
   return [
     text,
     'The worktree checkout path exceeds this system\'s path-length limit.',
-    'OpenChamber enables Git `core.longpaths` for worktree population; if this still fails on Windows, enable OS long paths (LongPathsEnabled) or open the repository from a shorter absolute path.',
+    'Magio enables Git `core.longpaths` for worktree population; if this still fails on Windows, enable OS long paths (LongPathsEnabled) or open the repository from a shorter absolute path.',
   ].join('\n');
 };
 
@@ -1163,7 +1163,7 @@ const ensureWorktreeLongpaths = async (directory: string): Promise<void> => {
     return;
   }
   // Local config is shared across linked worktrees via the common git dir, so
-  // subsequent OpenChamber and CLI git operations in this repo also get long
+  // subsequent Magio and CLI git operations in this repo also get long
   // path support. Failures here are non-fatal: populate still passes
   // `-c core.longpaths=true` on reset.
   await runGitCommand(directory, ['config', 'core.longpaths', 'true']);
@@ -1399,7 +1399,7 @@ const resolveCandidateDirectory = async (
       return { name, directory, branch: explicitBranchName };
     }
 
-    const branch = `openchamber/${name}`;
+    const branch = `magio/${name}`;
     const branchRef = `refs/heads/${branch}`;
     const branchExists = await runGitCommand(primaryWorktree, ['show-ref', '--verify', '--quiet', branchRef]);
     if (branchExists.success) {
@@ -1542,7 +1542,7 @@ const loadProjectStartCommand = async (projectID: string): Promise<string> => {
 };
 
 // OpenCode owns its own project/sandbox registry and records a worktree as a
-// sandbox itself when an instance boots for that directory. OpenChamber used to
+// sandbox itself when an instance boots for that directory. Magio used to
 // write that state into OpenCode's storage JSON directly, behind the back of the
 // running process — and since OpenCode v2 reads sandboxes from its database, the
 // JSON write did not even reach it. Registration is not ours to perform.
@@ -2434,7 +2434,7 @@ export async function removeWorktree(directory: string, input: RemoveGitWorktree
 // Run snapshots live under a private namespace so they never show up as
 // branches or tags, yet stay reachable (and safe from gc) until deleted.
 // Mirrors packages/web/server/lib/git/service.js snapshotWorktree.
-const RUN_SNAPSHOT_REF_PATTERN = /^refs\/openchamber\/runs\/[A-Za-z0-9._-]+\/[A-Za-z0-9._-]+$/;
+const RUN_SNAPSHOT_REF_PATTERN = /^refs\/magio\/runs\/[A-Za-z0-9._-]+\/[A-Za-z0-9._-]+$/;
 
 const assertRunSnapshotRef = (ref: string | undefined): string => {
   const value = typeof ref === 'string' ? ref.trim() : '';
@@ -2445,10 +2445,10 @@ const assertRunSnapshotRef = (ref: string | undefined): string => {
 };
 
 const SNAPSHOT_IDENTITY_ENV = {
-  GIT_AUTHOR_NAME: 'OpenChamber',
-  GIT_AUTHOR_EMAIL: 'snapshot@openchamber.local',
-  GIT_COMMITTER_NAME: 'OpenChamber',
-  GIT_COMMITTER_EMAIL: 'snapshot@openchamber.local',
+  GIT_AUTHOR_NAME: 'Magio',
+  GIT_AUTHOR_EMAIL: 'snapshot@magio.local',
+  GIT_COMMITTER_NAME: 'Magio',
+  GIT_COMMITTER_EMAIL: 'snapshot@magio.local',
 };
 
 export async function snapshotWorktree(directory: string, input: { ref?: string }): Promise<{ ref: string; commit: string; head: string }> {
@@ -2459,7 +2459,7 @@ export async function snapshotWorktree(directory: string, input: { ref?: string 
   const ref = assertRunSnapshotRef(input?.ref);
   const head = (await runGitCommandOrThrow(worktreeDirectory, ['rev-parse', '--verify', 'HEAD'], 'Worktree has no HEAD commit')).stdout.trim();
 
-  const tempDir = await fs.promises.mkdtemp(path.join(os.tmpdir(), 'openchamber-snapshot-'));
+  const tempDir = await fs.promises.mkdtemp(path.join(os.tmpdir(), 'magio-snapshot-'));
   const indexEnv = { GIT_INDEX_FILE: path.join(tempDir, 'index') };
   try {
     const run = async (args: string[], message: string, env: NodeJS.ProcessEnv = indexEnv): Promise<string> => {
@@ -2473,7 +2473,7 @@ export async function snapshotWorktree(directory: string, input: { ref?: string 
     await run(['add', '-A'], 'Failed to collect worktree changes');
     const tree = await run(['write-tree'], 'Failed to write snapshot tree');
     const commit = await run(
-      ['commit-tree', tree, '-p', head, '-m', 'OpenChamber run snapshot'],
+      ['commit-tree', tree, '-p', head, '-m', 'Magio run snapshot'],
       'Failed to write snapshot commit',
       { ...indexEnv, ...SNAPSHOT_IDENTITY_ENV },
     );
@@ -2828,7 +2828,7 @@ export async function applyGitHunk(
 
   const flags = HUNK_ACTION_ARGS[action];
   const tmpDir = os.tmpdir();
-  const tmpPath = path.join(tmpDir, `openchamber-hunk-${Date.now()}-${Math.random().toString(36).slice(2)}.patch`);
+  const tmpPath = path.join(tmpDir, `magio-hunk-${Date.now()}-${Math.random().toString(36).slice(2)}.patch`);
 
   try {
     await fs.promises.writeFile(tmpPath, patch, 'utf8');
@@ -3246,7 +3246,7 @@ export async function countGitStashFiles(directory: string, refs: string[]): Pro
 }
 
 export async function stashGitChanges(directory: string, options: { message?: string } = {}): Promise<{ success: boolean; created: boolean; message: string; output: string }> {
-  const message = options.message?.trim() || `OpenChamber stash ${new Date().toISOString()}`;
+  const message = options.message?.trim() || `Magio stash ${new Date().toISOString()}`;
   const result = await execGit(['stash', 'push', '--include-untracked', '-m', message], directory);
   if (result.exitCode !== 0) throw new Error(result.stderr.trim() || 'Failed to stash changes');
   const output = result.stdout.trim() || result.stderr.trim();

@@ -13,8 +13,8 @@
  * back to Node).
  *
  * Test hooks (env, never used in normal operation):
- *   OPENCHAMBER_ELECTRON_PKG_DIR       - resolve the electron package here.
- *   OPENCHAMBER_ELECTRON_INSTALL_COMMANDS - JSON array of [bin, args] repair
+ *   MAGIO_ELECTRON_PKG_DIR       - resolve the electron package here.
+ *   MAGIO_ELECTRON_INSTALL_COMMANDS - JSON array of [bin, args] repair
  *                                        commands, e.g.
  *                                        `[["bun",["install.js"]],["node",["install.js"]]]`.
  *
@@ -70,6 +70,22 @@ export function platformPath() {
     default:
       throw new Error(`Electron builds are not available on platform: ${platform}`);
   }
+}
+
+/**
+ * Every value `path.txt` may legitimately hold for this platform. The dev
+ * launcher can rebrand the bundle directory itself (`dist/Electron.app` ->
+ * `dist/Magio.app`) so the Dock labels the tile from the product name instead
+ * of the upstream Electron folder (see `scripts/electron-dev.mjs`), and
+ * path.txt records that name. Without it here a healthy rebranded install reads
+ * as broken, and repair() wipes and re-downloads the whole bundle on every
+ * launch.
+ */
+function acceptableExecutablePaths() {
+  const platform = process.env.npm_config_platform || process.platform;
+  const extracted = platformPath();
+  if (platform !== 'mas' && platform !== 'darwin') return [extracted];
+  return [extracted, extracted.replace(/^Electron\.app/, 'Magio.app')];
 }
 
 /**
@@ -214,7 +230,7 @@ export function isComplete(electronDir, expected = expectedArch()) {
   } catch {
     return false;
   }
-  if (executablePath !== platformPath()) return false;
+  if (!acceptableExecutablePaths().includes(executablePath)) return false;
 
   const executable = path.join(electronDir, 'dist', executablePath);
   if (!fs.existsSync(executable)) return false;
@@ -232,9 +248,9 @@ function resolveInstallCommands(env, bunResolver = resolveBunExecutable) {
     bin === 'bun' ? bunResolver({ env }) : bin,
     args,
   ]);
-  if (env.OPENCHAMBER_ELECTRON_INSTALL_COMMANDS) {
+  if (env.MAGIO_ELECTRON_INSTALL_COMMANDS) {
     try {
-      const parsed = JSON.parse(env.OPENCHAMBER_ELECTRON_INSTALL_COMMANDS);
+      const parsed = JSON.parse(env.MAGIO_ELECTRON_INSTALL_COMMANDS);
       if (
         Array.isArray(parsed) &&
         parsed.every((command) => Array.isArray(command) && typeof command[0] === 'string')
@@ -289,7 +305,7 @@ export function repair(electronDir, options = {}) {
 export async function main(argv = process.argv.slice(2), env = process.env) {
   const bestEffort = argv.includes('--best-effort');
 
-  const overrideDir = env.OPENCHAMBER_ELECTRON_PKG_DIR;
+  const overrideDir = env.MAGIO_ELECTRON_PKG_DIR;
   const electronDir = overrideDir
     ? fs.existsSync(path.join(overrideDir, 'package.json'))
       ? overrideDir

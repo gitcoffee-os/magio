@@ -28,7 +28,7 @@ export const FontArtifact: React.FC<{
   const [status, setStatus] = React.useState<'loading' | 'ready' | 'failed'>('loading');
   const [family] = React.useState(() => {
     fontFamilyCounter += 1;
-    return `oc-font-preview-${fontFamilyCounter}`;
+    return `mg-font-preview-${fontFamilyCounter}`;
   });
 
   React.useEffect(() => {

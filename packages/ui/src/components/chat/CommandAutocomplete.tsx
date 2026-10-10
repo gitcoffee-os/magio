@@ -15,7 +15,7 @@ import { useGuestCommands } from '@/hooks/useGuestSurfaces';
 import { AutocompleteRowTooltip } from './composer/ui/AutocompleteRowTooltip';
 
 // Skills are not here: they have their own `$` picker.
-type CommandSource = 'openchamber' | 'opencode' | 'extension';
+type CommandSource = 'magio' | 'opencode' | 'extension';
 
 export interface CommandInfo {
   id: string;
@@ -26,7 +26,7 @@ export interface CommandInfo {
   agent?: string;
   model?: string;
   isBuiltIn?: boolean;
-  isOpenChamber?: boolean;
+  isMagio?: boolean;
   scope?: string;
   /** Name of the extension that contributed the command; shown as its badge. */
   extensionName?: string;
@@ -148,64 +148,64 @@ export const CommandAutocomplete = React.forwardRef<CommandAutocompleteHandle, C
 
         const builtInCommands: CommandInfo[] = [
           ...(hasSession
-            ? [{ id: 'openchamber:init', name: 'init', source: 'openchamber' as const, description: t('chat.commandAutocomplete.command.initDescription'), isBuiltIn: true }]
+            ? [{ id: 'magio:init', name: 'init', source: 'magio' as const, description: t('chat.commandAutocomplete.command.initDescription'), isBuiltIn: true }]
             : []
           ),
           ...(hasSession  // Show when session exists, not when hasMessages
             ? [
-                { id: 'openchamber:undo', name: 'undo', source: 'openchamber' as const, description: t('chat.commandAutocomplete.command.undoDescription'), isBuiltIn: true },
-                { id: 'openchamber:redo', name: 'redo', source: 'openchamber' as const, description: t('chat.commandAutocomplete.command.redoDescription'), isBuiltIn: true },
-                { id: 'openchamber:timeline', name: 'timeline', source: 'openchamber' as const, description: t('chat.commandAutocomplete.command.timelineDescription'), isBuiltIn: true },
-                { id: 'openchamber:compact', name: 'compact', source: 'openchamber' as const, description: t('chat.commandAutocomplete.command.compactDescription'), isBuiltIn: true },
+                { id: 'magio:undo', name: 'undo', source: 'magio' as const, description: t('chat.commandAutocomplete.command.undoDescription'), isBuiltIn: true },
+                { id: 'magio:redo', name: 'redo', source: 'magio' as const, description: t('chat.commandAutocomplete.command.redoDescription'), isBuiltIn: true },
+                { id: 'magio:timeline', name: 'timeline', source: 'magio' as const, description: t('chat.commandAutocomplete.command.timelineDescription'), isBuiltIn: true },
+                { id: 'magio:compact', name: 'compact', source: 'magio' as const, description: t('chat.commandAutocomplete.command.compactDescription'), isBuiltIn: true },
               ]
             : []
           ),
           ...(hasSession
-            ? [{ id: 'openchamber:btw', name: 'btw', source: 'openchamber' as const, description: t('chat.commandAutocomplete.command.btwDescription'), isOpenChamber: true }]
+            ? [{ id: 'magio:btw', name: 'btw', source: 'magio' as const, description: t('chat.commandAutocomplete.command.btwDescription'), isMagio: true }]
             : []
           ),
           ...(hasSession
-            ? [{ id: 'openchamber:fork', name: 'fork', source: 'openchamber' as const, description: t('chat.commandAutocomplete.command.forkDescription'), isOpenChamber: true }]
+            ? [{ id: 'magio:fork', name: 'fork', source: 'magio' as const, description: t('chat.commandAutocomplete.command.forkDescription'), isMagio: true }]
             : []
           ),
           ...(hasSession
-            ? [{ id: 'openchamber:summary', name: 'summary', source: 'openchamber' as const, description: t('chat.commandAutocomplete.command.summaryDescription'), isOpenChamber: true }]
+            ? [{ id: 'magio:summary', name: 'summary', source: 'magio' as const, description: t('chat.commandAutocomplete.command.summaryDescription'), isMagio: true }]
             : []
           ),
           ...(canStartSessionCommand
-            ? [{ id: 'openchamber:workspace-review', name: 'workspace-review', source: 'openchamber' as const, description: t('chat.commandAutocomplete.command.workspaceReviewDescription'), isOpenChamber: true }]
+            ? [{ id: 'magio:workspace-review', name: 'workspace-review', source: 'magio' as const, description: t('chat.commandAutocomplete.command.workspaceReviewDescription'), isMagio: true }]
             : []
           ),
           ...(canUseReviewHandoffFlow
-            ? [{ id: 'openchamber:handoff-review', name: 'handoff-review', source: 'openchamber' as const, description: t('chat.commandAutocomplete.command.handoffReviewDescription'), isOpenChamber: true }]
+            ? [{ id: 'magio:handoff-review', name: 'handoff-review', source: 'magio' as const, description: t('chat.commandAutocomplete.command.handoffReviewDescription'), isMagio: true }]
             : []
           ),
           ...(canStartSessionCommand
-            ? [{ id: 'openchamber:plan-feature', name: 'plan-feature', source: 'openchamber' as const, description: t('chat.commandAutocomplete.command.featurePlanDescription'), isOpenChamber: true }]
+            ? [{ id: 'magio:plan-feature', name: 'plan-feature', source: 'magio' as const, description: t('chat.commandAutocomplete.command.featurePlanDescription'), isMagio: true }]
             : []
           ),
           ...(canStartSessionCommand
-            ? [{ id: 'openchamber:craft-goal', name: 'craft-goal', source: 'openchamber' as const, description: t('chat.commandAutocomplete.command.craftGoalDescription'), isOpenChamber: true }]
+            ? [{ id: 'magio:craft-goal', name: 'craft-goal', source: 'magio' as const, description: t('chat.commandAutocomplete.command.craftGoalDescription'), isMagio: true }]
             : []
           ),
           ...(canStartSessionCommand
-            ? [{ id: 'openchamber:schedule-task', name: 'schedule-task', source: 'openchamber' as const, description: t('chat.commandAutocomplete.command.scheduleTaskDescription'), isOpenChamber: true }]
+            ? [{ id: 'magio:schedule-task', name: 'schedule-task', source: 'magio' as const, description: t('chat.commandAutocomplete.command.scheduleTaskDescription'), isMagio: true }]
             : []
           ),
           ...(canStartSessionCommand
-            ? [{ id: 'openchamber:catch-up', name: 'catch-up', source: 'openchamber' as const, description: t('chat.commandAutocomplete.command.catchUpDescription'), isOpenChamber: true }]
+            ? [{ id: 'magio:catch-up', name: 'catch-up', source: 'magio' as const, description: t('chat.commandAutocomplete.command.catchUpDescription'), isMagio: true }]
             : []
           ),
           ...(canStartSessionCommand
-            ? [{ id: 'openchamber:debug', name: 'debug', source: 'openchamber' as const, description: t('chat.commandAutocomplete.command.debugDescription'), isOpenChamber: true }]
+            ? [{ id: 'magio:debug', name: 'debug', source: 'magio' as const, description: t('chat.commandAutocomplete.command.debugDescription'), isMagio: true }]
             : []
           ),
           ...(canStartSessionCommand
-            ? [{ id: 'openchamber:weigh', name: 'weigh', source: 'openchamber' as const, description: t('chat.commandAutocomplete.command.weighDescription'), isOpenChamber: true }]
+            ? [{ id: 'magio:weigh', name: 'weigh', source: 'magio' as const, description: t('chat.commandAutocomplete.command.weighDescription'), isMagio: true }]
             : []
           ),
           ...(canStartSessionCommand
-            ? [{ id: 'openchamber:explore', name: 'explore', source: 'openchamber' as const, description: t('chat.commandAutocomplete.command.exploreDescription'), isOpenChamber: true }]
+            ? [{ id: 'magio:explore', name: 'explore', source: 'magio' as const, description: t('chat.commandAutocomplete.command.exploreDescription'), isMagio: true }]
             : []
           ),
         ];
@@ -226,64 +226,64 @@ export const CommandAutocomplete = React.forwardRef<CommandAutocompleteHandle, C
 
         const builtInCommands: CommandInfo[] = [
           ...(hasSession
-            ? [{ id: 'openchamber:init', name: 'init', source: 'openchamber' as const, description: t('chat.commandAutocomplete.command.initDescription'), isBuiltIn: true }]
+            ? [{ id: 'magio:init', name: 'init', source: 'magio' as const, description: t('chat.commandAutocomplete.command.initDescription'), isBuiltIn: true }]
             : []
           ),
           ...(hasSession  // Show when session exists, not when hasMessages
             ? [
-                { id: 'openchamber:undo', name: 'undo', source: 'openchamber' as const, description: t('chat.commandAutocomplete.command.undoDescription'), isBuiltIn: true },
-                { id: 'openchamber:redo', name: 'redo', source: 'openchamber' as const, description: t('chat.commandAutocomplete.command.redoDescription'), isBuiltIn: true },
-                { id: 'openchamber:timeline', name: 'timeline', source: 'openchamber' as const, description: t('chat.commandAutocomplete.command.timelineDescription'), isBuiltIn: true },
+                { id: 'magio:undo', name: 'undo', source: 'magio' as const, description: t('chat.commandAutocomplete.command.undoDescription'), isBuiltIn: true },
+                { id: 'magio:redo', name: 'redo', source: 'magio' as const, description: t('chat.commandAutocomplete.command.redoDescription'), isBuiltIn: true },
+                { id: 'magio:timeline', name: 'timeline', source: 'magio' as const, description: t('chat.commandAutocomplete.command.timelineDescription'), isBuiltIn: true },
               ]
             : []
           ),
-          { id: 'openchamber:compact', name: 'compact', source: 'openchamber' as const, description: t('chat.commandAutocomplete.command.compactDescription'), isBuiltIn: true },
+          { id: 'magio:compact', name: 'compact', source: 'magio' as const, description: t('chat.commandAutocomplete.command.compactDescription'), isBuiltIn: true },
           ...(hasSession
-            ? [{ id: 'openchamber:btw', name: 'btw', source: 'openchamber' as const, description: t('chat.commandAutocomplete.command.btwDescription'), isOpenChamber: true }]
+            ? [{ id: 'magio:btw', name: 'btw', source: 'magio' as const, description: t('chat.commandAutocomplete.command.btwDescription'), isMagio: true }]
             : []
           ),
           ...(hasSession
-            ? [{ id: 'openchamber:fork', name: 'fork', source: 'openchamber' as const, description: t('chat.commandAutocomplete.command.forkDescription'), isOpenChamber: true }]
+            ? [{ id: 'magio:fork', name: 'fork', source: 'magio' as const, description: t('chat.commandAutocomplete.command.forkDescription'), isMagio: true }]
             : []
           ),
           ...(hasSession
-            ? [{ id: 'openchamber:summary', name: 'summary', source: 'openchamber' as const, description: t('chat.commandAutocomplete.command.summaryDescription'), isOpenChamber: true }]
+            ? [{ id: 'magio:summary', name: 'summary', source: 'magio' as const, description: t('chat.commandAutocomplete.command.summaryDescription'), isMagio: true }]
             : []
           ),
           ...(canStartSessionCommand
-            ? [{ id: 'openchamber:workspace-review', name: 'workspace-review', source: 'openchamber' as const, description: t('chat.commandAutocomplete.command.workspaceReviewDescription'), isOpenChamber: true }]
+            ? [{ id: 'magio:workspace-review', name: 'workspace-review', source: 'magio' as const, description: t('chat.commandAutocomplete.command.workspaceReviewDescription'), isMagio: true }]
             : []
           ),
           ...(canUseReviewHandoffFlow
-            ? [{ id: 'openchamber:handoff-review', name: 'handoff-review', source: 'openchamber' as const, description: t('chat.commandAutocomplete.command.handoffReviewDescription'), isOpenChamber: true }]
+            ? [{ id: 'magio:handoff-review', name: 'handoff-review', source: 'magio' as const, description: t('chat.commandAutocomplete.command.handoffReviewDescription'), isMagio: true }]
             : []
           ),
           ...(canStartSessionCommand
-            ? [{ id: 'openchamber:plan-feature', name: 'plan-feature', source: 'openchamber' as const, description: t('chat.commandAutocomplete.command.featurePlanDescription'), isOpenChamber: true }]
+            ? [{ id: 'magio:plan-feature', name: 'plan-feature', source: 'magio' as const, description: t('chat.commandAutocomplete.command.featurePlanDescription'), isMagio: true }]
             : []
           ),
           ...(canStartSessionCommand
-            ? [{ id: 'openchamber:craft-goal', name: 'craft-goal', source: 'openchamber' as const, description: t('chat.commandAutocomplete.command.craftGoalDescription'), isOpenChamber: true }]
+            ? [{ id: 'magio:craft-goal', name: 'craft-goal', source: 'magio' as const, description: t('chat.commandAutocomplete.command.craftGoalDescription'), isMagio: true }]
             : []
           ),
           ...(canStartSessionCommand
-            ? [{ id: 'openchamber:schedule-task', name: 'schedule-task', source: 'openchamber' as const, description: t('chat.commandAutocomplete.command.scheduleTaskDescription'), isOpenChamber: true }]
+            ? [{ id: 'magio:schedule-task', name: 'schedule-task', source: 'magio' as const, description: t('chat.commandAutocomplete.command.scheduleTaskDescription'), isMagio: true }]
             : []
           ),
           ...(canStartSessionCommand
-            ? [{ id: 'openchamber:catch-up', name: 'catch-up', source: 'openchamber' as const, description: t('chat.commandAutocomplete.command.catchUpDescription'), isOpenChamber: true }]
+            ? [{ id: 'magio:catch-up', name: 'catch-up', source: 'magio' as const, description: t('chat.commandAutocomplete.command.catchUpDescription'), isMagio: true }]
             : []
           ),
           ...(canStartSessionCommand
-            ? [{ id: 'openchamber:debug', name: 'debug', source: 'openchamber' as const, description: t('chat.commandAutocomplete.command.debugDescription'), isOpenChamber: true }]
+            ? [{ id: 'magio:debug', name: 'debug', source: 'magio' as const, description: t('chat.commandAutocomplete.command.debugDescription'), isMagio: true }]
             : []
           ),
           ...(canStartSessionCommand
-            ? [{ id: 'openchamber:weigh', name: 'weigh', source: 'openchamber' as const, description: t('chat.commandAutocomplete.command.weighDescription'), isOpenChamber: true }]
+            ? [{ id: 'magio:weigh', name: 'weigh', source: 'magio' as const, description: t('chat.commandAutocomplete.command.weighDescription'), isMagio: true }]
             : []
           ),
           ...(canStartSessionCommand
-            ? [{ id: 'openchamber:explore', name: 'explore', source: 'openchamber' as const, description: t('chat.commandAutocomplete.command.exploreDescription'), isOpenChamber: true }]
+            ? [{ id: 'magio:explore', name: 'explore', source: 'magio' as const, description: t('chat.commandAutocomplete.command.exploreDescription'), isMagio: true }]
             : []
           ),
         ];
@@ -385,7 +385,7 @@ export const CommandAutocomplete = React.forwardRef<CommandAutocompleteHandle, C
   return (
     <div
       ref={containerRef}
-      className="absolute z-[100] min-w-0 w-full max-w-[450px] max-h-64 oc-glass-popover border-2 border-border/60 rounded-xl shadow-none bottom-full mb-2 left-0 flex flex-col"
+      className="absolute z-[100] min-w-0 w-full max-w-[450px] max-h-64 mg-glass-popover border-2 border-border/60 rounded-xl shadow-none bottom-full mb-2 left-0 flex flex-col"
       style={mobileMaxHeight !== undefined ? { ...style, maxHeight: mobileMaxHeight } : style}
     >
       <ScrollableOverlay preventOverscroll outerClassName="flex-1 min-h-0" className="px-0 pb-2">
@@ -397,7 +397,7 @@ export const CommandAutocomplete = React.forwardRef<CommandAutocompleteHandle, C
           <div>
             {commands.map((command, index) => {
               const isSystem = command.isBuiltIn;
-              const isOpenChamberBadge = command.isOpenChamber;
+              const isMagioBadge = command.isMagio;
               return (
                 <AutocompleteRowTooltip description={command.description} active={!isMobile && index === selectedIndex}>
                 <div
@@ -474,9 +474,9 @@ export const CommandAutocomplete = React.forwardRef<CommandAutocompleteHandle, C
                         <span className={NEUTRAL_BADGE_CLASS}>
                           {command.extensionName}
                         </span>
-                      ) : isOpenChamberBadge ? (
+                      ) : isMagioBadge ? (
                         <span className={NEUTRAL_BADGE_CLASS}>
-                          OpenChamber
+                          Magio
                         </span>
                       ) : isSystem ? (
                         <span className={NEUTRAL_BADGE_CLASS}>

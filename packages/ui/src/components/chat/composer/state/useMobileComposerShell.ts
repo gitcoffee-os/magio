@@ -130,7 +130,7 @@ export function useMobileComposerShell(
     // chips leave once the full composer is up, and its centered title
     // re-centers over whatever room remains. Announced as a root class from a
     // layout effect so the restructure lands in the SAME frame as the pill
-    // swap — keyed on the keyboard instead (oc-keyboard-open arrives with the
+    // swap — keyed on the keyboard instead (mg-keyboard-open arrives with the
     // keyboardWillShow bridge event, ~100ms later), the chips vanished
     // mid-rise as a second visible jump.
     //
@@ -140,8 +140,8 @@ export function useMobileComposerShell(
     React.useLayoutEffect(() => {
         if (!isMobile || typeof document === 'undefined') return;
         const root = document.documentElement;
-        root.classList.toggle('oc-composer-expanded', expanded && !alwaysExpanded);
-        return () => root.classList.remove('oc-composer-expanded');
+        root.classList.toggle('mg-composer-expanded', expanded && !alwaysExpanded);
+        return () => root.classList.remove('mg-composer-expanded');
     }, [alwaysExpanded, expanded, isMobile]);
 
     const expand = React.useCallback(() => {
@@ -241,7 +241,7 @@ export function useMobileComposerShell(
     // Installed PWA (standalone): a focus() from a bare timeout is outside the
     // user gesture and iOS refuses to raise the keyboard for it (Safari
     // in-browser is lenient). MobileOverlayPanel dispatches
-    // 'oc:mobile-overlay-closed' synchronously from the same React flush as the
+    // 'mg:mobile-overlay-closed' synchronously from the same React flush as the
     // click that closed it — refocus right there, while the gesture is live.
     const pickerDialogsOpenRef = React.useRef(false);
     pickerDialogsOpenRef.current = holders.referencePickerOpen;
@@ -298,11 +298,11 @@ export function useMobileComposerShell(
             window.setTimeout(reveal, 650);
         };
 
-        window.addEventListener('oc:mobile-overlay-opened', handleOverlayOpened);
-        window.addEventListener('oc:mobile-overlay-closed', handleOverlayClosed);
+        window.addEventListener('mg:mobile-overlay-opened', handleOverlayOpened);
+        window.addEventListener('mg:mobile-overlay-closed', handleOverlayClosed);
         return () => {
-            window.removeEventListener('oc:mobile-overlay-opened', handleOverlayOpened);
-            window.removeEventListener('oc:mobile-overlay-closed', handleOverlayClosed);
+            window.removeEventListener('mg:mobile-overlay-opened', handleOverlayOpened);
+            window.removeEventListener('mg:mobile-overlay-closed', handleOverlayClosed);
         };
     }, [editorRef, formRef, isMobile]);
 
@@ -358,7 +358,7 @@ export function useMobileComposerShell(
     const busyRef = React.useRef(false);
     busyRef.current = busy;
 
-    // Browser counterpart of Capacitor's oc-keyboard-open root class (which is
+    // Browser counterpart of Capacitor's mg-keyboard-open root class (which is
     // driven by native keyboard events): the focused composer is the best
     // keyboard proxy a browser has. CSS keyed on it hides the draft starters
     // while typing, mirroring the native app.
@@ -366,9 +366,9 @@ export function useMobileComposerShell(
         if (!isMobile || isCapacitorApp() || typeof document === 'undefined') return;
         const root = document.documentElement;
         if (focused) {
-            root.classList.add('oc-browser-keyboard-open');
+            root.classList.add('mg-browser-keyboard-open');
         } else {
-            root.classList.remove('oc-browser-keyboard-open');
+            root.classList.remove('mg-browser-keyboard-open');
             // Installed PWA: after the keyboard dismisses, WebKit can leave the
             // layout viewport stuck smaller or panned (content shifted up with
             // a dead strip at the bottom) until something forces a recompute. A
@@ -376,18 +376,18 @@ export function useMobileComposerShell(
             // is harmless when nothing is stuck.
             if (window.matchMedia?.('(display-mode: standalone)')?.matches) {
                 window.setTimeout(() => {
-                    if (root.classList.contains('oc-browser-keyboard-open')) return;
+                    if (root.classList.contains('mg-browser-keyboard-open')) return;
                     window.scrollTo(0, 0);
                     document.body.scrollTop = 0;
                     root.scrollTop = 0;
                 }, 350);
             }
         }
-        return () => root.classList.remove('oc-browser-keyboard-open');
+        return () => root.classList.remove('mg-browser-keyboard-open');
     }, [focused, isMobile]);
 
     // Capacitor: collapse in the SAME frame the keyboard starts hiding. The
-    // hide choreography dispatches oc:keyboard-intent BEFORE restoring the
+    // hide choreography dispatches mg:keyboard-intent BEFORE restoring the
     // shell layout and measuring the chat compensation; flushSync commits the
     // pill swap first, so keyboard land and composer shrink are measured — and
     // compensated — as one motion instead of a two-step staircase. The delayed
@@ -413,8 +413,8 @@ export function useMobileComposerShell(
                 });
             });
         };
-        window.addEventListener('oc:keyboard-intent', handleIntent);
-        return () => window.removeEventListener('oc:keyboard-intent', handleIntent);
+        window.addEventListener('mg:keyboard-intent', handleIntent);
+        return () => window.removeEventListener('mg:keyboard-intent', handleIntent);
     }, [formRef, isMobile, morph, setExpandedInput]);
 
     const onEditorFocus = React.useCallback(() => {
@@ -455,7 +455,7 @@ export function useMobileComposerShell(
         // keyboard-dismiss reflow moves composer buttons before the tap's
         // synthesized click lands, so the click misses its target. Capacitor's
         // WebView does not need the hold — but it DOES need the state committed
-        // synchronously: the oc:keyboard-intent collapse arrives a few
+        // synchronously: the mg:keyboard-intent collapse arrives a few
         // milliseconds after this blur on a setTimeout(0), and React's own
         // scheduling can lose that race, leaving busyRef stale — the intent
         // handler then skips the instant collapse and the pill appears only

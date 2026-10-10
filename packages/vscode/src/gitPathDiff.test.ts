@@ -19,7 +19,7 @@ const SUBMODULE_TIMEOUT = { timeout: 60_000 };
 const git = (cwd: string, args: string[]) => execFileSync('git', args, { cwd, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] });
 
 const createRepository = () => {
-  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'oc-vscode-path-diff-'));
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'mg-vscode-path-diff-'));
   tempDirs.push(dir);
   git(dir, ['init', '-b', 'main']);
   git(dir, ['config', 'user.email', 'test@example.com']);

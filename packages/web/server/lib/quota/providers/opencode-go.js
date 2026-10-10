@@ -100,8 +100,8 @@ export const fetchOpenCodeGoUsage = async (apiKey, fetchImpl = fetch) => {
     headers: {
       Accept: 'application/json',
       Authorization: `Bearer ${apiKey}`,
-      'x-opencode-session': 'openchamber-usage',
-      'User-Agent': 'OpenChamber quota provider',
+      'x-opencode-session': 'magio-usage',
+      'User-Agent': 'Magio quota provider',
     },
     signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
   });
@@ -123,7 +123,7 @@ export const fetchConsoleGoUsage = async ({ access, orgID, expires }, fetchImpl 
       Accept: 'application/json',
       Authorization: `Bearer ${access}`,
       'x-org-id': orgID,
-      'User-Agent': 'OpenChamber quota provider',
+      'User-Agent': 'Magio quota provider',
     },
     // The bearer token belongs to opencode.ai/console; never follow a redirect
     // that would forward it to another origin.

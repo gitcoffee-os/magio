@@ -194,7 +194,7 @@ function App({ apis }: AppProps) {
   React.useEffect(() => {
     markStartupTrace('App:mounted');
     if (startupTraceEnabled()) {
-      console.info('[startup-trace] enabled. Run console.table(window.__OPENCHAMBER_STARTUP_TRACE__) after startup.');
+      console.info('[startup-trace] enabled. Run console.table(window.__MAGIO_STARTUP_TRACE__) after startup.');
     }
   }, []);
 
@@ -552,14 +552,14 @@ function App({ apis }: AppProps) {
       void useSessionUIStore.getState().setCurrentSession(sessionId, directory);
     };
 
-    window.addEventListener('openchamber:open-session', handler as EventListener);
+    window.addEventListener('magio:open-session', handler as EventListener);
     // A link that launched the app arrived before this listener existed; the
     // desktop shell keeps it until the window asks. Taking is one-shot, so a
     // cleanup must not drop links already taken (Strict Mode re-runs this).
     void takePendingDesktopSessionLinks().then((links) => {
       for (const link of links) void openSessionLink(link.sessionId, link.messageId);
     });
-    return () => window.removeEventListener('openchamber:open-session', handler as EventListener);
+    return () => window.removeEventListener('magio:open-session', handler as EventListener);
   }, []);
 
   // Host work the desktop shell queued (a confirmed pairing link, a relay host
@@ -576,9 +576,9 @@ function App({ apis }: AppProps) {
             : t('onboarding.remoteConnection.errors.failedToSaveConnection'));
       });
     };
-    window.addEventListener('openchamber:host-actions-ready', run);
+    window.addEventListener('magio:host-actions-ready', run);
     run();
-    return () => window.removeEventListener('openchamber:host-actions-ready', run);
+    return () => window.removeEventListener('magio:host-actions-ready', run);
   }, [t]);
 
   // Launch continuity: reopen the session that was open when the app last
@@ -602,8 +602,8 @@ function App({ apis }: AppProps) {
         projectId: null,
       });
     };
-    window.addEventListener('openchamber:open-mini-chat', onOpenMiniChat);
-    return () => window.removeEventListener('openchamber:open-mini-chat', onOpenMiniChat);
+    window.addEventListener('magio:open-mini-chat', onOpenMiniChat);
+    return () => window.removeEventListener('magio:open-mini-chat', onOpenMiniChat);
   }, []);
 
   // When the window regains focus, mark the currently-selected session as seen.
@@ -641,8 +641,8 @@ function App({ apis }: AppProps) {
       });
     };
 
-    window.addEventListener('openchamber:open-draft-session', handler as EventListener);
-    return () => window.removeEventListener('openchamber:open-draft-session', handler as EventListener);
+    window.addEventListener('magio:open-draft-session', handler as EventListener);
+    return () => window.removeEventListener('magio:open-draft-session', handler as EventListener);
   }, []);
 
   React.useEffect(() => {
@@ -650,8 +650,8 @@ function App({ apis }: AppProps) {
     if (!isInitialized || isSwitchingDirectory) return;
     if (appReadyDispatchedRef.current) return;
     appReadyDispatchedRef.current = true;
-    (window as unknown as { __openchamberAppReady?: boolean }).__openchamberAppReady = true;
-    window.dispatchEvent(new Event('openchamber:app-ready'));
+    (window as unknown as { __magioAppReady?: boolean }).__magioAppReady = true;
+    window.dispatchEvent(new Event('magio:app-ready'));
   }, [isInitialized, isSwitchingDirectory]);
 
   // useEventStream replaced by SyncProvider + SyncBridge
@@ -690,8 +690,8 @@ function App({ apis }: AppProps) {
   // Palette-only action: the memory debug panel has no keyboard shortcut.
   React.useEffect(() => {
     const handleToggle = () => setShowMemoryDebug((previous) => !previous);
-    window.addEventListener('openchamber:memory-debug-toggle', handleToggle);
-    return () => window.removeEventListener('openchamber:memory-debug-toggle', handleToggle);
+    window.addEventListener('magio:memory-debug-toggle', handleToggle);
+    return () => window.removeEventListener('magio:memory-debug-toggle', handleToggle);
   }, []);
 
   React.useEffect(() => {
@@ -702,7 +702,7 @@ function App({ apis }: AppProps) {
   }, [clearError, error]);
 
   // Poll for the injected boot outcome until it becomes available (desktop only).
-  // The Rust backend sets window.__OPENCHAMBER_DESKTOP_BOOT_OUTCOME__ once the
+  // The Rust backend sets window.__MAGIO_DESKTOP_BOOT_OUTCOME__ once the
   // sidecar reaches a stable state. We poll with exponential backoff to handle
   // potential race conditions during startup and config writes.
   React.useEffect(() => {

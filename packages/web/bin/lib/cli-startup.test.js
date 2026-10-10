@@ -9,8 +9,8 @@ const join = (...parts) => path.join(...parts);
 
 describe('stablePnpmEntrypoint', () => {
   const globalModules = join('/home/me', '.local', 'share', 'pnpm', 'global', '5', 'node_modules');
-  const storeEntry = join(globalModules, '.pnpm', '@openchamber+web@2.1.0', 'node_modules', '@openchamber', 'web', 'bin', 'cli.js');
-  const stableEntry = join(globalModules, '@openchamber', 'web', 'bin', 'cli.js');
+  const storeEntry = join(globalModules, '.pnpm', '@magio+web@2.1.0', 'node_modules', '@magio', 'web', 'bin', 'cli.js');
+  const stableEntry = join(globalModules, '@magio', 'web', 'bin', 'cli.js');
 
   it('maps a pnpm store path to the version-independent link', () => {
     expect(stablePnpmEntrypoint(storeEntry, (candidate) => candidate === stableEntry)).toBe(stableEntry);
@@ -21,7 +21,7 @@ describe('stablePnpmEntrypoint', () => {
   });
 
   it('leaves npm installs alone', () => {
-    const npmEntry = join('/usr/local/lib', 'node_modules', '@openchamber', 'web', 'bin', 'cli.js');
+    const npmEntry = join('/usr/local/lib', 'node_modules', '@magio', 'web', 'bin', 'cli.js');
     expect(stablePnpmEntrypoint(npmEntry, () => true)).toBeNull();
   });
 });
@@ -36,16 +36,16 @@ describe('buildSystemdUserService', () => {
 
 describe('macOS startup service', () => {
   it('writes a launch agent without background process throttling', () => {
-    const home = fs.mkdtempSync(path.join(os.tmpdir(), 'openchamber-startup-'));
+    const home = fs.mkdtempSync(path.join(os.tmpdir(), 'magio-startup-'));
     const platform = Object.getOwnPropertyDescriptor(process, 'platform');
-    const previousDataDir = process.env.OPENCHAMBER_DATA_DIR;
-    const plistPath = path.join(home, 'Library', 'LaunchAgents', 'dev.openchamber.web.plist');
+    const previousDataDir = process.env.MAGIO_DATA_DIR;
+    const plistPath = path.join(home, 'Library', 'LaunchAgents', 'dev.magio.web.plist');
     const writeFileSync = fs.writeFileSync;
     const stopBeforeLaunchctl = new Error('Stop before activating launchd');
 
     try {
       Object.defineProperty(process, 'platform', { configurable: true, value: 'darwin' });
-      process.env.OPENCHAMBER_DATA_DIR = path.join(home, '.config', 'openchamber');
+      process.env.MAGIO_DATA_DIR = path.join(home, '.config', 'magio');
       vi.spyOn(os, 'homedir').mockReturnValue(home);
       vi.spyOn(fs, 'writeFileSync').mockImplementation((file, ...args) => {
         writeFileSync(file, ...args);
@@ -60,8 +60,8 @@ describe('macOS startup service', () => {
     } finally {
       vi.restoreAllMocks();
       Object.defineProperty(process, 'platform', platform);
-      if (previousDataDir === undefined) delete process.env.OPENCHAMBER_DATA_DIR;
-      else process.env.OPENCHAMBER_DATA_DIR = previousDataDir;
+      if (previousDataDir === undefined) delete process.env.MAGIO_DATA_DIR;
+      else process.env.MAGIO_DATA_DIR = previousDataDir;
       fs.rmSync(home, { recursive: true, force: true });
     }
   });

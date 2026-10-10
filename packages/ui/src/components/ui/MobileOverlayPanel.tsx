@@ -82,9 +82,9 @@ export const MobileOverlayPanel: React.FC<MobileOverlayPanelProps> = ({
   // keyboard in an installed PWA.
   React.useLayoutEffect(() => {
     if (!open) return;
-    window.dispatchEvent(new Event('oc:mobile-overlay-opened'));
+    window.dispatchEvent(new Event('mg:mobile-overlay-opened'));
     return () => {
-      window.dispatchEvent(new Event('oc:mobile-overlay-closed'));
+      window.dispatchEvent(new Event('mg:mobile-overlay-closed'));
     };
   }, [open]);
 
@@ -131,8 +131,8 @@ export const MobileOverlayPanel: React.FC<MobileOverlayPanelProps> = ({
   const content = (
     <div
       className={cn(
-        'oc-keyboard-inset-surface oc-bottom-safe-surface fixed inset-0 z-[60] flex flex-col bg-surface-overlay transition-opacity duration-200 ease-out',
-        !enterSettled && 'oc-keyboard-inset-snap',
+        'mg-keyboard-inset-surface mg-bottom-safe-surface fixed inset-0 z-[60] flex flex-col bg-surface-overlay transition-opacity duration-200 ease-out',
+        !enterSettled && 'mg-keyboard-inset-snap',
         entered ? 'opacity-100' : 'opacity-0',
       )}
       role="dialog"
@@ -145,13 +145,13 @@ export const MobileOverlayPanel: React.FC<MobileOverlayPanelProps> = ({
       // column's insets; on phones they are 0 and this is a no-op. The scrim
       // deliberately still covers everything.
       style={{
-        paddingLeft: 'var(--oc-chat-inset-left, 0px)',
-        paddingRight: 'var(--oc-chat-inset-right, 0px)',
+        paddingLeft: 'var(--mg-chat-inset-left, 0px)',
+        paddingRight: 'var(--mg-chat-inset-right, 0px)',
       }}
     >
         <div
           className={cn(
-            'oc-surface-elevated mt-auto flex max-h-[calc(100dvh-0.75rem)] min-h-0 w-full flex-col rounded-t-xl border-x border-t border-border/50 bg-surface-elevated shadow-none pwa-overlay-panel',
+            'mg-surface-elevated mt-auto flex max-h-[calc(100dvh-0.75rem)] min-h-0 w-full flex-col rounded-t-xl border-x border-t border-border/50 bg-surface-elevated shadow-none pwa-overlay-panel',
             'mx-auto max-w-lg',
             className
           )}

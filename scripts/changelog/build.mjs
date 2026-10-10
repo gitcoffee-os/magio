@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Render the changelog outputs from `changelog/*.md`. `oc-dev create-release`
+// Render the changelog outputs from `changelog/*.md`. `mg-dev create-release`
 // is the normal caller; agents only edit `changelog/unreleased.md`.
 //
 //   node scripts/changelog/build.mjs                 write packages/vscode/CHANGELOG.md, changelog/index.json (and CHANGELOG.md while it exists)

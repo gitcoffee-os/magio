@@ -19,7 +19,7 @@ const run = (script, version = '2.0.20') => installOpenCodeV2({
 });
 
 beforeEach(async () => {
-  homeDirectory = await fs.mkdtemp(path.join(os.tmpdir(), 'oc-install-test-'));
+  homeDirectory = await fs.mkdtemp(path.join(os.tmpdir(), 'mg-install-test-'));
   binary = path.join(homeDirectory, '.opencode/bin/opencode');
   await fs.mkdir(path.dirname(binary), { recursive: true });
   await fs.writeFile(binary, cli('1.18.30'), { mode: 0o755 });
@@ -38,7 +38,7 @@ chmod 755 ${quote(binary)}
 `;
     expect(await run(script)).toBe(binary);
     expect(await readOpenCodeCliVersion({ binary, args: [] })).toBe('2.0.20');
-    await expect(fs.stat(path.join(path.dirname(binary), '.openchamber-install'))).rejects.toMatchObject({ code: 'ENOENT' });
+    await expect(fs.stat(path.join(path.dirname(binary), '.magio-install'))).rejects.toMatchObject({ code: 'ENOENT' });
   });
 
   it('restores the binary and shim when an installer exits zero but leaves v1', async () => {
@@ -69,7 +69,7 @@ chmod 755 ${quote(binary)}
     // The platform package keeps its binary at package/bin/opencode.exe. Here it is a
     // shell script, so the version check runs it on the Linux/macOS test host.
     const pack = async (version) => {
-      const root = await fs.mkdtemp(path.join(os.tmpdir(), 'oc-package-'));
+      const root = await fs.mkdtemp(path.join(os.tmpdir(), 'mg-package-'));
       await fs.mkdir(path.join(root, 'package/bin'), { recursive: true });
       await fs.writeFile(path.join(root, 'package/bin/opencode.exe'), cli(version), { mode: 0o755 });
       execFileSync('tar', ['-czf', path.join(root, 'package.tgz'), '-C', root, 'package']);
@@ -101,7 +101,7 @@ chmod 755 ${quote(binary)}
       expect(await runWindows(await pack('2.0.20'))).toBe(exe);
       expect(await readOpenCodeCliVersion({ binary: exe, args: [] })).toBe('2.0.20');
       expect(await readOpenCodeCliVersion({ binary, args: [] })).toBe('1.18.30');
-      await expect(fs.stat(path.join(path.dirname(exe), '.openchamber-install'))).rejects.toMatchObject({ code: 'ENOENT' });
+      await expect(fs.stat(path.join(path.dirname(exe), '.magio-install'))).rejects.toMatchObject({ code: 'ENOENT' });
     });
 
     it('installs the native arm64 package on Windows ARM64', async () => {
@@ -114,7 +114,7 @@ chmod 755 ${quote(binary)}
       const archive = await pack('2.0.20');
       await expect(runWindows(archive, integrityOf(Buffer.from('other')))).rejects.toThrow('integrity');
       expect(await readOpenCodeCliVersion({ binary: exe, args: [] })).toBe('1.18.30');
-      await expect(fs.stat(path.join(path.dirname(exe), '.openchamber-install'))).rejects.toMatchObject({ code: 'ENOENT' });
+      await expect(fs.stat(path.join(path.dirname(exe), '.magio-install'))).rejects.toMatchObject({ code: 'ENOENT' });
     });
 
     it('restores the previous binary when the package holds another release', async () => {
@@ -124,7 +124,7 @@ chmod 755 ${quote(binary)}
   });
 
   it('does not overwrite an installation owned by another process', async () => {
-    const lock = path.join(path.dirname(binary), '.openchamber-install');
+    const lock = path.join(path.dirname(binary), '.magio-install');
     await fs.mkdir(lock);
     await expect(run('exit 0')).rejects.toThrow('already in progress');
     expect((await fs.stat(lock)).isDirectory()).toBe(true);

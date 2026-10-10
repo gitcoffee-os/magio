@@ -123,9 +123,9 @@ class ReferenceChipWidget extends WidgetType {
     }
 }
 
-const AGENT_CHIP_ICON_HREF = '#oc-robot-2';
-const SNIPPET_CHIP_ICON_HREF = '#oc-file-text';
-const FOLDER_CHIP_ICON_HREF = '#oc-folder-3-fill';
+const AGENT_CHIP_ICON_HREF = '#mg-robot-2';
+const SNIPPET_CHIP_ICON_HREF = '#mg-file-text';
+const FOLDER_CHIP_ICON_HREF = '#mg-folder-3-fill';
 
 type ChipRange = { start: number; end: number; widget: ReferenceChipWidget };
 

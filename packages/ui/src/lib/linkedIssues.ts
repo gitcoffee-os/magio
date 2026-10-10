@@ -1,5 +1,5 @@
 import type { Session } from '@/lib/opencode/model';
-import { isJsonValue, type JsonValue } from '@openchamber/sdk';
+import { isJsonValue, type JsonValue } from '@magio/sdk';
 import { getSessionMetadata, type SessionMetadataRecord } from './sessionReviewMetadata';
 
 /**
@@ -276,11 +276,11 @@ export const buildLinkedLinearIssue = (input: {
 });
 
 export const getLinkedIssues = (session: Session | null | undefined): LinkedIssue[] => {
-  const openchamber = getSessionMetadata(session).openchamber;
-  if (!isRecord(openchamber) || !Array.isArray(openchamber.linked_issues)) return [];
+  const magio = getSessionMetadata(session).magio;
+  if (!isRecord(magio) || !Array.isArray(magio.linked_issues)) return [];
   // Malformed entries are dropped rather than rendered: a half-written link
   // has no row worth showing.
-  return openchamber.linked_issues.filter(isLinkedIssue);
+  return magio.linked_issues.filter(isLinkedIssue);
 };
 
 export type LinkedGitHubPullRequest = {
@@ -486,9 +486,9 @@ export const withLinkedIssue = (
   issue: LinkedIssue,
   linked: boolean,
 ): SessionMetadataRecord => {
-  const openchamber = isRecord(metadata.openchamber) ? metadata.openchamber : {};
-  const current = Array.isArray(openchamber.linked_issues)
-    ? openchamber.linked_issues.filter(isLinkedIssue)
+  const magio = isRecord(metadata.magio) ? metadata.magio : {};
+  const current = Array.isArray(magio.linked_issues)
+    ? magio.linked_issues.filter(isLinkedIssue)
     : [];
   const withoutIssue = current.filter((entry) => !isSameLinkedEntry(entry, issue));
   // Re-linking an existing entry replaces it, so a stale title can be refreshed
@@ -497,8 +497,8 @@ export const withLinkedIssue = (
 
   return {
     ...metadata,
-    openchamber: {
-      ...openchamber,
+    magio: {
+      ...magio,
       linked_issues: next,
     },
   };

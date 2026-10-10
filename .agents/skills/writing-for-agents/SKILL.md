@@ -86,7 +86,7 @@ Keep each cross-cutting rule with one canonical owner; companion skills add only
 
 | Concern | Canonical skill |
 |---|---|
-| Change scope, abstraction discipline, and validation risk | `openchamber-change-discipline` |
+| Change scope, abstraction discipline, and validation risk | `magio-change-discipline` |
 | State authority, reconciliation, optimistic state, and lifecycle correctness | `sync-state-invariants` |
 | Isolated-space trust boundaries and the evidence that each one holds | `isolated-space-boundary` |
 | Enterprise mode: what counts as egress or exposure, how it is gated, and administrator knobs | `enterprise-boundary` |

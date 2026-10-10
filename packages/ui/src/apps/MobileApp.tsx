@@ -1,12 +1,12 @@
 import { OpenCodeCompatibilityGate } from '@/components/update/OpenCodeCompatibilityGate';
 import React from 'react';
 
-import { AboutSettings } from '@/components/sections/openchamber/AboutSettings';
+import { AboutSettings } from '@/components/sections/magio/AboutSettings';
 import { OpenCodeUpdateToast } from '@/components/update/OpenCodeUpdateToast';
 import { MobileAppUpdateToast } from '@/components/update/MobileAppUpdateToast';
 import { ConfigUpdateOverlay } from '@/components/ui/ConfigUpdateOverlay';
 import { Button } from '@/components/ui/button';
-import { OpenChamberLogo } from '@/components/ui/OpenChamberLogo';
+import { MagioLogo } from '@/components/ui/MagioLogo';
 import { AppStartupOverlay } from '@/components/ui/AppStartupOverlay';
 import { ChatView } from '@/components/views/ChatView';
 import { PlanView } from '@/components/views/PlanView';
@@ -37,7 +37,7 @@ import type { ProjectRef } from '@/lib/projectContextApi';
 import { readTabletLayout, useOrientation, useTabletLayout } from '@/lib/device';
 import { useHardwareKeyboard } from '@/lib/hardwareKeyboard';
 import { useI18n } from '@/lib/i18n';
-import { subscribeOpenchamberEvents } from '@/lib/openchamberEvents';
+import { subscribemagioEvents } from '@/lib/magioEvents';
 import { runtimeFetch } from '@/lib/runtime-fetch';
 import { getRuntimeApiBaseUrl, subscribeRuntimeEndpointChanged, switchRuntimeEndpoint, MOBILE_DISCONNECTED_RUNTIME_KEY } from '@/lib/runtime-switch';
 import { useGlobalSessionsStore } from '@/stores/useGlobalSessionsStore';
@@ -219,7 +219,7 @@ const MobileShell: React.FC<{ onActiveConnectionDeleted: () => void }> = ({ onAc
 
   // The agent asked for a file to be shown: open the files drawer and stage
   // the path the way a chat file link does, so the surface routes to it.
-  React.useEffect(() => subscribeOpenchamberEvents((event) => {
+  React.useEffect(() => subscribemagioEvents((event) => {
     if (event.type !== 'file-open-request') return;
     const directory = event.directory ?? useDirectoryStore.getState().currentDirectory;
     if (!directory) return;
@@ -233,10 +233,10 @@ const MobileShell: React.FC<{ onActiveConnectionDeleted: () => void }> = ({ onAc
     setWorkspaceOpen(true);
   }, []);
 
-  const leftResize = useIpadSidebarResize('left', 'openchamber.ipad.leftSidebarWidth', IPAD_LEFT_SIDEBAR_WIDTH);
+  const leftResize = useIpadSidebarResize('left', 'magio.ipad.leftSidebarWidth', IPAD_LEFT_SIDEBAR_WIDTH);
   const rightResize = useIpadSidebarResize(
     'right',
-    'openchamber.ipad.rightSidebarWidth',
+    'magio.ipad.rightSidebarWidth',
     IPAD_RIGHT_SIDEBAR_WIDTH,
     IPAD_WORKSPACE_SIDEBAR_MAX_WIDTH,
   );
@@ -255,11 +255,11 @@ const MobileShell: React.FC<{ onActiveConnectionDeleted: () => void }> = ({ onAc
   React.useEffect(() => {
     if (typeof document === 'undefined') return;
     const root = document.documentElement;
-    root.style.setProperty('--oc-chat-inset-left', `${sidebarWidth}px`);
-    root.style.setProperty('--oc-chat-inset-right', `${workspacePanelWidth}px`);
+    root.style.setProperty('--mg-chat-inset-left', `${sidebarWidth}px`);
+    root.style.setProperty('--mg-chat-inset-right', `${workspacePanelWidth}px`);
     return () => {
-      root.style.removeProperty('--oc-chat-inset-left');
-      root.style.removeProperty('--oc-chat-inset-right');
+      root.style.removeProperty('--mg-chat-inset-left');
+      root.style.removeProperty('--mg-chat-inset-right');
     };
   }, [sidebarWidth, workspacePanelWidth]);
 
@@ -283,8 +283,8 @@ const MobileShell: React.FC<{ onActiveConnectionDeleted: () => void }> = ({ onAc
     if (typeof document === 'undefined') return;
     const keep = isTabletLayout && (isPortrait || hasHardwareKeyboard);
     const root = document.documentElement;
-    root.classList.toggle('oc-keep-draft-starters', keep);
-    return () => root.classList.remove('oc-keep-draft-starters');
+    root.classList.toggle('mg-keep-draft-starters', keep);
+    return () => root.classList.remove('mg-keep-draft-starters');
   }, [hasHardwareKeyboard, isTabletLayout, isPortrait]);
 
   const mobileActions = React.useMemo<MobileAppActions>(
@@ -299,7 +299,7 @@ const MobileShell: React.FC<{ onActiveConnectionDeleted: () => void }> = ({ onAc
     [openChangesSurface, openFilesSurface, openSettingsSurface, openSurface],
   );
 
-  // Expose the shell's panel-opening actions to the deep-link layer so openchamber:// URLs
+  // Expose the shell's panel-opening actions to the deep-link layer so magio:// URLs
   // (and notification taps / widgets) can navigate to these surfaces. Session and
   // new-session intents resolve directly against the store, so they aren't wired here.
   const deepLinkHandlers = React.useMemo(
@@ -473,7 +473,7 @@ const MobileShell: React.FC<{ onActiveConnectionDeleted: () => void }> = ({ onAc
   return (
     <DedicatedMobileAppProvider actions={mobileActions}>
       <div
-        className="oc-mobile-app-shell main-content-safe-area flex h-[100dvh] flex-row bg-background text-foreground"
+        className="mg-mobile-app-shell main-content-safe-area flex h-[100dvh] flex-row bg-background text-foreground"
         data-page-scroll-lock="true"
       >
         {/* iPad: persistent full-height sessions sidebar; the chat column and
@@ -494,9 +494,9 @@ const MobileShell: React.FC<{ onActiveConnectionDeleted: () => void }> = ({ onAc
               width: sidebarOpen ? leftResize.width : 0,
               minWidth: sidebarOpen ? leftResize.width : 0,
               maxWidth: sidebarOpen ? leftResize.width : 0,
-              ['--oc-ipad-sidebar-width' as string]: `${leftResize.width}px`,
+              ['--mg-ipad-sidebar-width' as string]: `${leftResize.width}px`,
               overflowX: 'clip',
-              paddingTop: 'var(--oc-safe-area-top, 0px)',
+              paddingTop: 'var(--mg-safe-area-top, 0px)',
               transitionProperty: leftResize.isResizing ? 'none' : 'width, min-width, max-width',
               transitionDuration: '200ms',
               transitionTimingFunction: 'cubic-bezier(0.22, 1, 0.36, 1)',
@@ -510,7 +510,7 @@ const MobileShell: React.FC<{ onActiveConnectionDeleted: () => void }> = ({ onAc
                 leftResize.isResizing && 'pointer-events-none',
                 !sidebarOpen && 'pointer-events-none select-none opacity-0',
               )}
-              style={{ width: 'var(--oc-ipad-sidebar-width)', overflowX: 'hidden' }}
+              style={{ width: 'var(--mg-ipad-sidebar-width)', overflowX: 'hidden' }}
             >
               <ErrorBoundary>
                 <MobileSessionsSheet
@@ -580,9 +580,9 @@ const MobileShell: React.FC<{ onActiveConnectionDeleted: () => void }> = ({ onAc
             width: workspacePanelWidth,
             minWidth: workspacePanelWidth,
             maxWidth: workspacePanelWidth,
-            ['--oc-ipad-sidebar-width' as string]: `${rightResize.width}px`,
+            ['--mg-ipad-sidebar-width' as string]: `${rightResize.width}px`,
             overflowX: 'clip',
-            paddingTop: 'var(--oc-safe-area-top, 0px)',
+            paddingTop: 'var(--mg-safe-area-top, 0px)',
             transitionProperty: rightResize.isResizing ? 'none' : 'width, min-width, max-width',
             transitionDuration: '200ms',
             transitionTimingFunction: 'cubic-bezier(0.22, 1, 0.36, 1)',
@@ -596,7 +596,7 @@ const MobileShell: React.FC<{ onActiveConnectionDeleted: () => void }> = ({ onAc
               rightResize.isResizing && 'pointer-events-none',
               !workspacePanelWidth && 'pointer-events-none select-none opacity-0',
             )}
-            style={{ width: 'var(--oc-ipad-sidebar-width)', overflowX: 'hidden' }}
+            style={{ width: 'var(--mg-ipad-sidebar-width)', overflowX: 'hidden' }}
           >
             <ErrorBoundary>
               <MobileWorkspaceDrawer
@@ -906,7 +906,7 @@ function MobileAppContent({ apis }: MobileAppProps) {
     const now = Date.now();
     if (now - lastNativeResumeSyncEventAtRef.current >= NATIVE_RESUME_SYNC_EVENT_THROTTLE_MS) {
       lastNativeResumeSyncEventAtRef.current = now;
-      window.dispatchEvent(new Event('openchamber:system-resume'));
+      window.dispatchEvent(new Event('magio:system-resume'));
     }
   }, [agentsCount, apis.sourceControl, apis.linear, initializeApp, loadAgents, loadProviders, providersCount, refreshSourceControlAuth, refreshLinearAuthStatus]);
 
@@ -1226,7 +1226,7 @@ function MobileAppContent({ apis }: MobileAppProps) {
   React.useEffect(() => {
     if (!isConnected) return;
     let cancelled = false;
-    const unsubscribe = subscribeOpenchamberEvents((event) => {
+    const unsubscribe = subscribemagioEvents((event) => {
       if (event.type !== 'worktree-changed') return;
       void refreshWorktreeTopologyForChange(projects, event.directories, () => cancelled);
     });
@@ -1292,7 +1292,7 @@ function MobileAppContent({ apis }: MobileAppProps) {
   // (document.hasFocus() is unreliable) and leaked while the app was open; the in-app SSE
   // notification dispatch is no-op'd for native in renderMobileApp.
   useNativePushRegistration({ enabled: isNativeMobileApp && isConnected });
-  // Single native deep-link entry point: notification taps AND the openchamber:// URL
+  // Single native deep-link entry point: notification taps AND the magio:// URL
   // scheme (widgets, Live Activities, external links). Registered unconditionally so a
   // cold-launch tap/open isn't lost on the connect/splash screen; intents stash until
   // the app is ready (connected + initialized) and shell handlers are registered.
@@ -1311,7 +1311,7 @@ function MobileAppContent({ apis }: MobileAppProps) {
   if (!fontsReady) {
     return (
       <main className="flex min-h-dvh items-center justify-center bg-[var(--splash-background,var(--surface-background))] text-foreground">
-        <OpenChamberLogo width={120} height={120} isAnimated variant="splash" />
+        <MagioLogo width={120} height={120} isAnimated variant="splash" />
       </main>
     );
   }
@@ -1329,7 +1329,7 @@ function MobileAppContent({ apis }: MobileAppProps) {
       return (
         <main className="flex min-h-dvh items-center justify-center bg-[var(--splash-background,var(--surface-background))] px-6 text-center text-foreground">
           <div className="flex max-w-sm flex-col items-center gap-4">
-            <OpenChamberLogo width={120} height={120} isAnimated={!showConnectionRecovery} variant="splash" />
+            <MagioLogo width={120} height={120} isAnimated={!showConnectionRecovery} variant="splash" />
             {showConnectionRecovery ? (
               <>
                 <div className="space-y-2">
@@ -1360,7 +1360,7 @@ function MobileAppContent({ apis }: MobileAppProps) {
     if (autoConnectPhase !== 'done') {
       return (
         <main className="relative flex min-h-dvh items-center justify-center bg-[var(--splash-background,var(--surface-background))] text-foreground">
-          <OpenChamberLogo width={120} height={120} isAnimated variant="splash" />
+          <MagioLogo width={120} height={120} isAnimated variant="splash" />
           {/* Absolutely positioned below the (still perfectly centered) logo so
               the text never pushes it up. 50% + half the 120px logo + a gap. */}
           {autoConnectLabel ? (
@@ -1392,7 +1392,7 @@ function MobileAppContent({ apis }: MobileAppProps) {
     if (!showConnectionRecovery) {
       return (
         <main className="flex min-h-dvh items-center justify-center bg-[var(--splash-background,var(--surface-background))] text-foreground">
-          <OpenChamberLogo width={120} height={120} isAnimated variant="splash" />
+          <MagioLogo width={120} height={120} isAnimated variant="splash" />
         </main>
       );
     }
@@ -1428,7 +1428,7 @@ function MobileAppContent({ apis }: MobileAppProps) {
               <AppLinkConfirmDialog />
               <SharedTrustConfirmDialog />
               {isolatedSpacesEnabled ? <><SpaceAccessDialog /><SpaceActionsSheet /><SpaceApplyDialog /><SpaceDeleteDialog /><SpaceSetupOutputDialog /></> : null}
-              <Toaster position="top-center" offset="calc(var(--oc-safe-area-top, 0px) + 16px)" />
+              <Toaster position="top-center" offset="calc(var(--mg-safe-area-top, 0px) + 16px)" />
               {isInitialized ? <ConfigUpdateOverlay /> : null}
             </div>
           </TooltipProvider>

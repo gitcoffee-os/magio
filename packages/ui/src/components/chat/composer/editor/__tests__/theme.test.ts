@@ -165,7 +165,7 @@ describe('composerNativeSelectionTheme', () => {
      *
      * BUT a visible native caret makes WebKit re-render its caret UI after
      * every keystroke's decoration redraw — severe input lag. Both rules are
-     * therefore scoped to `.oc-native-range`, which only exists while a range
+     * therefore scoped to `.mg-native-range`, which only exists while a range
      * is selected (when there is no caret to lag on).
      */
     test('the native caret is re-enabled, since the handles take its colour', () => {
@@ -183,7 +183,7 @@ describe('composerNativeSelectionTheme', () => {
         for (const selector of nativeSelectors) {
             const value = (NATIVE_SELECTION_THEME_SPEC as Record<string, Record<string, string>>)[selector];
             if (value.caretColor) {
-                expect(selector.includes('.oc-native-range')).toBe(true);
+                expect(selector.includes('.mg-native-range')).toBe(true);
             }
         }
     });
@@ -191,7 +191,7 @@ describe('composerNativeSelectionTheme', () => {
     test('the drawn cursor layer is hidden so there are not two carets', () => {
         const rule = nativeSelectors.find((selector) => selector.includes('.cm-cursorLayer'));
         expect(rule).toBeDefined();
-        expect(rule!.includes('.oc-native-range')).toBe(true);
+        expect(rule!.includes('.mg-native-range')).toBe(true);
         const value = (NATIVE_SELECTION_THEME_SPEC as Record<string, Record<string, string>>)[rule!];
         expect(value.display).toBe('none');
     });

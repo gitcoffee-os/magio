@@ -24,7 +24,7 @@ const definition = {
 };
 
 async function setup(overrides = {}) {
-  const root = await fs.mkdtemp(path.join(os.tmpdir(), 'oc-theme-import-'));
+  const root = await fs.mkdtemp(path.join(os.tmpdir(), 'mg-theme-import-'));
   directories.push(root);
   const themesDir = path.join(root, 'themes');
   const runtime = createThemeRuntime({ fsPromises: { ...fs, ...overrides }, path, themesDir, maxThemeJsonBytes: 512 * 1024, logger: console });
@@ -39,7 +39,7 @@ describe('theme import persistence', () => {
     const { app, runtime, themesDir } = await setup();
     const theme = await runtime.saveImportedTheme(definition);
     await fs.writeFile(path.join(themesDir, 'custom.json'), JSON.stringify(definition));
-    await request(app).delete('/api/config/themes/openchamber-dark').expect(200);
+    await request(app).delete('/api/config/themes/magio-dark').expect(200);
     await request(app).delete(`/api/config/themes/${theme.metadata.id}`).expect(200);
     expect(await fs.readdir(themesDir)).toEqual(['custom.json']);
     await request(app).delete(`/api/config/themes/${theme.metadata.id}`).expect(200);

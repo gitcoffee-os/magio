@@ -205,7 +205,7 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
           ? { height: `${effectiveResizedHeight}px`, minHeight: 'fit-content' }
           : undefined}
         className={cn(
-          "oc-surface-elevated group/textarea relative flex w-full flex-col rounded-[var(--radius-xl)] bg-surface-elevated pb-2.5",
+          "mg-surface-elevated group/textarea relative flex w-full flex-col rounded-[var(--radius-xl)] bg-surface-elevated pb-2.5",
           "ring-1 ring-inset ring-border/60 transition duration-200 ease-out",
           "hover:[&:not(:focus-within)]:[background-image:linear-gradient(var(--interactive-hover),var(--interactive-hover))]",
           // Scoped to the textarea, not any disabled descendant: an endSlot

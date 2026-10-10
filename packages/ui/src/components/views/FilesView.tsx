@@ -66,7 +66,7 @@ import { EMPTY_CANVAS_READ, shouldShowFileCanvas, type FileCanvasHandle } from '
 import { GuestFileEditor } from '@/components/views/files/GuestFileEditor';
 import { findGuestFileEditor, useGuestFileEditor } from '@/lib/guests/file-editors';
 import { useGuestsStore } from '@/lib/guests/store';
-import { GUEST_FILE_EDITOR_CONTENT_MAX } from '@openchamber/sdk';
+import { GUEST_FILE_EDITOR_CONTENT_MAX } from '@magio/sdk';
 import { useRuntimeAPIs } from '@/hooks/useRuntimeAPIs';
 import { EditorView } from '@codemirror/view';
 import type { Extension } from '@codemirror/state';
@@ -81,6 +81,7 @@ import { useGitStatus, useGitStore } from '@/stores/useGitStore';
 import { DirectoryRequests } from './files/directoryRequests';
 import { useFileTreeUpload } from './files/useFileTreeUpload';
 import { areDirectoryNodesEqual, buildFileTreeStatusIndex } from './files/fileTreeStatus';
+import { addTreeEntryToConversation, openTreeEntryInIntegratedTerminal } from './files/fileTreeMenuActions';
 import { BinaryArtifact } from './files/previews/BinaryArtifact';
 import { FontArtifact } from './files/previews/FontArtifact';
 import { ImageArtifact } from './files/previews/ImageArtifact';
@@ -424,18 +425,13 @@ const FileRow: React.FC<FileRowProps> = ({
   const { t } = useI18n();
   const isDir = node.type === 'directory';
   const { canRename, canCreateFile, canCreateFolder, canDelete, canReveal } = permissions;
-  const canDownload = !isDir && Boolean(downloadFile);
   const canRevealPath = canReveal && !isBrowserClient;
   const canUploadHere = isDir && canUpload;
-  const hasMenuActions = canRename || canCreateFile || canCreateFolder || canUploadHere || canDelete || canDownload || canRevealPath;
 
   const handleContextMenu = React.useCallback((event?: React.MouseEvent) => {
-    if (!hasMenuActions) {
-      return;
-    }
     event?.preventDefault();
     setRightClickMenuPath(node.path);
-  }, [hasMenuActions, node.path, setRightClickMenuPath]);
+  }, [node.path, setRightClickMenuPath]);
 
   const handleInteraction = React.useCallback(() => {
     if (isDir) {
@@ -459,6 +455,21 @@ const FileRow: React.FC<FileRowProps> = ({
     Separator: React.ElementType;
   }) => (
     <>
+      <Item onClick={(e: React.MouseEvent) => {
+        e.stopPropagation();
+        addTreeEntryToConversation(getDisplayPath(root, node.path) || node.path);
+      }}>
+        <Icon name="chat-1" className="mr-2 size-4" /> {t('sidebarFilesTree.menu.addToConversation')}
+      </Item>
+      {isDir && (
+        <Item onClick={(e: React.MouseEvent) => {
+          e.stopPropagation();
+          openTreeEntryInIntegratedTerminal(root, node.path);
+        }}>
+          <Icon name="terminal-box" className="mr-2 size-4" /> {t('sidebarFilesTree.menu.openInIntegratedTerminal')}
+        </Item>
+      )}
+      <Separator />
       {canRename && (
         <Item onClick={(e: React.MouseEvent) => { e.stopPropagation(); onOpenDialog('rename', node); }}>
           <Icon name="edit" className="mr-2 size-4" /> {t('sidebarFilesTree.menu.rename')}
@@ -585,31 +596,29 @@ const FileRow: React.FC<FileRowProps> = ({
           </span>
         )}
       </button>
-      {hasMenuActions && (
-        <div className={cn(
-          "absolute right-1 top-1/2 -translate-y-1/2",
-          alwaysShowActions ? "opacity-100" : "opacity-0 focus-within:opacity-100 group-hover:opacity-100"
-        )}>
-          <DropdownMenu
-            open={contextMenuPath === node.path}
-            onOpenChange={(open) => setContextMenuPath(open ? node.path : null)}
-          >
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="size-6"
-                onClick={handleMenuButtonClick}
-              >
-                <Icon name="more-2-fill" className="size-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" side={isMobile ? "bottom" : "bottom"} onCloseAutoFocus={() => setContextMenuPath(null)}>
-              {renderMenuItems({ Item: DropdownMenuItem, Separator: DropdownMenuSeparator })}
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
-      )}
+      <div className={cn(
+        "absolute right-1 top-1/2 -translate-y-1/2",
+        alwaysShowActions ? "opacity-100" : "opacity-0 focus-within:opacity-100 group-hover:opacity-100"
+      )}>
+        <DropdownMenu
+          open={contextMenuPath === node.path}
+          onOpenChange={(open) => setContextMenuPath(open ? node.path : null)}
+        >
+          <DropdownMenuTrigger asChild>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="size-6"
+              onClick={handleMenuButtonClick}
+            >
+              <Icon name="more-2-fill" className="size-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" side={isMobile ? "bottom" : "bottom"} onCloseAutoFocus={() => setContextMenuPath(null)}>
+            {renderMenuItems({ Item: DropdownMenuItem, Separator: DropdownMenuSeparator })}
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
       </ContextMenuTrigger>
       <ContextMenuContent className="min-w-[180px]">
         {renderMenuItems({ Item: ContextMenuItem, Separator: ContextMenuSeparator })}
@@ -2742,9 +2751,9 @@ export const FilesView: React.FC<FilesViewProps> = ({ mode = 'full', visible = t
     }
   }, [canEdit, textViewMode]);
 
-  const MD_VIEWER_MODE_KEY = 'openchamber:files:md-viewer-mode';
-  const HTML_VIEWER_MODE_KEY = 'openchamber:files:html-viewer-mode';
-  const JSON_VIEWER_MODE_KEY = 'openchamber:files:json-viewer-mode';
+  const MD_VIEWER_MODE_KEY = 'magio:files:md-viewer-mode';
+  const HTML_VIEWER_MODE_KEY = 'magio:files:html-viewer-mode';
+  const JSON_VIEWER_MODE_KEY = 'magio:files:json-viewer-mode';
 
   React.useEffect(() => {
     const selectedPath = selectedFile?.path;
@@ -3095,9 +3104,9 @@ export const FilesView: React.FC<FilesViewProps> = ({ mode = 'full', visible = t
       applyDefaultFileViewerMode(enabled);
     };
 
-    window.addEventListener('openchamber:file-viewer-preview-mode-changed', handleFileViewerModeChanged);
+    window.addEventListener('magio:file-viewer-preview-mode-changed', handleFileViewerModeChanged);
     return () => {
-      window.removeEventListener('openchamber:file-viewer-preview-mode-changed', handleFileViewerModeChanged);
+      window.removeEventListener('magio:file-viewer-preview-mode-changed', handleFileViewerModeChanged);
     };
   }, [openPaths]);
 
@@ -4710,7 +4719,7 @@ export const FilesView: React.FC<FilesViewProps> = ({ mode = 'full', visible = t
           ) : selectedFile && isMarkdown && getMdViewMode() === 'preview' ? (
             <div className="relative h-full min-h-0">
               <div
-                className="oc-file-preview h-full overflow-auto p-3 outline-none"
+                className="mg-file-preview h-full overflow-auto p-3 outline-none"
                 // Focusable so Cmd/Ctrl+F reaches the find bar: the keybind only
                 // fires when the event target sits inside this container, and a
                 // plain div never holds focus. -1 keeps it out of the tab order.
@@ -5099,7 +5108,7 @@ export const FilesView: React.FC<FilesViewProps> = ({ mode = 'full', visible = t
             // highlighted by the search it drives.
             <div className="relative h-full min-h-0">
             <div
-              className="oc-file-preview h-full overflow-auto p-4 outline-none"
+              className="mg-file-preview h-full overflow-auto p-4 outline-none"
               tabIndex={-1}
               onMouseDown={focusMdPreviewContainer}
               ref={setFullscreenMarkdownScroller}

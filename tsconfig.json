@@ -13,8 +13,8 @@
     "allowImportingTsExtensions": true,
     "resolveJsonModule": true,
     "paths": {
-      "@openchamber/ui/*": ["./packages/ui/src/*"],
-      "@openchamber/web/*": ["./packages/web/src/*"]
+      "@magio/ui/*": ["./packages/ui/src/*"],
+      "@magio/web/*": ["./packages/web/src/*"]
     }
   }
 }

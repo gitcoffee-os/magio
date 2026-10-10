@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'bun:test';
 
-import { HostRequestError, OPENCHAMBER_SDK_CHANNEL, type GuestMessage, type GuestStatusControl, type ResolveResultPayload, type StartSessionRequest, type ToastRequest } from '@openchamber/sdk';
+import { HostRequestError, MAGIO_SDK_CHANNEL, type GuestMessage, type GuestStatusControl, type ResolveResultPayload, type StartSessionRequest, type ToastRequest } from '@magio/sdk';
 import type { GuestFileProxyResult, GuestFileRequest } from './files.ts';
 import type { GuestGenerateProxyResult } from './generate.ts';
 
@@ -12,10 +12,10 @@ import {
 } from './host-bridge.ts';
 
 const toast: GuestMessage = {
-  channel: OPENCHAMBER_SDK_CHANNEL,
+  channel: MAGIO_SDK_CHANNEL,
   v: 1,
   type: 'toast',
-  id: 'oc-1',
+  id: 'mg-1',
   payload: { kind: 'info', message: 'Hello' },
 };
 
@@ -61,7 +61,7 @@ describe('answerGuestMessage', () => {
   test('publishes status controls through the frame owner and reports unsupported owners', async () => {
     const controls: GuestStatusControl[] = [{ kind: 'button', id: 'refresh', label: 'Refresh' }];
     const seen: GuestStatusControl[][] = [];
-    const message: GuestMessage = { channel: OPENCHAMBER_SDK_CHANNEL, v: 1, type: 'status-controls', id: 'header-1', payload: { controls } };
+    const message: GuestMessage = { channel: MAGIO_SDK_CHANNEL, v: 1, type: 'status-controls', id: 'header-1', payload: { controls } };
     const result = await answerGuestMessage(message, effects({ setStatusControls: (next) => { seen.push(next); } }));
     expect(seen).toEqual([controls]);
     expect(result).toMatchObject({ type: 'result', id: 'header-1', ok: true });
@@ -90,20 +90,20 @@ describe('answerGuestMessage', () => {
     }));
     expect(seen).toEqual(['Hello']);
     expect(reply).toEqual({
-      channel: OPENCHAMBER_SDK_CHANNEL,
+      channel: MAGIO_SDK_CHANNEL,
       v: 1,
       type: 'result',
-      id: 'oc-1',
+      id: 'mg-1',
       ok: true,
     });
   });
 
   test('rejects a non-http url', async () => {
     const reply = await answerGuestMessage({
-      channel: OPENCHAMBER_SDK_CHANNEL,
+      channel: MAGIO_SDK_CHANNEL,
       v: 1,
       type: 'open-url',
-      id: 'oc-2',
+      id: 'mg-2',
       payload: { url: 'file:///etc/passwd' },
     }, effects());
     expect(reply?.type).toBe('result');
@@ -112,10 +112,10 @@ describe('answerGuestMessage', () => {
 
   test('rejects an unknown surface', async () => {
     const reply = await answerGuestMessage({
-      channel: OPENCHAMBER_SDK_CHANNEL,
+      channel: MAGIO_SDK_CHANNEL,
       v: 1,
       type: 'open-surface',
-      id: 'oc-3',
+      id: 'mg-3',
       payload: { surfaceId: 'not-a-surface' },
     }, effects());
     expect(reply?.type).toBe('result');
@@ -125,10 +125,10 @@ describe('answerGuestMessage', () => {
   test('writes clipboard text', async () => {
     const seen: string[] = [];
     const reply = await answerGuestMessage({
-      channel: OPENCHAMBER_SDK_CHANNEL,
+      channel: MAGIO_SDK_CHANNEL,
       v: 1,
       type: 'clipboard-write',
-      id: 'oc-4',
+      id: 'mg-4',
       payload: { text: '/repo' },
     }, effects({
       writeClipboard: async (text) => {
@@ -142,10 +142,10 @@ describe('answerGuestMessage', () => {
 
   test('rejects a failed clipboard write', async () => {
     const reply = await answerGuestMessage({
-      channel: OPENCHAMBER_SDK_CHANNEL,
+      channel: MAGIO_SDK_CHANNEL,
       v: 1,
       type: 'clipboard-write',
-      id: 'oc-5',
+      id: 'mg-5',
       payload: { text: '/repo' },
     }, effects({
       writeClipboard: async () => false,
@@ -156,10 +156,10 @@ describe('answerGuestMessage', () => {
   test('composes with append when the guest omits mode', async () => {
     const seen: Array<{ text: string; mode: 'replace' | 'append' }> = [];
     const reply = await answerGuestMessage({
-      channel: OPENCHAMBER_SDK_CHANNEL,
+      channel: MAGIO_SDK_CHANNEL,
       v: 1,
       type: 'compose',
-      id: 'oc-6',
+      id: 'mg-6',
       payload: { text: 'Ask about the diff' },
     }, effects({
       compose: (text, mode) => {
@@ -173,10 +173,10 @@ describe('answerGuestMessage', () => {
   test('attaches an http issue and rejects a file url', async () => {
     const seen: string[] = [];
     const ok = await answerGuestMessage({
-      channel: OPENCHAMBER_SDK_CHANNEL,
+      channel: MAGIO_SDK_CHANNEL,
       v: 1,
       type: 'attach',
-      id: 'oc-7',
+      id: 'mg-7',
       payload: {
         providerId: 'hello',
         id: 'HELLO-1',
@@ -193,10 +193,10 @@ describe('answerGuestMessage', () => {
 
     const pulls: Array<{ kind?: string; author?: string }> = [];
     const pull = await answerGuestMessage({
-      channel: OPENCHAMBER_SDK_CHANNEL,
+      channel: MAGIO_SDK_CHANNEL,
       v: 1,
       type: 'attach',
-      id: 'oc-7b',
+      id: 'mg-7b',
       payload: {
         providerId: 'gitlab',
         id: '!12',
@@ -215,10 +215,10 @@ describe('answerGuestMessage', () => {
     expect(pull && pull.type === 'result' && pull.ok).toBe(true);
 
     const bad = await answerGuestMessage({
-      channel: OPENCHAMBER_SDK_CHANNEL,
+      channel: MAGIO_SDK_CHANNEL,
       v: 1,
       type: 'attach',
-      id: 'oc-8',
+      id: 'mg-8',
       payload: {
         providerId: 'hello',
         id: 'HELLO-1',
@@ -232,10 +232,10 @@ describe('answerGuestMessage', () => {
   test('starts a session and rejects a file url', async () => {
     const seen: Array<Pick<StartSessionRequest, 'id' | 'worktree'>> = [];
     const ok = await answerGuestMessage({
-      channel: OPENCHAMBER_SDK_CHANNEL,
+      channel: MAGIO_SDK_CHANNEL,
       v: 1,
       type: 'start-session',
-      id: 'oc-12',
+      id: 'mg-12',
       payload: {
         providerId: 'gitlab',
         id: '!12',
@@ -252,19 +252,19 @@ describe('answerGuestMessage', () => {
     }));
     expect(seen).toEqual([{ id: '!12', worktree: true }]);
     expect(ok).toEqual({
-      channel: OPENCHAMBER_SDK_CHANNEL,
+      channel: MAGIO_SDK_CHANNEL,
       v: 1,
       type: 'result',
-      id: 'oc-12',
+      id: 'mg-12',
       ok: true,
       payload: { sessionId: 'ses-9', sent: 'sent' },
     });
 
     const bad = await answerGuestMessage({
-      channel: OPENCHAMBER_SDK_CHANNEL,
+      channel: MAGIO_SDK_CHANNEL,
       v: 1,
       type: 'start-session',
-      id: 'oc-13',
+      id: 'mg-13',
       payload: {
         providerId: 'gitlab',
         id: '!12',
@@ -278,10 +278,10 @@ describe('answerGuestMessage', () => {
   test('prompts and forwards a busy refusal', async () => {
     const seen: Array<{ text: string; send?: boolean }> = [];
     const ok = await answerGuestMessage({
-      channel: OPENCHAMBER_SDK_CHANNEL,
+      channel: MAGIO_SDK_CHANNEL,
       v: 1,
       type: 'prompt',
-      id: 'oc-14',
+      id: 'mg-14',
       payload: { text: 'Fix the login', send: true },
     }, effects({
       prompt: async (request) => {
@@ -291,28 +291,28 @@ describe('answerGuestMessage', () => {
     }));
     expect(seen).toEqual([{ text: 'Fix the login', send: true }]);
     expect(ok).toEqual({
-      channel: OPENCHAMBER_SDK_CHANNEL,
+      channel: MAGIO_SDK_CHANNEL,
       v: 1,
       type: 'result',
-      id: 'oc-14',
+      id: 'mg-14',
       ok: true,
       payload: { sent: 'sent' },
     });
 
     const busy = await answerGuestMessage({
-      channel: OPENCHAMBER_SDK_CHANNEL,
+      channel: MAGIO_SDK_CHANNEL,
       v: 1,
       type: 'prompt',
-      id: 'oc-15',
+      id: 'mg-15',
       payload: { text: 'Wait', send: true },
     }, effects({
       prompt: async () => ({ ok: false, code: 'SESSION_BUSY', message: 'Session is busy.' }),
     }));
     expect(busy).toEqual({
-      channel: OPENCHAMBER_SDK_CHANNEL,
+      channel: MAGIO_SDK_CHANNEL,
       v: 1,
       type: 'result',
-      id: 'oc-15',
+      id: 'mg-15',
       ok: false,
       error: 'Session is busy.',
       code: 'SESSION_BUSY',
@@ -322,10 +322,10 @@ describe('answerGuestMessage', () => {
   test('links the current session and rejects a file url', async () => {
     const seen: string[] = [];
     const ok = await answerGuestMessage({
-      channel: OPENCHAMBER_SDK_CHANNEL,
+      channel: MAGIO_SDK_CHANNEL,
       v: 1,
       type: 'session-link',
-      id: 'oc-16',
+      id: 'mg-16',
       payload: {
         providerId: 'gitlab',
         id: '!12',
@@ -342,10 +342,10 @@ describe('answerGuestMessage', () => {
     expect(ok && ok.type === 'result' && ok.ok).toBe(true);
 
     const missing = await answerGuestMessage({
-      channel: OPENCHAMBER_SDK_CHANNEL,
+      channel: MAGIO_SDK_CHANNEL,
       v: 1,
       type: 'session-link',
-      id: 'oc-17',
+      id: 'mg-17',
       payload: {
         providerId: 'gitlab',
         id: '!12',
@@ -356,20 +356,20 @@ describe('answerGuestMessage', () => {
       sessionLink: async () => ({ ok: false, code: 'NO_SESSION', message: 'No open session.' }),
     }));
     expect(missing).toEqual({
-      channel: OPENCHAMBER_SDK_CHANNEL,
+      channel: MAGIO_SDK_CHANNEL,
       v: 1,
       type: 'result',
-      id: 'oc-17',
+      id: 'mg-17',
       ok: false,
       error: 'No open session.',
       code: 'NO_SESSION',
     });
 
     const bad = await answerGuestMessage({
-      channel: OPENCHAMBER_SDK_CHANNEL,
+      channel: MAGIO_SDK_CHANNEL,
       v: 1,
       type: 'session-link',
-      id: 'oc-18',
+      id: 'mg-18',
       payload: {
         providerId: 'gitlab',
         id: '!12',
@@ -383,10 +383,10 @@ describe('answerGuestMessage', () => {
   test('closes the host chrome', async () => {
     let closed = 0;
     const reply = await answerGuestMessage({
-      channel: OPENCHAMBER_SDK_CHANNEL,
+      channel: MAGIO_SDK_CHANNEL,
       v: 1,
       type: 'close',
-      id: 'oc-9',
+      id: 'mg-9',
     }, effects({
       close: () => {
         closed += 1;
@@ -399,10 +399,10 @@ describe('answerGuestMessage', () => {
   test('starts oauth and answers ok', async () => {
     let started = 0;
     const reply = await answerGuestMessage({
-      channel: OPENCHAMBER_SDK_CHANNEL,
+      channel: MAGIO_SDK_CHANNEL,
       v: 1,
       type: 'oauth-start',
-      id: 'oc-10',
+      id: 'mg-10',
     }, effects({
       oauthStart: async () => {
         started += 1;
@@ -415,19 +415,19 @@ describe('answerGuestMessage', () => {
 
   test('returns a request payload without a token', async () => {
     const reply = await answerGuestMessage({
-      channel: OPENCHAMBER_SDK_CHANNEL,
+      channel: MAGIO_SDK_CHANNEL,
       v: 1,
       type: 'request',
-      id: 'oc-11',
+      id: 'mg-11',
       payload: { method: 'GET', path: '/api/v2/user' },
     }, effects({
       request: async () => ({ ok: true, result: { status: 200, body: '{"user":{"username":"ada"}}' } }),
     }));
     expect(reply).toEqual({
-      channel: OPENCHAMBER_SDK_CHANNEL,
+      channel: MAGIO_SDK_CHANNEL,
       v: 1,
       type: 'result',
-      id: 'oc-11',
+      id: 'mg-11',
       ok: true,
       payload: { status: 200, body: '{"user":{"username":"ada"}}' },
     });
@@ -436,19 +436,19 @@ describe('answerGuestMessage', () => {
 
   test('forwards a disconnected request code', async () => {
     const reply = await answerGuestMessage({
-      channel: OPENCHAMBER_SDK_CHANNEL,
+      channel: MAGIO_SDK_CHANNEL,
       v: 1,
       type: 'request',
-      id: 'oc-11',
+      id: 'mg-11',
       payload: { method: 'GET', path: '/api/v2/user' },
     }, effects({
       request: async () => ({ ok: false, code: 'DISCONNECTED', message: 'Not connected.' }),
     }));
     expect(reply).toEqual({
-      channel: OPENCHAMBER_SDK_CHANNEL,
+      channel: MAGIO_SDK_CHANNEL,
       v: 1,
       type: 'result',
-      id: 'oc-11',
+      id: 'mg-11',
       ok: false,
       error: 'Not connected.',
       code: 'DISCONNECTED',
@@ -457,36 +457,36 @@ describe('answerGuestMessage', () => {
 
   test('proxies serviceRequest and serviceStatus', async () => {
     const service = await answerGuestMessage({
-      channel: OPENCHAMBER_SDK_CHANNEL,
+      channel: MAGIO_SDK_CHANNEL,
       v: 1,
       type: 'service-request',
-      id: 'oc-12',
+      id: 'mg-12',
       payload: { method: 'GET', path: '/containers' },
     }, effects({
       serviceRequest: async () => ({ ok: true, result: { status: 200, body: '[]' } }),
     }));
     expect(service).toEqual({
-      channel: OPENCHAMBER_SDK_CHANNEL,
+      channel: MAGIO_SDK_CHANNEL,
       v: 1,
       type: 'result',
-      id: 'oc-12',
+      id: 'mg-12',
       ok: true,
       payload: { status: 200, body: '[]' },
     });
 
     const status = await answerGuestMessage({
-      channel: OPENCHAMBER_SDK_CHANNEL,
+      channel: MAGIO_SDK_CHANNEL,
       v: 1,
       type: 'service-status',
-      id: 'oc-13',
+      id: 'mg-13',
     }, effects({
       serviceStatus: async () => ({ ok: true, result: { status: 'ready' } }),
     }));
     expect(status).toEqual({
-      channel: OPENCHAMBER_SDK_CHANNEL,
+      channel: MAGIO_SDK_CHANNEL,
       v: 1,
       type: 'result',
-      id: 'oc-13',
+      id: 'mg-13',
       ok: true,
       payload: { status: 'ready' },
     });
@@ -501,15 +501,15 @@ describe('answerGuestMessage', () => {
       if (request.op === 'list') return { ok: true, result: { entries: [{ name: 'a', kind: 'file' }] } };
       return { ok: false, code: 'NO_DIRECTORY', message: 'No project is open.' };
     };
-    const base = { channel: OPENCHAMBER_SDK_CHANNEL, v: 1 } as const;
-    const read = await answerGuestMessage({ ...base, type: 'file-read', id: 'oc-20', payload: { path: 'README.md' } }, effects({ file }));
-    expect(read).toMatchObject({ id: 'oc-20', ok: true, payload: { content: '# hi' } });
-    const write = await answerGuestMessage({ ...base, type: 'file-write', id: 'oc-21', payload: { path: 'a.txt', content: 'x' } }, effects({ file }));
-    expect(write).toMatchObject({ id: 'oc-21', ok: true, payload: { written: true } });
-    const list = await answerGuestMessage({ ...base, type: 'file-list', id: 'oc-22', payload: { path: '.' } }, effects({ file }));
-    expect(list).toMatchObject({ id: 'oc-22', ok: true, payload: { entries: [{ name: 'a', kind: 'file' }] } });
-    const stat = await answerGuestMessage({ ...base, type: 'file-stat', id: 'oc-23', payload: { path: 'b' } }, effects({ file }));
-    expect(stat).toMatchObject({ id: 'oc-23', ok: false, code: 'NO_DIRECTORY', error: 'No project is open.' });
+    const base = { channel: MAGIO_SDK_CHANNEL, v: 1 } as const;
+    const read = await answerGuestMessage({ ...base, type: 'file-read', id: 'mg-20', payload: { path: 'README.md' } }, effects({ file }));
+    expect(read).toMatchObject({ id: 'mg-20', ok: true, payload: { content: '# hi' } });
+    const write = await answerGuestMessage({ ...base, type: 'file-write', id: 'mg-21', payload: { path: 'a.txt', content: 'x' } }, effects({ file }));
+    expect(write).toMatchObject({ id: 'mg-21', ok: true, payload: { written: true } });
+    const list = await answerGuestMessage({ ...base, type: 'file-list', id: 'mg-22', payload: { path: '.' } }, effects({ file }));
+    expect(list).toMatchObject({ id: 'mg-22', ok: true, payload: { entries: [{ name: 'a', kind: 'file' }] } });
+    const stat = await answerGuestMessage({ ...base, type: 'file-stat', id: 'mg-23', payload: { path: 'b' } }, effects({ file }));
+    expect(stat).toMatchObject({ id: 'mg-23', ok: false, code: 'NO_DIRECTORY', error: 'No project is open.' });
     expect(seen).toEqual([
       { op: 'read', path: 'README.md' },
       { op: 'write', path: 'a.txt', content: 'x' },
@@ -525,20 +525,20 @@ describe('answerGuestMessage', () => {
       if (request.prompt === 'fail') return { ok: false, code: 'NO_MODEL', message: 'No Small Model.' };
       return { ok: true, result: { text: 'Done.' } };
     };
-    const base = { channel: OPENCHAMBER_SDK_CHANNEL, v: 1 } as const;
-    const ok = await answerGuestMessage({ ...base, type: 'generate', id: 'oc-40', payload: { prompt: 'Summarize', system: 'Brief', maxOutputTokens: 50 } }, effects({ generate }));
-    expect(ok).toMatchObject({ id: 'oc-40', ok: true, payload: { text: 'Done.' } });
-    const refused = await answerGuestMessage({ ...base, type: 'generate', id: 'oc-41', payload: { prompt: 'fail' } }, effects({ generate }));
-    expect(refused).toMatchObject({ id: 'oc-41', ok: false, code: 'NO_MODEL', error: 'No Small Model.' });
+    const base = { channel: MAGIO_SDK_CHANNEL, v: 1 } as const;
+    const ok = await answerGuestMessage({ ...base, type: 'generate', id: 'mg-40', payload: { prompt: 'Summarize', system: 'Brief', maxOutputTokens: 50 } }, effects({ generate }));
+    expect(ok).toMatchObject({ id: 'mg-40', ok: true, payload: { text: 'Done.' } });
+    const refused = await answerGuestMessage({ ...base, type: 'generate', id: 'mg-41', payload: { prompt: 'fail' } }, effects({ generate }));
+    expect(refused).toMatchObject({ id: 'mg-41', ok: false, code: 'NO_MODEL', error: 'No Small Model.' });
     expect(seen).toEqual([{ prompt: 'Summarize', system: 'Brief', maxOutputTokens: 50 }, { prompt: 'fail' }]);
   });
 
   test('forwards NO_SERVICE from serviceRequest', async () => {
     const reply = await answerGuestMessage({
-      channel: OPENCHAMBER_SDK_CHANNEL,
+      channel: MAGIO_SDK_CHANNEL,
       v: 1,
       type: 'service-request',
-      id: 'oc-14',
+      id: 'mg-14',
       payload: { method: 'GET', path: '/containers' },
     }, effects({
       serviceRequest: async () => ({
@@ -548,10 +548,10 @@ describe('answerGuestMessage', () => {
       }),
     }));
     expect(reply).toEqual({
-      channel: OPENCHAMBER_SDK_CHANNEL,
+      channel: MAGIO_SDK_CHANNEL,
       v: 1,
       type: 'result',
-      id: 'oc-14',
+      id: 'mg-14',
       ok: false,
       error: 'Allow this extension\'s local service in Settings → Extensions.',
       code: 'NO_SERVICE',
@@ -560,27 +560,27 @@ describe('answerGuestMessage', () => {
 
   test('routes shells calls and turns failures into coded results', async () => {
     const calls: string[] = [];
-    const stopMessage: GuestMessage = { channel: OPENCHAMBER_SDK_CHANNEL, v: 1, type: 'shell-stop', id: 'oc-9', payload: { shellId: 'sh_1' } };
+    const stopMessage: GuestMessage = { channel: MAGIO_SDK_CHANNEL, v: 1, type: 'shell-stop', id: 'mg-9', payload: { shellId: 'sh_1' } };
     const refused = await answerGuestMessage(stopMessage, effects({ shellStop: async () => { throw new HostRequestError('NOT_GRANTED', 'Not allowed'); } }));
     expect(refused).toMatchObject({ ok: false, code: 'NOT_GRANTED' });
     const allowed = await answerGuestMessage(stopMessage, effects({ shellStop: async ({ shellId }) => { calls.push(shellId); return { stopped: true }; } }));
     expect(allowed).toMatchObject({ ok: true, payload: { stopped: true } });
     expect(calls).toEqual(['sh_1']);
 
-    const subscribeMessage: GuestMessage = { channel: OPENCHAMBER_SDK_CHANNEL, v: 1, type: 'shells-subscribe', id: 'oc-10', payload: { subscriptionId: 's1', scope: { kind: 'session', sessionId: 'ses_1' } } };
+    const subscribeMessage: GuestMessage = { channel: MAGIO_SDK_CHANNEL, v: 1, type: 'shells-subscribe', id: 'mg-10', payload: { subscriptionId: 's1', scope: { kind: 'session', sessionId: 'ses_1' } } };
     let subscribed = '';
     await answerGuestMessage(subscribeMessage, effects({ shellsSubscribe: ({ subscriptionId }) => { subscribed = subscriptionId; } }));
     expect(subscribed).toBe('s1');
     let routedScope = '';
-    await answerGuestMessage({ channel: OPENCHAMBER_SDK_CHANNEL, v: 1, type: 'shells-subscribe', id: 'oc-10b', payload: { subscriptionId: 's2', scope: { kind: 'project', projectId: 'path_/repo' } } }, effects({ shellsSubscribe: (subscription) => { routedScope = subscription.scope.kind; } }));
+    await answerGuestMessage({ channel: MAGIO_SDK_CHANNEL, v: 1, type: 'shells-subscribe', id: 'mg-10b', payload: { subscriptionId: 's2', scope: { kind: 'project', projectId: 'path_/repo' } } }, effects({ shellsSubscribe: (subscription) => { routedScope = subscription.scope.kind; } }));
     expect(routedScope).toBe('project');
     const refusedSubscribe = await answerGuestMessage(subscribeMessage, effects({ shellsSubscribe: () => { throw new HostRequestError('NOT_FOUND', 'Project is not registered.'); } }));
     expect(refusedSubscribe).toMatchObject({ ok: false, code: 'NOT_FOUND' });
     let unsubscribed = '';
-    await answerGuestMessage({ channel: OPENCHAMBER_SDK_CHANNEL, v: 1, type: 'shells-unsubscribe', id: 'oc-11', payload: { subscriptionId: 's1' } }, effects({ shellsUnsubscribe: (id) => { unsubscribed = id; } }));
+    await answerGuestMessage({ channel: MAGIO_SDK_CHANNEL, v: 1, type: 'shells-unsubscribe', id: 'mg-11', payload: { subscriptionId: 's1' } }, effects({ shellsUnsubscribe: (id) => { unsubscribed = id; } }));
     expect(unsubscribed).toBe('s1');
 
-    const outputMessage: GuestMessage = { channel: OPENCHAMBER_SDK_CHANNEL, v: 1, type: 'shell-output', id: 'oc-12', payload: { shellId: 'sh_1', cursor: 4 } };
+    const outputMessage: GuestMessage = { channel: MAGIO_SDK_CHANNEL, v: 1, type: 'shell-output', id: 'mg-12', payload: { shellId: 'sh_1', cursor: 4 } };
     const output = await answerGuestMessage(outputMessage, effects({ shellOutput: async ({ shellId, cursor }) => ({ output: `${shellId}:${cursor}`, cursor: 6, skipped: false }) }));
     expect(output).toMatchObject({ ok: true, payload: { output: 'sh_1:4', cursor: 6 } });
     const missingOutput = await answerGuestMessage(outputMessage, effects({ shellOutput: async () => { throw new HostRequestError('NOT_FOUND', 'That shell is not running.'); } }));
@@ -634,7 +634,7 @@ describe('guestSessionLifecyclePhase', () => {
 describe('badge and resolve-result', () => {
   test('routes popover lifecycle requests through the owning pane', async () => {
     const seen: string[] = [];
-    const base = { channel: OPENCHAMBER_SDK_CHANNEL, v: 1 } as const;
+    const base = { channel: MAGIO_SDK_CHANNEL, v: 1 } as const;
     const open = await answerGuestMessage({ ...base, type: 'popover-open', id: 'popover-call', payload: {
       id: 'preview-1', anchor: { x: 10, y: 10, width: 20, height: 20 }, width: 160, height: 48, data: null,
     } }, effects({ openPopover: (request) => { seen.push(`open:${request.id}`); } }));
@@ -648,7 +648,7 @@ describe('badge and resolve-result', () => {
 
   test('refuses popovers when the mounted owner has no overlay handler', async () => {
     const reply = await answerGuestMessage({
-      channel: OPENCHAMBER_SDK_CHANNEL, v: 1, type: 'popover-open', id: 'popover-call', payload: {
+      channel: MAGIO_SDK_CHANNEL, v: 1, type: 'popover-open', id: 'popover-call', payload: {
         id: 'preview-1', anchor: { x: 10, y: 10, width: 20, height: 20 }, width: 160, height: 48, data: null,
       },
     }, { ...effects(), openPopover: undefined });
@@ -658,33 +658,33 @@ describe('badge and resolve-result', () => {
   test('badge sets the count and answers ok', async () => {
     const seen: Array<number | null> = [];
     const reply = await answerGuestMessage({
-      channel: OPENCHAMBER_SDK_CHANNEL,
+      channel: MAGIO_SDK_CHANNEL,
       v: 1,
       type: 'badge',
-      id: 'oc-9',
+      id: 'mg-9',
       payload: { count: 4 },
     }, effects({ setBadge: (count) => { seen.push(count); } }));
     expect(seen).toEqual([4]);
-    expect(reply).toMatchObject({ type: 'result', id: 'oc-9', ok: true });
+    expect(reply).toMatchObject({ type: 'result', id: 'mg-9', ok: true });
   });
 
   test('resize hands the height to the pane and answers ok', async () => {
     const seen: number[] = [];
     const reply = await answerGuestMessage({
-      channel: OPENCHAMBER_SDK_CHANNEL,
+      channel: MAGIO_SDK_CHANNEL,
       v: 1,
       type: 'resize',
-      id: 'oc-10',
+      id: 'mg-10',
       payload: { height: 180 },
     }, effects({ resize: (height) => { seen.push(height); } }));
     expect(seen).toEqual([180]);
-    expect(reply).toMatchObject({ type: 'result', id: 'oc-10', ok: true });
+    expect(reply).toMatchObject({ type: 'result', id: 'mg-10', ok: true });
   });
 
   test('resolve-result hands the payload to the pane and sends nothing back', async () => {
     const seen: Array<[string, ResolveResultPayload]> = [];
     const reply = await answerGuestMessage({
-      channel: OPENCHAMBER_SDK_CHANNEL,
+      channel: MAGIO_SDK_CHANNEL,
       v: 1,
       type: 'resolve-result',
       id: 'resolve-1',

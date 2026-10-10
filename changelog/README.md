@@ -1,6 +1,6 @@
 # Release notes source
 
-One file per release, plus `unreleased.md` for what has not shipped. At release time `oc-dev create-release` turns `unreleased.md` into `<version>.md` with today's date and renders `packages/vscode/CHANGELOG.md` (extension, shown by the Marketplace as is) and `index.json` (website and the app's update dialog) from the released files. Edit the files here; the generated ones are overwritten and hold released versions only, so editing `unreleased.md` never leaves them stale.
+One file per release, plus `unreleased.md` for what has not shipped. At release time `mg-dev create-release` turns `unreleased.md` into `<version>.md` with today's date and renders `packages/vscode/CHANGELOG.md` (extension, shown by the Marketplace as is) and `index.json` (website and the app's update dialog) from the released files. Edit the files here; the generated ones are overwritten and hold released versions only, so editing `unreleased.md` never leaves them stale.
 
 ```markdown
 ---

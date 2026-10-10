@@ -65,7 +65,7 @@ export const SessionGoalRow: React.FC<SessionGoalRowProps> = React.memo(({ sessi
         'border-[var(--interactive-border)]',
         // The strip floats over the transcript like the composer box it sits
         // above, so it needs a surface of its own: a border alone is clear glass.
-        'oc-glass-composer',
+        'mg-glass-composer',
         className,
       )}
       aria-label={t('chat.goal.row.aria')}

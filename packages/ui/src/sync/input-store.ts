@@ -4,7 +4,7 @@
  */
 
 import { create } from "zustand"
-import type { AttachIssueRequest } from '@openchamber/sdk'
+import type { AttachIssueRequest } from '@magio/sdk'
 import type { ContextPartMetadata } from '@/lib/messages/contextParts'
 import type { AttachedFile } from "@/stores/types/sessionTypes"
 import { prepareAttachmentFiles } from "./attachment-files"
@@ -126,6 +126,18 @@ type PendingBtwComposerRequest = {
   text: string
 }
 
+/** A queued composer insertion, consumed as one unit by ChatInput. */
+type PendingInputText = {
+  text: string
+  mode: "replace" | "append" | "append-inline"
+  /**
+   * Paths to confirm as `@mention`s before the text lands in the composer.
+   * Absent when the queued text carries none, so a consumer never inherits a
+   * confirmation from an earlier queue.
+   */
+  mentions?: string[]
+}
+
 export type VSCodeActiveEditorFile = {
   filePath: string
   fileName: string
@@ -150,6 +162,14 @@ export type InputState = {
    * session, which text quoted inside that chat is written to.
    */
   pendingInputTarget: string | null
+  /**
+   * Paths that must reach the composer as confirmed `@mention`s alongside
+   * `pendingInputText`: a reference the sender did not type itself resolves as
+   * a file only when it is confirmed (a path with spaces, or one without an
+   * extension). Consumed atomically with the text it belongs to; null when the
+   * queued text carries none, so a later queue never inherits an earlier one.
+   */
+  pendingInputMentions: string[] | null
   /** Pending context for the main chat's composer. */
   pendingSyntheticParts: SyntheticContextPart[] | null
   /** Pending context for pinned composers, by their session id. */
@@ -170,8 +190,8 @@ export type InputState = {
   restoreAttachedFiles: (files: AttachedFile[], target: ChatDraftIdentity | null) => void
   activeEditorFile: VSCodeActiveEditorFile | null
 
-  setPendingInputText: (text: string | null, mode?: "replace" | "append" | "append-inline", target?: string | null) => void
-  consumePendingInputText: (target?: string | null) => { text: string; mode: "replace" | "append" | "append-inline" } | null
+  setPendingInputText: (text: string | null, mode?: "replace" | "append" | "append-inline", target?: string | null, mentions?: readonly string[]) => void
+  consumePendingInputText: (target?: string | null) => PendingInputText | null
   requestPresetSubmit: (text: string, type: "command" | "skill") => void
   consumePendingPresetSubmit: () => { text: string; type: "command" | "skill" } | null
   setPendingGuestIssue: (issue: AttachIssueRequest | null) => void
@@ -203,6 +223,7 @@ export const useInputStore = create<InputState>()((set, get) => ({
   pendingInputText: null,
   pendingInputMode: "replace",
   pendingInputTarget: null,
+  pendingInputMentions: null,
   pendingSyntheticParts: null,
   pinnedSyntheticParts: new Map(),
   pendingPresetSubmit: null,
@@ -236,14 +257,26 @@ export const useInputStore = create<InputState>()((set, get) => ({
   },
   activeEditorFile: null,
 
-  setPendingInputText: (text, mode = "replace", target = null) =>
-    set({ pendingInputText: text, pendingInputMode: mode, pendingInputTarget: text === null ? null : target }),
+  setPendingInputText: (text, mode = "replace", target = null, mentions = []) =>
+    set({
+      pendingInputText: text,
+      pendingInputMode: mode,
+      pendingInputTarget: text === null ? null : target,
+      pendingInputMentions: text === null || mentions.length === 0 ? null : [...mentions],
+    }),
 
   consumePendingInputText: (target = null) => {
-    const { pendingInputText, pendingInputMode, pendingInputTarget } = get()
+    const { pendingInputText, pendingInputMode, pendingInputTarget, pendingInputMentions } = get()
     if (pendingInputText === null || pendingInputTarget !== target) return null
-    set({ pendingInputText: null, pendingInputMode: "replace", pendingInputTarget: null })
-    return { text: pendingInputText, mode: pendingInputMode }
+    set({
+      pendingInputText: null,
+      pendingInputMode: "replace",
+      pendingInputTarget: null,
+      pendingInputMentions: null,
+    })
+    return pendingInputMentions === null
+      ? { text: pendingInputText, mode: pendingInputMode }
+      : { text: pendingInputText, mode: pendingInputMode, mentions: pendingInputMentions }
   },
 
   requestPresetSubmit: (text, type) => set({ pendingPresetSubmit: { text, type } }),

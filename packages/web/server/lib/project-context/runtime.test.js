@@ -25,7 +25,7 @@ const writeJson = async (filePath, value) => {
 const readJson = async (filePath) => JSON.parse(await fsPromises.readFile(filePath, 'utf8'));
 
 beforeEach(async () => {
-  projectsDirPath = await fsPromises.mkdtemp(path.join(os.tmpdir(), 'oc-project-context-'));
+  projectsDirPath = await fsPromises.mkdtemp(path.join(os.tmpdir(), 'mg-project-context-'));
   idCounter = 0;
   runtime = createProjectContextRuntime({
     fsPromises,

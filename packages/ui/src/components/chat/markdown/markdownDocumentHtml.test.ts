@@ -21,9 +21,9 @@ const { isGeneratedMarkdownClass, isSafeSrcset } = await import('./markdownSecur
 const renderDocument = (markdown: string): string => renderMarkdownSync(markdown, 'inline', 'sanitize');
 
 const README_HEAD = [
-  '# <picture><source media="(prefers-color-scheme: dark)" srcset="docs/logo-dark.svg"><img src="docs/logo-light.svg" width="32" height="32" align="absmiddle" /></picture> OpenChamber',
+  '# <picture><source media="(prefers-color-scheme: dark)" srcset="docs/logo-dark.svg"><img src="docs/logo-light.svg" width="32" height="32" align="absmiddle" /></picture> Magio',
   '',
-  '[![GitHub stars](https://img.shields.io/github/stars/openchamber/openchamber?style=flat)](https://github.com/openchamber/openchamber/stargazers)',
+  '[![GitHub stars](https://img.shields.io/github/stars/gitcoffee-os/magio?style=flat)](https://github.com/gitcoffee-os/magio/stargazers)',
   '',
   '<a href="https://www.blacksmith.sh/"><picture><source media="(prefers-color-scheme: dark)" srcset="docs/blacksmith-dark.svg"><img src="docs/blacksmith-light.svg" height="28" alt="CI powered by Blacksmith" /></picture></a>',
   '',
@@ -34,8 +34,8 @@ describe('document raw HTML', () => {
   test('renders GitHub-style README markup: pictures, badges and aligned blocks', () => {
     const html = renderDocument(README_HEAD);
 
-    expect(html).toContain('<h1><picture><source media="(prefers-color-scheme: dark)" srcset="docs/logo-dark.svg"><img src="docs/logo-light.svg" width="32" height="32" align="absmiddle" style="aspect-ratio:32/32"></picture> OpenChamber</h1>');
-    expect(html).toContain('<img src="https://img.shields.io/github/stars/openchamber/openchamber?style=flat" alt="GitHub stars"></a>');
+    expect(html).toContain('<h1><picture><source media="(prefers-color-scheme: dark)" srcset="docs/logo-dark.svg"><img src="docs/logo-light.svg" width="32" height="32" align="absmiddle" style="aspect-ratio:32/32"></picture> Magio</h1>');
+    expect(html).toContain('<img src="https://img.shields.io/github/stars/gitcoffee-os/magio?style=flat" alt="GitHub stars"></a>');
     expect(html).toContain('<a href="https://www.blacksmith.sh/"><picture><source media="(prefers-color-scheme: dark)" srcset="docs/blacksmith-dark.svg"><img src="docs/blacksmith-light.svg" height="28" alt="CI powered by Blacksmith" style="height:28px"></picture></a>');
     expect(html).toContain('<p align="center"><sub>small</sub> <kbd>Ctrl</kbd></p>');
   });
@@ -77,7 +77,7 @@ describe('document raw HTML', () => {
     const html = renderDocument('Area \\(\\pi r^2\\) and $x$');
 
     expect(html).toContain('class="katex"');
-    expect(html).not.toContain('data-oc-math');
+    expect(html).not.toContain('data-mg-math');
   });
 
   test('keeps assistant output inert: raw HTML stays text, also inside link text', () => {
@@ -92,7 +92,7 @@ describe('document raw HTML', () => {
     const badge = '[![stars](https://img.shields.io/x.svg)](https://github.com/o/r) [**bold**](https://example.test)';
 
     expect(renderMarkdownSync(badge, 'inline')).toContain('<a href="https://github.com/o/r" class="external-link" target="_blank" rel="noopener noreferrer"><img src="https://img.shields.io/x.svg" alt="stars"></a>');
-    expect(renderMarkdownSync(badge, 'label')).toContain('data-openchamber-markdown-image-label="true">x.svg</span></a>');
+    expect(renderMarkdownSync(badge, 'label')).toContain('data-magio-markdown-image-label="true">x.svg</span></a>');
     expect(renderMarkdownSync(badge)).toContain('<strong>bold</strong></a>');
   });
 

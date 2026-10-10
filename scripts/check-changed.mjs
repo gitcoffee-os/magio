@@ -91,7 +91,7 @@ const runOxlint = (files, cwd) => {
 const checkAntiSlopRatchet = (base, files) => {
   const current = countFindings(runOxlint(files, REPO_ROOT), (file) => path.relative(REPO_ROOT, path.resolve(REPO_ROOT, file)));
 
-  const baseDir = mkdtempSync(path.join(tmpdir(), 'oc-check-changed-'));
+  const baseDir = mkdtempSync(path.join(tmpdir(), 'mg-check-changed-'));
   try {
     const baseFiles = [];
     for (const file of files) {

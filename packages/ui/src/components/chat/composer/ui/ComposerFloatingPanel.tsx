@@ -58,7 +58,7 @@ export function ComposerFloatingPanel({ header, children, compact = false, role,
             {/* Shadow on the wrapper, never on the glass: see "Floating composer"
                 in composer/DOCUMENTATION.md. */}
             <GlassPopupMotion className="origin-bottom rounded-xl shadow-[0_4px_16px_-4px_rgb(0_0_0_/_0.12)]">
-            <div className="oc-glass-popover w-full min-w-0 overflow-hidden rounded-xl border border-[var(--interactive-border)]">
+            <div className="mg-glass-popover w-full min-w-0 overflow-hidden rounded-xl border border-[var(--interactive-border)]">
                 <div className={cn('flex items-center gap-2 px-3', compact ? 'min-h-8 py-0' : 'py-1.5')}>
                     {header}
                 </div>

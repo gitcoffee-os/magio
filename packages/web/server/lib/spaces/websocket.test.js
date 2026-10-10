@@ -17,8 +17,8 @@ import { SpaceError } from './errors.js';
 import { createSpaceDispatcher } from './dispatcher.js';
 import { buildHandshake, closeFrame, createSpaceWebSocketForwarder, parseHandshakeAnswer } from './websocket.js';
 
-const dataDir = fs.mkdtempSync(path.join(os.tmpdir(), 'openchamber-space-ws-test-'));
-process.env.OPENCHAMBER_DATA_DIR = dataDir;
+const dataDir = fs.mkdtempSync(path.join(os.tmpdir(), 'magio-space-ws-test-'));
+process.env.MAGIO_DATA_DIR = dataDir;
 
 const ID = 'a1b2c3d4e5f6';
 const OTHER = '0f0f0f0f0f0f';
@@ -113,13 +113,13 @@ describe('the handshake pieces', () => {
     const request = buildHandshake({
       innerPath: '/api/terminal/ws',
       search: '?a=1',
-      requestHeaders: { host: 'app.test', origin: 'http://app.test', cookie: 'oc_ui_session_3000=user', authorization: 'Bearer user', upgrade: 'websocket', connection: 'Upgrade', 'sec-websocket-key': 'abc', 'sec-websocket-version': '13', 'sec-websocket-protocol': 'p1', 'x-forwarded-for': '1.2.3.4' },
-      cookie: 'oc_ui_session_27600=space',
+      requestHeaders: { host: 'app.test', origin: 'http://app.test', cookie: 'mg_ui_session_3000=user', authorization: 'Bearer user', upgrade: 'websocket', connection: 'Upgrade', 'sec-websocket-key': 'abc', 'sec-websocket-version': '13', 'sec-websocket-protocol': 'p1', 'x-forwarded-for': '1.2.3.4' },
+      cookie: 'mg_ui_session_27600=space',
     });
     const [line, ...rest] = request.split('\r\n');
     expect(line).toBe('GET /api/terminal/ws?a=1 HTTP/1.1');
     const headers = Object.fromEntries(rest.filter(Boolean).map((entry) => entry.split(': ')));
-    expect(headers).toMatchObject({ host: '127.0.0.1:27600', origin: 'http://127.0.0.1:27600', cookie: 'oc_ui_session_27600=space', upgrade: 'websocket', connection: 'Upgrade', 'sec-websocket-key': 'abc', 'sec-websocket-version': '13', 'sec-websocket-protocol': 'p1' });
+    expect(headers).toMatchObject({ host: '127.0.0.1:27600', origin: 'http://127.0.0.1:27600', cookie: 'mg_ui_session_27600=space', upgrade: 'websocket', connection: 'Upgrade', 'sec-websocket-key': 'abc', 'sec-websocket-version': '13', 'sec-websocket-protocol': 'p1' });
     expect(headers.authorization).toBeUndefined();
     expect(headers['x-forwarded-for']).toBeUndefined();
     expect(request.endsWith('\r\n\r\n')).toBe(true);
@@ -172,9 +172,9 @@ describe('the WebSocket forwarder', () => {
 
   it('forwards the terminal socket with the user\'s credentials removed, the space session added and the loopback origin', async () => {
     await start();
-    const { socket, first } = await open(host.url(`/api/spaces/${ID}/terminal/ws?a=1&oc_url_token=secret-url`), { headers: { cookie: 'oc_ui_session_3000=user-cookie', authorization: 'Bearer user-bearer', 'x-custom': 'kept' } });
+    const { socket, first } = await open(host.url(`/api/spaces/${ID}/terminal/ws?a=1&mg_url_token=secret-url`), { headers: { cookie: 'mg_ui_session_3000=user-cookie', authorization: 'Bearer user-bearer', 'x-custom': 'kept' } });
     expect(first.hello).toBe('/api/terminal/ws?a=1');
-    expect(first.headers.cookie).toMatch(/^oc_ui_session_27600=[^;]+$/);
+    expect(first.headers.cookie).toMatch(/^mg_ui_session_27600=[^;]+$/);
     expect(first.headers.cookie).not.toContain('user-cookie');
     expect(first.headers.authorization).toBeUndefined();
     expect(first.headers.origin).toBe('http://127.0.0.1:27600');
@@ -243,17 +243,17 @@ describe('the WebSocket forwarder', () => {
   it('applies the host\'s own auth and origin rules before anything reaches the space', async () => {
     const uiAuthController = {
       enabled: true,
-      ensureSessionToken: async (req) => (req.headers.cookie === 'oc_ui_session_3000=user' ? 'user' : null),
-      resolveAuthContext: async (req) => (req.headers.authorization === 'Bearer client' ? { type: 'client', token: 'client:d' } : req.headers.cookie === 'oc_ui_session_3000=user' ? { type: 'session', token: 'user' } : null),
+      ensureSessionToken: async (req) => (req.headers.cookie === 'mg_ui_session_3000=user' ? 'user' : null),
+      resolveAuthContext: async (req) => (req.headers.authorization === 'Bearer client' ? { type: 'client', token: 'client:d' } : req.headers.cookie === 'mg_ui_session_3000=user' ? { type: 'session', token: 'user' } : null),
     };
     await start({ uiAuthController });
     const anonymous = await open(host.url(`/api/spaces/${ID}/terminal/ws`));
     expect(anonymous.status).toBe(401);
-    const badOrigin = await open(host.url(`/api/spaces/${ID}/terminal/ws`), { headers: { cookie: 'oc_ui_session_3000=user', origin: 'http://evil.test' } });
+    const badOrigin = await open(host.url(`/api/spaces/${ID}/terminal/ws`), { headers: { cookie: 'mg_ui_session_3000=user', origin: 'http://evil.test' } });
     expect(badOrigin.status).toBe(403);
     expect(badOrigin.body).toMatchObject({ code: 'invalid_origin' });
     expect(inside.state.upgrades).toHaveLength(0);
-    const user = await open(host.url(`/api/spaces/${ID}/terminal/ws`), { headers: { cookie: 'oc_ui_session_3000=user' } });
+    const user = await open(host.url(`/api/spaces/${ID}/terminal/ws`), { headers: { cookie: 'mg_ui_session_3000=user' } });
     expect(user.first.hello).toBe('/api/terminal/ws');
     user.socket.close();
 
@@ -268,7 +268,7 @@ describe('the WebSocket forwarder', () => {
     expect(client.first.headers.authorization).toBeUndefined();
     client.socket.close();
     const sessionNoOrigin = await new Promise((resolve, reject) => {
-      const socket = new WebSocket(host.url(`/api/spaces/${ID}/dev-tunnel?port=3000`), { headers: { cookie: 'oc_ui_session_3000=user' } });
+      const socket = new WebSocket(host.url(`/api/spaces/${ID}/dev-tunnel?port=3000`), { headers: { cookie: 'mg_ui_session_3000=user' } });
       socket.on('error', reject);
       socket.on('unexpected-response', (_request, response) => resolve({ status: response.statusCode }));
     });

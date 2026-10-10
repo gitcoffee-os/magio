@@ -39,7 +39,7 @@ test('shows only live actions in its exact directory and follows start, stop and
   await act(async () => { store.allocateActionExecution('/repo', tab, 'dev'); });
   expect(document.querySelectorAll('[data-action-directory]')).toHaveLength(1);
   expect(document.querySelector('[data-action-directory]')?.getAttribute('data-action-directory')).toBe('/repo');
-  expect(document.querySelector('use')?.getAttribute('href')).toBe('#oc-pulse');
+  expect(document.querySelector('use')?.getAttribute('href')).toBe('#mg-pulse');
   await act(async () => store.setTabLifecycle('/repo', tab, 'stopping'));
   expect(document.querySelectorAll('[data-action-directory]')).toHaveLength(1);
   await act(async () => store.setTabLifecycle('/repo', tab, 'exited'));

@@ -35,7 +35,7 @@ export const SidebarRefLinks: React.FC<{ items: readonly SidebarRefLink[]; direc
           type="button"
           className={cn(
             'group/ref flex min-w-0 flex-col rounded text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-default',
-            item.color ? 'oc-ref-tint' : 'text-muted-foreground',
+            item.color ? 'mg-ref-tint' : 'text-muted-foreground',
           )}
           style={item.color ? refTintStyle(item.color) : undefined}
           disabled={!item.url}

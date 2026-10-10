@@ -28,7 +28,7 @@ let managerOutputChannel: vscode.OutputChannel | null = null;
 
 function getManagerOutputChannel(): vscode.OutputChannel {
   if (!managerOutputChannel) {
-    managerOutputChannel = vscode.window.createOutputChannel('OpenChamberManager');
+    managerOutputChannel = vscode.window.createOutputChannel('MagioManager');
   }
   return managerOutputChannel;
 }
@@ -105,8 +105,8 @@ function isValidOpenCodePassword(password: string): boolean {
   return typeof password === 'string' && password.trim().length > 0;
 }
 
-function readOpenChamberSettings(): Record<string, unknown> {
-  const settingsPath = path.join(os.homedir(), '.config', 'openchamber', 'settings.json');
+function readMagioSettings(): Record<string, unknown> {
+  const settingsPath = path.join(os.homedir(), '.config', 'magio', 'settings.json');
   try {
     const raw = fs.readFileSync(settingsPath, 'utf8');
     const parsed = JSON.parse(raw) as unknown;
@@ -193,7 +193,7 @@ function normalizeConfiguredOpencodeBinary(raw: unknown): string | null {
 }
 
 function createConfiguredOpencodeBinaryError(raw: string, normalized: string): Error {
-  const messageSuffix = 'OpenChamber needs the standalone opencode CLI. Install it and set openchamber.opencodeBinary to the CLI path, for example ~/.opencode/bin/opencode, or leave the setting empty to use PATH lookup.';
+  const messageSuffix = 'Magio needs the standalone opencode CLI. Install it and set magio.opencodeBinary to the CLI path, for example ~/.opencode/bin/opencode, or leave the setting empty to use PATH lookup.';
   if (isKnownOpenCodeDesktopAppPath(raw) || isKnownOpenCodeDesktopAppPath(normalized)) {
     const platformName = process.platform === 'win32' ? 'Windows desktop app install' : 'macOS desktop app bundle';
     return new Error(`Configured OpenCode binary points at the ${platformName}, not the CLI: ${normalized}. ${messageSuffix}`);
@@ -222,7 +222,7 @@ function createConfiguredOpencodeBinaryError(raw: string, normalized: string): E
 /**
  * The OpenCode CLI the administrator pinned in the machine policy file, the
  * same `opencodeBinary` the web server honours. It wins over
- * `openchamber.opencodeBinary`, the shared settings and the environment, and
+ * `magio.opencodeBinary`, the shared settings and the environment, and
  * an unusable pin never falls back to them. `null` when nothing is pinned.
  */
 function readPinnedOpencodeBinary(): { raw: string; binary: string | null } | null {
@@ -242,14 +242,14 @@ function validateConfiguredOpencodeBinaryForManagedStart(): string | null {
       return pinned.binary;
     }
     throw new Error(
-      `The OpenCode CLI pinned by your administrator (opencodeBinary in the OpenChamber policy file) is missing or not executable: ${pinned.raw}. `
+      `The OpenCode CLI pinned by your administrator (opencodeBinary in the Magio policy file) is missing or not executable: ${pinned.raw}. `
       + 'Ask your administrator to install the standalone opencode CLI at that path or update the policy.'
     );
   }
 
   const candidates: string[] = [];
   try {
-    const config = vscode.workspace.getConfiguration('openchamber');
+    const config = vscode.workspace.getConfiguration('magio');
     const raw = config.get<string>('opencodeBinary') || '';
     if (raw.trim()) {
       candidates.push(raw.trim());
@@ -259,7 +259,7 @@ function validateConfiguredOpencodeBinaryForManagedStart(): string | null {
   }
 
   try {
-    const settings = readOpenChamberSettings();
+    const settings = readMagioSettings();
     const raw = typeof settings.opencodeBinary === 'string' ? settings.opencodeBinary.trim() : '';
     if (raw) {
       candidates.push(raw);
@@ -293,7 +293,7 @@ function resolveOpencodeCliPath(): string | null {
 
   const configured = (() => {
     try {
-      const config = vscode.workspace.getConfiguration('openchamber');
+      const config = vscode.workspace.getConfiguration('magio');
       return normalizeConfiguredOpencodeBinary(config.get<string>('opencodeBinary') || '');
     } catch {
       return null;
@@ -304,9 +304,9 @@ function resolveOpencodeCliPath(): string | null {
     return configured;
   }
 
-  const sharedFromOpenChamber = (() => {
+  const sharedFromMagio = (() => {
     try {
-      const settings = readOpenChamberSettings();
+      const settings = readMagioSettings();
       const candidate = settings.opencodeBinary;
       if (typeof candidate !== 'string') {
         return null;
@@ -317,15 +317,15 @@ function resolveOpencodeCliPath(): string | null {
     }
   })();
 
-  if (sharedFromOpenChamber && isExecutable(sharedFromOpenChamber) && !isKnownOpenCodeDesktopAppPath(sharedFromOpenChamber)) {
-    return sharedFromOpenChamber;
+  if (sharedFromMagio && isExecutable(sharedFromMagio) && !isKnownOpenCodeDesktopAppPath(sharedFromMagio)) {
+    return sharedFromMagio;
   }
 
   const explicit = [
     process.env.OPENCODE_BINARY,
     process.env.OPENCODE_PATH,
-    process.env.OPENCHAMBER_OPENCODE_PATH,
-    process.env.OPENCHAMBER_OPENCODE_BIN,
+    process.env.MAGIO_OPENCODE_PATH,
+    process.env.MAGIO_OPENCODE_BIN,
   ]
     .map((v) => (typeof v === 'string' ? stripWrappingQuotes(v) : ''))
     .filter(Boolean);
@@ -617,7 +617,7 @@ function spawnManagedOpenCodeServer(
     env,
     port, timeoutMs, signal, sourceBinary: binary,
     appBundleHint: isMacOpenCodeAppBundlePath(binary)
-      ? ' The configured binary points at the macOS desktop app bundle; OpenChamber needs the standalone opencode CLI.'
+      ? ' The configured binary points at the macOS desktop app bundle; Magio needs the standalone opencode CLI.'
       : '',
   });
 }
@@ -686,7 +686,7 @@ export function createOpenCodeManager(context: vscode.ExtensionContext): OpenCod
 
   let pendingOperation: Promise<void> | null = null;
 
-  const config = vscode.workspace.getConfiguration('openchamber');
+  const config = vscode.workspace.getConfiguration('magio');
   const configuredApiUrl = config.get<string>('apiUrl') || '';
   const useConfiguredUrl = configuredApiUrl && configuredApiUrl.trim().length > 0;
 
@@ -1018,7 +1018,7 @@ export function createOpenCodeManager(context: vscode.ExtensionContext): OpenCod
         }
         const binary = await installOpenCodeV2();
         if (revision !== lifecycleRevision) throw new Error('OpenCode installation was cancelled.');
-        const config = vscode.workspace.getConfiguration('openchamber');
+        const config = vscode.workspace.getConfiguration('magio');
         const setting = config.inspect<string>('opencodeBinary');
         const target = setting?.workspaceFolderValue !== undefined
           ? vscode.ConfigurationTarget.WorkspaceFolder
@@ -1035,7 +1035,7 @@ export function createOpenCodeManager(context: vscode.ExtensionContext): OpenCod
     },
     upgradeCli: () => enqueueOperation(async () => {
       if (useConfiguredUrl) {
-        throw new Error('This OpenCode runtime cannot be upgraded by OpenChamber.');
+        throw new Error('This OpenCode runtime cannot be upgraded by Magio.');
       }
       // Match capability reporting: the resolver may find the CLI after startup.
       // Upgrading the binary does not require a live managed server process.

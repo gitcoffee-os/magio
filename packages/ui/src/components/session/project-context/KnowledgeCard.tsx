@@ -34,7 +34,7 @@ export const KnowledgeCard: React.FC<{
   return (
     <li
       className={cn(
-        'oc-surface-elevated flex flex-col gap-1 rounded-lg border border-[var(--interactive-border)] bg-surface-elevated px-2 py-1.5',
+        'mg-surface-elevated flex flex-col gap-1 rounded-lg border border-[var(--interactive-border)] bg-surface-elevated px-2 py-1.5',
         !expanded && 'cursor-pointer hover:border-[var(--interactive-border)] hover:bg-interactive-hover/30',
       )}
       onClick={expanded ? undefined : onToggleExpanded}

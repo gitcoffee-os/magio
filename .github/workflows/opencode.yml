@@ -9,8 +9,8 @@ on:
 jobs:
   opencode:
     if: |
-      !startsWith(github.event.comment.body, '/oc-review') &&
-      !contains(github.event.comment.body, ' /oc-review') &&
+      !startsWith(github.event.comment.body, '/mg-review') &&
+      !contains(github.event.comment.body, ' /mg-review') &&
       (contains(github.event.comment.body, ' /oc') ||
       startsWith(github.event.comment.body, '/oc') ||
       contains(github.event.comment.body, ' /opencode') ||

@@ -9,7 +9,9 @@
  */
 
 import { app, protocol } from 'electron';
+import fs from 'node:fs';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { shouldIgnoreLoopbackConnectionLimit } from './startup-url-selection.mjs';
 import {
   APP_USER_MODEL_ID,
@@ -26,25 +28,25 @@ import {
 recordEarlyStartupMark('electron.entry');
 
 // Set the product name early so electron-log derives its log directory as
-// ~/Library/Logs/OpenChamber/ (not ~/Library/Logs/@openchamber/electron/).
-app.setName('OpenChamber');
+// ~/Library/Logs/Magio/ (not ~/Library/Logs/@magio/electron/).
+app.setName('Magio');
 if (process.platform === 'linux') {
-  app.setDesktopName('openchamber.desktop');
+  app.setDesktopName('magio.desktop');
 }
 if (isDev) {
-  app.setPath('userData', path.join(app.getPath('appData'), 'OpenChamber Dev'));
+  app.setPath('userData', path.join(app.getPath('appData'), 'Magio Dev'));
 }
 // Test hook for scripts/profile-startup.mjs: a packaged launch that must not
 // share the single-instance lock or the Chromium profile with the installed
 // app. macOS resolves the home directory from the user record, not $HOME, so
 // an environment-only isolation cannot move these.
-const userDataOverride = String(process.env.OPENCHAMBER_DESKTOP_USER_DATA_DIR || '').trim();
+const userDataOverride = String(process.env.MAGIO_DESKTOP_USER_DATA_DIR || '').trim();
 if (userDataOverride) {
   app.setPath('userData', userDataOverride);
 }
 app.setAppUserModelId(APP_USER_MODEL_ID);
 // Resolve preview names in Chromium, not through the configured proxy.
-app.commandLine.appendSwitch('proxy-bypass-list', '<-loopback>;openchamber-preview.localhost');
+app.commandLine.appendSwitch('proxy-bypass-list', '<-loopback>;magio-preview.localhost');
 // Lift Chromium's per-host cap only for bundled UI. Applying this to Vite HMR
 // lets the renderer request most of the module graph at once, overwhelming the
 // dev server's transform pipeline and leaving the HTML splash visible for up
@@ -53,7 +55,7 @@ app.commandLine.appendSwitch('proxy-bypass-list', '<-loopback>;openchamber-previ
 // browser panel's forwarded previews.
 if (shouldIgnoreLoopbackConnectionLimit({
   development: isDev,
-  packagedUi: process.env.OPENCHAMBER_ELECTRON_USE_BUNDLED_UI === '1',
+  packagedUi: process.env.MAGIO_ELECTRON_USE_BUNDLED_UI === '1',
 })) {
   app.commandLine.appendSwitch('ignore-connections-limit', '127.0.0.1');
 }
@@ -81,6 +83,20 @@ deferAppEventsUntilMainLoads();
 
 app.whenReady().then(async () => {
   recordEarlyStartupMark('electron.app.ready');
+  // Electron's own bundle ships electron.icns, so a development launch — bare
+  // `electron ./entry.mjs` out of node_modules — inherits the stock icon.
+  // Packaged builds take theirs from the bundle and never run this.
+  //
+  // Load from PNG, not the .icns sitting next to it: nativeImage's decoder does
+  // not handle the icns container and throws "Failed to load image from path".
+  if (isDev && process.platform === 'darwin') {
+    try {
+      const devIcon = fileURLToPath(new URL('./resources/icons/dev-icon.png', import.meta.url));
+      if (fs.existsSync(devIcon)) app.dock.setIcon(devIcon);
+    } catch (error) {
+      console.warn('[electron] could not set the dev dock icon:', error);
+    }
+  }
   // The login shell runs in its own process; only its spawn touches this thread.
   if (!shellEnvironmentProbeBlocksMainThread) void startShellEnvironmentProbe().catch(() => {});
   // A login-item or --background launch has no window to show. Otherwise the

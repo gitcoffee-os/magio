@@ -94,10 +94,10 @@ const ScrollToBottomButton: React.FC<ScrollToBottomButtonProps> = ({ visible, wo
                 <div
                     className={cn(
                         // Glass material with a hairline real border — much
-                        // lighter than the oc-glass-floating stack.
+                        // lighter than the mg-glass-floating stack.
                         // min-h, not h: the mobile touch-target floor grows
                         // the buttons inside to 36px, and the pill with them.
-                        'oc-glass-popover inline-flex min-h-8 max-w-full items-center rounded-full [corner-shape:round]',
+                        'mg-glass-popover inline-flex min-h-8 max-w-full items-center rounded-full [corner-shape:round]',
                         'border border-black/[0.06] dark:border-white/[0.08]',
                         visible ? 'pointer-events-auto' : 'pointer-events-none',
                     )}

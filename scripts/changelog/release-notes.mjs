@@ -20,7 +20,7 @@ const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..'
 try {
   const { releases } = loadReleases(path.join(repoRoot, 'changelog'));
   const release = releases.find((entry) => entry.version === version);
-  if (!release) throw new Error(`changelog/${version}.md not found; run "oc-dev create-release" before tagging`);
+  if (!release) throw new Error(`changelog/${version}.md not found; run "mg-dev create-release" before tagging`);
   fs.mkdirSync(path.dirname(outFile), { recursive: true });
   fs.writeFileSync(outFile, renderReleaseNotes(release));
   process.stdout.write(`${release.title}\n`);

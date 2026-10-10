@@ -1,4 +1,4 @@
-export { OPENCHAMBER_SDK_API_VERSION, OPENCHAMBER_SDK_CHANNEL, OPENCHAMBER_SDK_MANIFEST_API_VERSIONS } from './api-version.ts';
+export { MAGIO_SDK_API_VERSION, MAGIO_SDK_CHANNEL, MAGIO_SDK_MANIFEST_API_VERSIONS } from './api-version.ts';
 export { GUEST_SCROLLBAR_CSS, GUEST_SCROLLBAR_SCRIPT } from './scrollbar-style.ts';
 export { guestFramePolicy } from './frame-policy.ts';
 export type { GuestLoadState, GuestProject, GuestWorktree, GuestSessionActivity, GuestSessionRecord, GuestDirectoryCoverage, GuestProjectsSnapshot, GuestWorktreesSnapshot, GuestSessionsSnapshot, GuestWorkspaceSnapshot, GuestWorkspaceQuery, GuestWorkspaceSubscription, GuestWorkspaceUpdate, GuestStorageRequest, GuestStorageResult, GuestStorageOptions, GuestStorageScope, GuestSessionWorktree } from './workspace.ts';
@@ -22,13 +22,13 @@ export {
 } from './shells.ts';
 export { GUEST_STATUS_CONTROLS_MAX, GUEST_STATUS_CONTROL_ID, GUEST_STATUS_CONTROL_LABEL_MAX, GUEST_STATUS_CONTROL_OPTIONS_MAX, GUEST_STATUS_CONTROL_VALUE_MAX } from './status-controls.ts';
 export type { GuestStatusControl, GuestStatusControlEvent, GuestStatusControlOption } from './status-controls.ts';
-export type { OpenChamberManifestApiVersion } from './api-version.ts';
+export type { MagioManifestApiVersion } from './api-version.ts';
 export {
-  compareOpenChamberVersions,
-  hostMeetsOpenChamberEngine,
-  openChamberEngineMinimum,
-  OPENCHAMBER_ENGINE_PATTERN,
-  parseOpenChamberVersion,
+  compareMagioVersions,
+  hostMeetsMagioEngine,
+  magioEngineMinimum,
+  MAGIO_ENGINE_PATTERN,
+  parseMagioVersion,
 } from './host-version.ts';
 export {
   DECLARED_GUEST_CAPABILITIES,
@@ -107,9 +107,9 @@ export type {
   IntegrationSettingField,
   IntegrationToken,
   IntegrationTokenScheme,
-  OpenChamberContributes,
-  OpenChamberEngines,
-  OpenChamberManifest,
+  MagioContributes,
+  MagioEngines,
+  MagioManifest,
   PanelContribution,
   BackgroundContribution,
   PageContribution,

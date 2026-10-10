@@ -150,9 +150,9 @@ export interface MarkdownRendererProps {
   enableFileReferences?: boolean;
 }
 
-const BLOCK_PATH_TOKEN_ATTR = 'data-openchamber-block-path-token';
+const BLOCK_PATH_TOKEN_ATTR = 'data-magio-block-path-token';
 const BLOCK_PATH_TOKEN_SELECTOR = `[${BLOCK_PATH_TOKEN_ATTR}]`;
-const CODE_BLOCK_PATH_SCANNED_ATTR = 'data-openchamber-block-paths-scanned';
+const CODE_BLOCK_PATH_SCANNED_ATTR = 'data-magio-block-paths-scanned';
 // Matches `path[:line[:col]]` or `path:start-end` inside shell/grep-style
 // output. The regex is defined in `./fileReferenceParser`; the inline-code
 // pipeline reads full text content rather than using this regex.
@@ -275,12 +275,12 @@ const extractHrefFileReferenceCandidate = (anchor: HTMLAnchorElement): string | 
 
 // Walks text nodes inside `<pre><code>` subtrees and wraps any substring that
 // looks like a `path[:line[:col]]` reference in a span carrying
-// `data-openchamber-block-path-token`. `annotateFileLinks` then promotes those
+// `data-magio-block-path-token`. `annotateFileLinks` then promotes those
 // spans into clickable file links via the same existing pipeline used for
 // inline code (parseFileReference → fileReferenceExists → openFileReference).
 //
 // Idempotent: each `<code>` node is marked with
-// `data-openchamber-block-paths-scanned` once processed so the walk is not
+// `data-magio-block-paths-scanned` once processed so the walk is not
 // repeated on the same element. When the renderer replaces the `<code>` subtree
 // (e.g. on content change during streaming), the new element lacks the marker and
 // will be rescanned on the next mutation-observer callback.
@@ -416,9 +416,9 @@ const useFileReferenceInteractions = ({
     const fileReferencesEnabled = enabled && !isMobileSurfaceRuntime();
 
     const clearFileLinkAttributes = (candidate: HTMLElement) => {
-      candidate.removeAttribute('data-openchamber-file-link');
-      candidate.removeAttribute('data-openchamber-file-ref');
-      candidate.removeAttribute('data-openchamber-file-path');
+      candidate.removeAttribute('data-magio-file-link');
+      candidate.removeAttribute('data-magio-file-ref');
+      candidate.removeAttribute('data-magio-file-path');
       if (candidate.getAttribute('title') === 'Open file') {
         candidate.removeAttribute('title');
       }
@@ -437,14 +437,14 @@ const useFileReferenceInteractions = ({
     };
 
     const openFileReference = async (sourceElement: HTMLElement, options?: { external: boolean }) => {
-      const raw = sourceElement.getAttribute('data-openchamber-file-ref') || extractPathCandidateFromElement(sourceElement);
+      const raw = sourceElement.getAttribute('data-magio-file-ref') || extractPathCandidateFromElement(sourceElement);
       const parsedReference = getResolvedReference(raw, effectiveDirectory);
       if (!parsedReference) {
         return;
       }
       // Annotation stored where the file really is, which differs from the
       // written path when a bare name was found elsewhere in the workspace.
-      const storedPath = sourceElement.getAttribute('data-openchamber-file-path');
+      const storedPath = sourceElement.getAttribute('data-magio-file-path');
       const resolved = storedPath ? { ...parsedReference, resolvedPath: storedPath } : parsedReference;
 
       // Cmd/Ctrl-click hands the file to the OS, which opens it with the app
@@ -575,9 +575,9 @@ const useFileReferenceInteractions = ({
             return;
           }
 
-          candidate.setAttribute('data-openchamber-file-link', 'true');
-          candidate.setAttribute('data-openchamber-file-ref', latestRawCandidate);
-          candidate.setAttribute('data-openchamber-file-path', targetPath);
+          candidate.setAttribute('data-magio-file-link', 'true');
+          candidate.setAttribute('data-magio-file-ref', latestRawCandidate);
+          candidate.setAttribute('data-magio-file-path', targetPath);
           candidate.setAttribute('title', 'Open file');
           if (candidate.tagName.toLowerCase() !== 'a') {
             candidate.setAttribute('role', 'button');
@@ -593,7 +593,7 @@ const useFileReferenceInteractions = ({
       }
 
       const target = event.target;
-      if (!(target instanceof HTMLElement) || target.getAttribute('data-openchamber-file-link') !== 'true') {
+      if (!(target instanceof HTMLElement) || target.getAttribute('data-magio-file-link') !== 'true') {
         return;
       }
 
@@ -1185,9 +1185,9 @@ const useMorphdomMarkdown = ({
           const delayMs = Math.min(enteredThisPass, 4) * 55;
           enteredThisPass += 1;
           for (const child of Array.from(temp.children)) {
-            child.classList.add('oc-md-block-enter');
+            child.classList.add('mg-md-block-enter');
             if (delayMs > 0 && child instanceof HTMLElement) {
-              child.style.setProperty('--oc-md-enter-delay', `${delayMs}ms`);
+              child.style.setProperty('--mg-md-enter-delay', `${delayMs}ms`);
             }
           }
         }

@@ -81,7 +81,7 @@ const connectIntegrationKey = async (request: IntegrationKeyRequest): Promise<vo
 };
 
 const ADD_PROVIDER_ID = '__add_provider__';
-/** Not an OpenCode provider id: the page for OpenChamber's own classification providers (Jev). */
+/** Not an OpenCode provider id: the page for Magio's own classification providers (Jev). */
 const CLASSIFICATION_PAGE_ID = '__classification__';
 
 interface ProviderSourceInfo {
@@ -150,7 +150,7 @@ export const ProvidersPage: React.FC = () => {
   const [catalog, setCatalog] = React.useState<IntegrationCatalog | null>(() => peekIntegrationCatalog());
   const [integrationsLoadFailed, setIntegrationsLoadFailed] = React.useState(false);
   const integrations = catalog?.integrations ?? null;
-  // Null until read, and where the runtime has no OpenChamber server (VS Code).
+  // Null until read, and where the runtime has no Magio server (VS Code).
   const [disabledProviders, setDisabledProviders] = React.useState<string[] | null>(null);
   React.useEffect(() => {
     let active = true;
@@ -324,7 +324,7 @@ export const ProvidersPage: React.FC = () => {
 
     const loadSources = async () => {
       try {
-        // OpenChamber-only metadata endpoint: the SDK exposes provider data but
+        // Magio-only metadata endpoint: the SDK exposes provider data but
         // not local auth/source-file provenance used by this settings UI.
         const query = settingsDirectory ? `?directory=${encodeURIComponent(settingsDirectory)}` : '';
         const response = await runtimeFetch(`/api/provider/${encodeURIComponent(selectedProviderId)}/source${query}`, {

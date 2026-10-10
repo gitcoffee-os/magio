@@ -16,16 +16,16 @@ export type SearchFieldHandle = Handle<SearchFieldProps>;
 export const mountSearchField = (root: Element, initial: SearchFieldProps): SearchFieldHandle => {
   ensureStyle(UI_CSS);
   let props = initial;
-  const wrap = el('div', 'oc-sdk oc-sdk-search');
-  const input = el('input', 'oc-sdk-input');
+  const wrap = el('div', 'mg-sdk mg-sdk-search');
+  const input = el('input', 'mg-sdk-input');
   input.type = 'text';
   input.spellcheck = false;
   input.autocomplete = 'off';
   input.setAttribute('role', 'searchbox');
-  const clear = button('oc-sdk-search-clear');
+  const clear = button('mg-sdk-search-clear');
   clear.append(icon('close', 14));
   clear.tabIndex = -1;
-  wrap.append(icon('search', 16, 'oc-sdk-search-icon'), input, clear);
+  wrap.append(icon('search', 16, 'mg-sdk-search-icon'), input, clear);
   root.append(wrap);
 
   const paint = (): void => {

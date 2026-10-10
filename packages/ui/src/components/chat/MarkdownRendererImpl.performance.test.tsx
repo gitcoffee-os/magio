@@ -213,7 +213,7 @@ const initializePerformanceDom = async (): Promise<void> => {
     set(value: string) {
       if (activeCounts) {
         activeCounts.innerHTMLWrites += 1;
-        if (value.includes('href="#oc-')) activeCounts.spriteIconInnerHTMLWrites += 1;
+        if (value.includes('href="#mg-')) activeCounts.spriteIconInnerHTMLWrites += 1;
       }
       innerHTMLDescriptor.set?.call(this, value);
     },
@@ -355,7 +355,7 @@ describe('MarkdownRenderer DOM mount performance contract', () => {
       const first = host.querySelector<HTMLDetailsElement>('details');
       expect(first).not.toBeNull();
       expect(first?.open).toBe(false);
-      expect(first?.querySelector('summary [data-md-disclosure-icon] use')?.getAttribute('href')).toBe('#oc-arrow-right-s');
+      expect(first?.querySelector('summary [data-md-disclosure-icon] use')?.getAttribute('href')).toBe('#mg-arrow-right-s');
       if (!first) throw new Error('Expected disclosure');
       first.open = true;
       for (let count = 1; count <= 5; count += 1) {
@@ -650,7 +650,7 @@ describe('MarkdownRenderer DOM mount performance contract', () => {
   test('builds Markdown sprite controls without parsing SVG markup', async () => {
     const mounted = await mountFixture(1);
 
-    const spriteControlCount = mounted.host.querySelectorAll('[data-md-action] use[href^="#oc-"]').length;
+    const spriteControlCount = mounted.host.querySelectorAll('[data-md-action] use[href^="#mg-"]').length;
     const spriteIconInnerHTMLWrites = mounted.operations.spriteIconInnerHTMLWrites;
     await act(async () => mounted.root.unmount());
 

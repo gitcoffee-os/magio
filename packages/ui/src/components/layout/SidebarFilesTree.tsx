@@ -38,6 +38,7 @@ import { useUIStore } from '@/stores/useUIStore';
 import { useGitStatus, useGitStore } from '@/stores/useGitStore';
 import { DirectoryRequests } from '@/components/views/files/directoryRequests';
 import { areDirectoryNodesEqual } from '@/components/views/files/fileTreeStatus';
+import { addTreeEntryToConversation, openTreeEntryInIntegratedTerminal } from '@/components/views/files/fileTreeMenuActions';
 import { useFileTreeUpload } from '@/components/views/files/useFileTreeUpload';
 import { AUTO_RELIST_MAX_ENTRIES, useFileTreeChanges, type FileTreeChangeBatch } from '@/components/views/files/useFileTreeChanges';
 import { useDirectoryShowHidden } from '@/lib/directoryShowHidden';
@@ -271,10 +272,8 @@ const FileRow: React.FC<FileRowProps> = ({
   const isDir = node.type === 'directory';
   const uploadDirectory = isDir ? node.path : getParentPath(node.path);
   const { canRename, canCreateFile, canCreateFolder, canDelete, canReveal } = permissions;
-  const canDownload = !isDir && Boolean(downloadFile);
   const canRevealPath = canReveal && !isBrowserClient;
   const canUploadHere = isDir && canUpload;
-  const hasMenuActions = canRename || canCreateFile || canCreateFolder || canUploadHere || canDelete || canDownload || canRevealPath;
 
   // Menu open state is local to each row so opening a menu in one row
   // never re-renders its siblings. Previously this state lived on the
@@ -283,10 +282,9 @@ const FileRow: React.FC<FileRowProps> = ({
   const [rightClickOpen, setRightClickOpen] = React.useState(false);
 
   const handleContextMenu = React.useCallback((event?: React.MouseEvent) => {
-    if (!hasMenuActions) return;
     event?.preventDefault();
     setRightClickOpen(true);
-  }, [hasMenuActions]);
+  }, []);
 
   const handleInteraction = React.useCallback(() => {
     if (isDir) {
@@ -314,6 +312,21 @@ const FileRow: React.FC<FileRowProps> = ({
     Separator: React.ElementType;
   }) => (
     <>
+      <Item onClick={(e: React.MouseEvent) => {
+        e.stopPropagation();
+        addTreeEntryToConversation(getRelativePath(root, node.path));
+      }}>
+        <Icon name="chat-1" className="mr-2 h-4 w-4" /> {t('sidebarFilesTree.menu.addToConversation')}
+      </Item>
+      {isDir && (
+        <Item onClick={(e: React.MouseEvent) => {
+          e.stopPropagation();
+          openTreeEntryInIntegratedTerminal(root, node.path);
+        }}>
+          <Icon name="terminal-box" className="mr-2 h-4 w-4" /> {t('sidebarFilesTree.menu.openInIntegratedTerminal')}
+        </Item>
+      )}
+      <Separator />
       {canRename && (
         <Item onClick={(e: React.MouseEvent) => { e.stopPropagation(); onOpenDialog('rename', node); }}>
           <Icon name="edit" className="mr-2 h-4 w-4" /> {t('sidebarFilesTree.menu.rename')}
@@ -396,7 +409,7 @@ const FileRow: React.FC<FileRowProps> = ({
     recordFileTreeDragStart(e);
     const path = getRelativePath(root, node.path);
     if (!path || path === '.') return;
-    e.dataTransfer.setData('application/x-openchamber-file-path', path);
+    e.dataTransfer.setData('application/x-magio-file-path', path);
     e.dataTransfer.effectAllowed = 'copy';
   }, [node.path, root]);
 
@@ -482,37 +495,35 @@ const FileRow: React.FC<FileRowProps> = ({
           </span>
         )}
       </button>
-      {hasMenuActions && (
-        <div className="absolute right-1 top-1/2 -translate-y-1/2 opacity-0 focus-within:opacity-100 group-hover:opacity-100">
-          <DropdownMenu
-            open={contextMenuOpen}
-            onOpenChange={setContextMenuOpen}
-          >
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <span className="inline-flex">
-                  <DropdownMenuTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-6 w-6"
-                      onClick={handleMenuButtonClick}
-                      title={t('sidebarFilesTree.actions.fileMenuTitle')}
-                      aria-label={t('sidebarFilesTree.actions.fileMenuTitle')}
-                    >
-                      <Icon name="more-2-fill" className="h-4 w-4" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                </span>
-              </TooltipTrigger>
-              <TooltipContent side="bottom" sideOffset={6}>{t('sidebarFilesTree.actions.fileMenuTitle')}</TooltipContent>
-            </Tooltip>
-            <DropdownMenuContent align="end" side="bottom" onCloseAutoFocus={() => setContextMenuOpen(false)}>
-              {renderMenuItems({ Item: DropdownMenuItem, Separator: DropdownMenuSeparator })}
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
-      )}
+      <div className="absolute right-1 top-1/2 -translate-y-1/2 opacity-0 focus-within:opacity-100 group-hover:opacity-100">
+        <DropdownMenu
+          open={contextMenuOpen}
+          onOpenChange={setContextMenuOpen}
+        >
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <span className="inline-flex">
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-6 w-6"
+                    onClick={handleMenuButtonClick}
+                    title={t('sidebarFilesTree.actions.fileMenuTitle')}
+                    aria-label={t('sidebarFilesTree.actions.fileMenuTitle')}
+                  >
+                    <Icon name="more-2-fill" className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+              </span>
+            </TooltipTrigger>
+            <TooltipContent side="bottom" sideOffset={6}>{t('sidebarFilesTree.actions.fileMenuTitle')}</TooltipContent>
+          </Tooltip>
+          <DropdownMenuContent align="end" side="bottom" onCloseAutoFocus={() => setContextMenuOpen(false)}>
+            {renderMenuItems({ Item: DropdownMenuItem, Separator: DropdownMenuSeparator })}
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
       </ContextMenuTrigger>
       <ContextMenuContent className="min-w-[180px]">
         {renderMenuItems({ Item: ContextMenuItem, Separator: ContextMenuSeparator })}
@@ -1467,7 +1478,7 @@ const SidebarFilesTreeContent: React.FC<{ visible: boolean }> = ({ visible }) =>
                       recordFileTreeDragStart(e);
                       const path = node.relativePath || getRelativePath(root ?? '', node.path);
                       if (!path || path === '.') return;
-                      e.dataTransfer.setData('application/x-openchamber-file-path', path);
+                      e.dataTransfer.setData('application/x-magio-file-path', path);
                       e.dataTransfer.effectAllowed = 'copy';
                     }}
                     onDragEnd={(e) => {

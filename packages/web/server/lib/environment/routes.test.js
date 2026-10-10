@@ -15,7 +15,7 @@ describe('environment routes', () => {
   let app;
 
   beforeEach(() => {
-    root = fs.mkdtempSync(path.join(os.tmpdir(), 'oc-environment-routes-'));
+    root = fs.mkdtempSync(path.join(os.tmpdir(), 'mg-environment-routes-'));
     store = createEnvironmentStore({ filePath: path.join(root, 'environment.json') });
     runtime = {
       projectStatus: vi.fn(() => null),

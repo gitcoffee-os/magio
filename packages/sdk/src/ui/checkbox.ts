@@ -20,15 +20,15 @@ const mountToggle = (
 ): CheckboxHandle => {
   ensureStyle(UI_CSS);
   let props = initial;
-  const node = button('oc-sdk oc-sdk-check');
+  const node = button('mg-sdk mg-sdk-check');
   node.setAttribute('role', role);
-  const control = el('span', role === 'switch' ? 'oc-sdk-check-thumb' : 'oc-sdk-check-box');
+  const control = el('span', role === 'switch' ? 'mg-sdk-check-thumb' : 'mg-sdk-check-box');
   if (role === 'checkbox') {
     control.append(icon('check', 12));
   }
-  const text = el('span', 'oc-sdk-check-text');
-  const label = el('span', 'oc-sdk-check-label');
-  const description = el('span', 'oc-sdk-check-desc');
+  const text = el('span', 'mg-sdk-check-text');
+  const label = el('span', 'mg-sdk-check-label');
+  const description = el('span', 'mg-sdk-check-desc');
   text.append(label, description);
   node.append(control, text);
   root.append(node);

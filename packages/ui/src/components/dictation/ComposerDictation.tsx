@@ -130,7 +130,7 @@ export const ComposerDictation: React.FC<ComposerDictationProps> = ({
     const dictationEnabled = useConfigStore((state) => state.dictationEnabled);
     const shortcutOverrides = useUIStore((state) => state.shortcutOverrides);
     const dictationShortcut = formatShortcutForDisplay(getEffectiveShortcutCombo('toggle_dictation', shortcutOverrides));
-    // The dictation server (WebSocket + STT worker) lives in the OpenChamber
+    // The dictation server (WebSocket + STT worker) lives in the Magio
     // web server; the VS Code bridge has no server process for it.
     const [supported] = React.useState(() => !isVSCodeRuntime() && isDictationCaptureSupported());
 
@@ -215,8 +215,8 @@ export const ComposerDictation: React.FC<ComposerDictationProps> = ({
                 void confirmDictation();
             }
         };
-        window.addEventListener('openchamber:dictation-toggle', onToggle);
-        return () => window.removeEventListener('openchamber:dictation-toggle', onToggle);
+        window.addEventListener('magio:dictation-toggle', onToggle);
+        return () => window.removeEventListener('magio:dictation-toggle', onToggle);
     }, [startDictation, confirmDictation]);
 
     // While recording: Enter confirms (insert), Escape cancels. Capture-phase
@@ -418,7 +418,7 @@ export const ComposerDictation: React.FC<ComposerDictationProps> = ({
                     // devices, which painted a phantom scrollbar on Android.
                     className={cn(
                         // Exactly one glass surface while dictating (see the
-                        // .oc-dictation-overlay rule in design-system.css):
+                        // .mg-dictation-overlay rule in design-system.css):
                         // desktop mounts the overlay inside the glass box and
                         // hides the box's other contents, so the overlay is
                         // transparent; mobile mounts it beside the pill/box,
@@ -427,20 +427,20 @@ export const ComposerDictation: React.FC<ComposerDictationProps> = ({
                         // shadow (see "Floating composer" in
                         // composer/DOCUMENTATION.md); this element keeps the
                         // surface's text context.
-                        'oc-dictation-overlay absolute inset-0 z-50 flex flex-col overflow-x-hidden overflow-y-hidden',
-                        isMobile && 'oc-surface-elevated border border-border/80 shadow-[0_4px_16px_-4px_rgb(0_0_0_/_0.12)]',
+                        'mg-dictation-overlay absolute inset-0 z-50 flex flex-col overflow-x-hidden overflow-y-hidden',
+                        isMobile && 'mg-surface-elevated border border-border/80 shadow-[0_4px_16px_-4px_rgb(0_0_0_/_0.12)]',
                         // Mobile: the overlay surface shows instantly (riding the
                         // pill → voice morph), its content fades in only after the
                         // shape has grown — otherwise the controls paint clipped
                         // inside the still-small pill.
-                        isMobile && 'oc-composer-morph-content-fade',
+                        isMobile && 'mg-composer-morph-content-fade',
                     )}
                     style={{ borderRadius: radius }}
                     role="dialog"
                     aria-label={t('chat.dictation.overlayAria')}
                 >
                     {isMobile ? (
-                        <div aria-hidden="true" data-dictation-glass="true" className="oc-glass-composer pointer-events-none absolute inset-0 -z-10" />
+                        <div aria-hidden="true" data-dictation-glass="true" className="mg-glass-composer pointer-events-none absolute inset-0 -z-10" />
                     ) : null}
                     {topAccessory}
                     <div

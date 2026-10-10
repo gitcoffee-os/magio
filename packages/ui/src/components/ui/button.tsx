@@ -65,7 +65,7 @@ const buttonVariants = cva(
          neutral:
            "bg-secondary text-secondary-foreground border border-border/60 hover:[background-image:linear-gradient(var(--interactive-hover),var(--interactive-hover))] active:[background-image:linear-gradient(var(--interactive-active),var(--interactive-active))]",
         outline:
-           "oc-surface-elevated bg-surface-elevated text-foreground border border-border/60 hover:[background-image:linear-gradient(var(--interactive-hover),var(--interactive-hover))] active:[background-image:linear-gradient(var(--interactive-active),var(--interactive-active))]",
+           "mg-surface-elevated bg-surface-elevated text-foreground border border-border/60 hover:[background-image:linear-gradient(var(--interactive-hover),var(--interactive-hover))] active:[background-image:linear-gradient(var(--interactive-active),var(--interactive-active))]",
          // A chip represents selection, independently of the primary action.
         chip: cn(
           "border border-border/60 bg-transparent text-foreground hover:bg-interactive-hover hover:text-foreground",

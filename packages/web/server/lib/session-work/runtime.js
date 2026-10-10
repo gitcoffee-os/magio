@@ -32,16 +32,16 @@ import {
 } from './questions.js';
 import { clearSuggestionPatch, offerReviewPatch, openByJevPatch, readWork, suggestDonePatch } from './state.js';
 
-const OPENCHAMBER_SETTINGS_FILE = path.join(
-  process.env.OPENCHAMBER_DATA_DIR
-    ? path.resolve(process.env.OPENCHAMBER_DATA_DIR)
-    : path.join(os.homedir(), '.config', 'openchamber'),
+const MAGIO_SETTINGS_FILE = path.join(
+  process.env.MAGIO_DATA_DIR
+    ? path.resolve(process.env.MAGIO_DATA_DIR)
+    : path.join(os.homedir(), '.config', 'magio'),
   'settings.json',
 );
 
 /** In work and auto-open default on, the review offer off; read at every use so a change applies without a restart. */
 const readSessionWorkSettings = () => {
-  const settings = readMergedSettingsSync({ fs, path, settingsFilePath: OPENCHAMBER_SETTINGS_FILE });
+  const settings = readMergedSettingsSync({ fs, path, settingsFilePath: MAGIO_SETTINGS_FILE });
   return {
     enabled: settings.sessionWorkEnabled !== false,
     autoOpen: settings.sessionWorkAutoOpen !== false,
@@ -75,7 +75,7 @@ const busySchema = z.object({
   properties: z.object({ sessionID: z.string().min(1), status: z.object({ type: z.literal('busy') }) }),
 });
 
-const reviewSessionSchema = z.object({ openchamber: z.object({ kind: z.literal('review') }) });
+const reviewSessionSchema = z.object({ magio: z.object({ kind: z.literal('review') }) });
 
 export function createSessionWorkRuntime({
   buildOpenCodeUrl,

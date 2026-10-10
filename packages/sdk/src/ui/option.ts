@@ -18,7 +18,7 @@ export const createOption = (
   spec: OptionSpec,
   on: { hover: () => void; pick: () => void },
 ): HTMLButtonElement => {
-  const node = button('oc-sdk-option');
+  const node = button('mg-sdk-option');
   node.id = optionId(uid, spec.id);
   node.setAttribute('role', role);
   node.tabIndex = -1;
@@ -27,11 +27,11 @@ export const createOption = (
     node.setAttribute('aria-selected', spec.selected ? 'true' : 'false');
   }
   node.dataset.destructive = spec.destructive ? 'true' : 'false';
-  const label = el('span', 'oc-sdk-option-label');
+  const label = el('span', 'mg-sdk-option-label');
   label.textContent = spec.label;
   node.append(label);
   if (spec.hint) {
-    const hint = el('span', 'oc-sdk-option-hint');
+    const hint = el('span', 'mg-sdk-option-hint');
     hint.textContent = spec.hint;
     node.append(hint);
   }
@@ -49,7 +49,7 @@ export const highlightOption = (
 ): void => {
   const target = optionId(uid, id);
   for (const child of Array.from(container.children)) {
-    if (child instanceof HTMLElement && child.classList.contains('oc-sdk-option')) {
+    if (child instanceof HTMLElement && child.classList.contains('mg-sdk-option')) {
       child.dataset.active = child.id === target ? 'true' : 'false';
     }
   }

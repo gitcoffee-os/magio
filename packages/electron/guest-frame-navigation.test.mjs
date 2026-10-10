@@ -20,11 +20,11 @@ test('refuses an extension frame leaving for any other address', () => {
   }
 });
 
-for (const pathname of ['/api/fs/raw', '/openchamber/api/fs/raw']) {
+for (const pathname of ['/api/fs/raw', '/magio/api/fs/raw']) {
   test(`allows the app to load a PDF into an empty direct child through ${pathname}`, () => {
     const mainFrame = {};
     const frame = { url: '', parent: mainFrame };
-    const url = `http://127.0.0.1:3902${pathname}?path=/tmp/document.pdf&oc_url_token=x`;
+    const url = `http://127.0.0.1:3902${pathname}?path=/tmp/document.pdf&mg_url_token=x`;
 
     const blocked = shouldBlockGuestFrameNavigation({
       isMainFrame: false, frameOrigin: 'null', frame, initiator: mainFrame, mainFrame, url, isAppOrigin,
@@ -65,7 +65,7 @@ for (const url of [
   'http://127.0.0.1:3902/api/fs/serve/tmp/document.pdf',
   'http://127.0.0.1:3902/api/spaces/0123456789ab/fs/raw?path=/tmp/document.pdf',
   'http://127.0.0.1:3902/api/other/api/fs/raw?path=/tmp/document.pdf',
-  'openchamber-ui://app/api/fs/raw?path=/tmp/document.pdf',
+  'magio-ui://app/api/fs/raw?path=/tmp/document.pdf',
 ]) {
   test(`refuses an app-initiated empty frame loading ${url}`, () => {
     const mainFrame = {};
@@ -73,7 +73,7 @@ for (const url of [
 
     const blocked = shouldBlockGuestFrameNavigation({
       isMainFrame: false, frameOrigin: 'null', frame, initiator: mainFrame, mainFrame, url,
-      isAppOrigin: (value) => value.startsWith('openchamber-ui:') || isAppOrigin(value),
+      isAppOrigin: (value) => value.startsWith('magio-ui:') || isAppOrigin(value),
     });
 
     assert.equal(blocked, true);
@@ -82,7 +82,7 @@ for (const url of [
 
 test('lets an extension frame load its own pages and local documents', () => {
   for (const url of [
-    'http://127.0.0.1:3902/api/guests/demo/index.html?oc_url_token=x',
+    'http://127.0.0.1:3902/api/guests/demo/index.html?mg_url_token=x',
     'http://127.0.0.1:3902/api/guests/demo/other/page.html',
     'about:srcdoc',
     'about:blank',

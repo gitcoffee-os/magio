@@ -1,16 +1,16 @@
 {
-  "name": "@openchamber/electron",
-  "version": "2.2.0",
+  "name": "@magio/electron",
+  "version": "1.0.0",
   "private": true,
-  "description": "Electron desktop runtime for OpenChamber",
-  "author": "OpenChamber",
+  "description": "Electron desktop runtime for Magio",
+  "author": "Magio",
   "type": "module",
   "main": "./dist-bundle/entry.mjs",
   "opencodeCli": {
     "version": "2.0.25"
   },
   "dependencies": {
-    "@openchamber/web": "workspace:*",
+    "@magio/web": "workspace:*",
     "electron-context-menu": "^4.1.2",
     "electron-log": "^5.4.3",
     "electron-updater": "^6.8.3",
@@ -56,13 +56,13 @@
     "lint": "node -e \"process.exit(0)\""
   },
   "build": {
-    "appId": "dev.openchamber.desktop",
-    "productName": "OpenChamber",
+    "appId": "dev.magio.desktop",
+    "productName": "Magio",
     "asarUnpack": [
-      "node_modules/@openchamber/web/server/built-in-extensions/**/*",
-      "node_modules/@openchamber/web/server/lib/git/credential-helper.js",
-      "node_modules/@openchamber/web/server/lib/git/ssh-wrapper.js",
-      "node_modules/@openchamber/web/server/lib/git/repository-credential-helper.js"
+      "node_modules/@magio/web/server/built-in-extensions/**/*",
+      "node_modules/@magio/web/server/lib/git/credential-helper.js",
+      "node_modules/@magio/web/server/lib/git/ssh-wrapper.js",
+      "node_modules/@magio/web/server/lib/git/repository-credential-helper.js"
     ],
     "files": [
       "dist-bundle/entry.mjs",
@@ -104,8 +104,7 @@
       "icon": "resources/icons/icon.icns",
       "artifactName": "${productName}-${version}-mac-${arch}.${ext}",
       "extendInfo": {
-        "CFBundleIconName": "AppIcon",
-        "NSLocalNetworkUsageDescription": "OpenChamber needs access to devices and services on your local network."
+        "NSLocalNetworkUsageDescription": "Magio needs access to devices and services on your local network."
       },
       "hardenedRuntime": true,
       "gatekeeperAssess": false,
@@ -131,14 +130,14 @@
       ],
       "category": "Development",
       "icon": "resources/icons/app-icon.svg",
-      "executableName": "openchamber",
+      "executableName": "magio",
       "artifactName": "${productName}-${version}-linux-${arch}.${ext}",
       "desktop": {
         "entry": {
-          "Name": "OpenChamber",
-          "Comment": "Desktop runtime for OpenChamber",
-          "Icon": "openchamber",
-          "StartupWMClass": "openchamber"
+          "Name": "Magio",
+          "Comment": "Desktop runtime for Magio",
+          "Icon": "magio",
+          "StartupWMClass": "magio"
         }
       }
     },
@@ -175,8 +174,8 @@
     },
     "publish": {
       "provider": "github",
-      "owner": "openchamber",
-      "repo": "openchamber"
+      "owner": "magio",
+      "repo": "magio"
     }
   }
 }

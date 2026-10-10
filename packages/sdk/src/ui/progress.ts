@@ -18,16 +18,16 @@ export const clampProgress = (value: number): number => (
 export const mountProgress = (root: Element, initial: ProgressProps): ProgressHandle => {
   ensureStyle(UI_CSS);
   let props = initial;
-  const node = el('div', 'oc-sdk oc-sdk-progress');
-  const caption = el('div', 'oc-sdk-progress-label');
+  const node = el('div', 'mg-sdk mg-sdk-progress');
+  const caption = el('div', 'mg-sdk-progress-label');
   const label = el('span');
   const percent = el('span');
   caption.append(label, percent);
-  const track = el('div', 'oc-sdk-progress-track');
+  const track = el('div', 'mg-sdk-progress-track');
   track.setAttribute('role', 'progressbar');
   track.setAttribute('aria-valuemin', '0');
   track.setAttribute('aria-valuemax', '100');
-  const fill = el('div', 'oc-sdk-progress-fill');
+  const fill = el('div', 'mg-sdk-progress-fill');
   track.append(fill);
   node.append(caption, track);
   root.append(node);
