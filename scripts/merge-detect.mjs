@@ -146,10 +146,10 @@ const git = (args) =>
 const tree = (rev) => {
   const entries = new Map();
   for (const line of git(['ls-tree', '-r', rev]).split('\n')) {
-    const match = line.match(/^(\d+) \w+ \h+\t(.+)$/);
+    const match = line.match(/^(\d+) \w+ ([0-9a-f]+)\t(.+)$/);
     if (!match) continue;
     if (match[1] === '120000') continue;
-    entries.set(match[2], match[1]);
+    entries.set(match[3], match[1]);
   }
   return entries;
 };
@@ -176,7 +176,7 @@ const transformTree = (dir, paths) => {
       cwd: dir,
       maxBuffer: 64 * 1024 * 1024,
     });
-  batch(`sed -i '' ${SED_RULES.map(shellQuote).join(' ')}`);
+  batch(`sed -i '' ${SED_RULES.map((rule) => `-e ${shellQuote(rule)}`).join(' ')}`);
   batch(
     `sed -i '' -E ${[
       `-e ${shellQuote(`s/${PREFIX_RULES[0]}/\\1mg-/g`)}`,
