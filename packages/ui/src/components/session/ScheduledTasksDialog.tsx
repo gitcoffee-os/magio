@@ -14,7 +14,7 @@ import { useProjectsInSidebarOrder } from '@/components/session/sidebar/list/use
 import { useSessionUIStore } from '@/sync/session-ui-store';
 import { useDirectoryStore } from '@/stores/useDirectoryStore';
 import { refreshGlobalSessions, useGlobalSessionsStore } from '@/stores/useGlobalSessionsStore';
-import { subscribeOpenchamberEvents } from '@/lib/openchamberEvents';
+import { subscribemagioEvents } from '@/lib/magioEvents';
 import { openSessionFromRoute } from '@/lib/router/openSessionFromRoute';
 import { PROJECT_ICON_MAP, resolveProjectColor, ProjectIconImage } from '@/lib/projectMeta';
 import { useThemeSystem } from '@/contexts/useThemeSystem';
@@ -351,7 +351,7 @@ export function ScheduledTasksView({ layout, onLeave }: {
 
   React.useEffect(() => {
     let timeoutID: ReturnType<typeof setTimeout> | null = null;
-    const unsubscribe = subscribeOpenchamberEvents((event) => {
+    const unsubscribe = subscribemagioEvents((event) => {
       if (event.type !== 'scheduled-task-ran') {
         return;
       }
@@ -777,7 +777,7 @@ export function ScheduledTasksView({ layout, onLeave }: {
           </div>
           <div
             className="shrink-0 border-t border-border/70 px-4 pt-2"
-            style={{ paddingBottom: 'calc(0.5rem + var(--oc-safe-area-bottom, 0px))' }}
+            style={{ paddingBottom: 'calc(0.5rem + var(--mg-safe-area-bottom, 0px))' }}
           >
             {newTaskButton('w-full')}
           </div>

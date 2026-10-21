@@ -2,29 +2,29 @@
   :root {
     color-scheme: light;
     -webkit-font-smoothing: antialiased;
-    --oc-safe-area-top: 0px;
-    --oc-safe-area-right: 0px;
-    --oc-safe-area-bottom: 0px;
-    --oc-safe-area-bottom-visual: 0px;
-    --oc-safe-area-left: 0px;
-    --oc-header-height: 56px;
-    --oc-visual-viewport-offset-top: 0px;
-    --oc-visual-viewport-height: 100dvh;
-    --oc-wco-left-inset: 0px;
-    --oc-wco-right-inset: 0px;
-    --oc-wco-titlebar-height: 0px;
+    --mg-safe-area-top: 0px;
+    --mg-safe-area-right: 0px;
+    --mg-safe-area-bottom: 0px;
+    --mg-safe-area-bottom-visual: 0px;
+    --mg-safe-area-left: 0px;
+    --mg-header-height: 56px;
+    --mg-visual-viewport-offset-top: 0px;
+    --mg-visual-viewport-height: 100dvh;
+    --mg-wco-left-inset: 0px;
+    --mg-wco-right-inset: 0px;
+    --mg-wco-titlebar-height: 0px;
     --ui-regular-font-weight: 400;
     /* Quiet at rest so a long scroll track does not read as a divider; the
        hover state still gives a grab target clear contrast. */
-    --oc-scrollbar-thumb: oklch(0.32 0.03 50 / 0.18);
-    --oc-scrollbar-thumb-hover: oklch(0.32 0.03 50 / 0.36);
+    --mg-scrollbar-thumb: oklch(0.32 0.03 50 / 0.18);
+    --mg-scrollbar-thumb-hover: oklch(0.32 0.03 50 / 0.36);
     --padding-scale: 1;
     /* Shared glass surfaces. Semantic surface tokens provide each tint. */
-    --oc-glass-blur: 22px;
-    --oc-glass-opacity: 52%;
-    --oc-glass-popover-opacity: 50%;
-    --oc-glass-tooltip-opacity: 62%;
-    --oc-glass-saturation: 1.24;
+    --mg-glass-blur: 22px;
+    --mg-glass-opacity: 52%;
+    --mg-glass-popover-opacity: 50%;
+    --mg-glass-tooltip-opacity: 62%;
+    --mg-glass-saturation: 1.24;
 
     /* Semantic typography defaults (must match SEMANTIC_TYPOGRAPHY) */
     --text-markdown: 0.875rem;
@@ -36,7 +36,7 @@
     --text-settings-page-title: 1.0625rem;
 
     /* Text selection colour shared by native ::selection and the comment overlay */
-    --oc-text-selection: var(--interactive-selection);
+    --mg-text-selection: var(--interactive-selection);
 
     /* Default Light Theme */
     --background: oklch(0.97 0.02 85); /* Warm sand background */
@@ -81,11 +81,11 @@
   }
 
   .dark {
-    --oc-glass-blur: 26px;
-    --oc-glass-opacity: 50%;
-    --oc-glass-popover-opacity: 52%;
-    --oc-glass-tooltip-opacity: 64%;
-    --oc-glass-saturation: 1.16;
+    --mg-glass-blur: 26px;
+    --mg-glass-opacity: 50%;
+    --mg-glass-popover-opacity: 52%;
+    --mg-glass-tooltip-opacity: 64%;
+    --mg-glass-saturation: 1.16;
     /* Default Dark Theme - using OKLCH color space */
     --background: oklch(0.16 0.01 30); /* #151313 */
     --foreground: oklch(0.85 0.02 90); /* #cdccc3 */
@@ -290,19 +290,19 @@
 @layer components {
   /* A painted surface owns its text context too. Neutral children using
      text-foreground inherit the surface's foreground, not the canvas color. */
-  .oc-surface-elevated,
+  .mg-surface-elevated,
   .bg-surface-elevated,
   [class~="bg-[var(--surface-elevated)]"],
   .bg-card,
   .bg-popover,
-  .oc-glass-popover,
-  .oc-glass-tooltip,
-  .oc-surface-floating {
+  .mg-glass-popover,
+  .mg-glass-tooltip,
+  .mg-surface-floating {
     --foreground: var(--surface-elevated-foreground);
     color: var(--foreground);
   }
 
-  .oc-surface-canvas,
+  .mg-surface-canvas,
   .bg-background,
   .bg-surface-background,
   [class~="bg-[var(--surface-background)]"],
@@ -310,12 +310,12 @@
   .bg-surface-muted,
   [class~="bg-[var(--surface-muted)]"],
   .bg-sidebar,
-  .oc-glass-panel {
+  .mg-glass-panel {
     --foreground: var(--surface-foreground);
     color: var(--foreground);
   }
 
-  .oc-surface-code,
+  .mg-surface-code,
   [class~="bg-[var(--syntax-background)]"] {
     --foreground: var(--syntax-foreground);
     color: var(--foreground);
@@ -329,26 +329,26 @@
   /* Shared translucent surfaces. Each variant only chooses its semantic tint;
      blur, accessibility fallbacks, and floating-surface elevation stay common.
      Utilities remain able to opt an individual consumer out. */
-  .oc-glass-popover,
-.oc-glass-tooltip,
-.oc-glass-panel {
-  background-color: color-mix(in srgb, var(--oc-glass-color) var(--oc-glass-opacity), transparent);
-  -webkit-backdrop-filter: blur(var(--oc-glass-blur)) saturate(var(--oc-glass-saturation));
-  backdrop-filter: blur(var(--oc-glass-blur)) saturate(var(--oc-glass-saturation));
+  .mg-glass-popover,
+.mg-glass-tooltip,
+.mg-glass-panel {
+  background-color: color-mix(in srgb, var(--mg-glass-color) var(--mg-glass-opacity), transparent);
+  -webkit-backdrop-filter: blur(var(--mg-glass-blur)) saturate(var(--mg-glass-saturation));
+  backdrop-filter: blur(var(--mg-glass-blur)) saturate(var(--mg-glass-saturation));
 }
 
-.oc-glass-popover {
-  --oc-glass-color: var(--surface-elevated);
-  --oc-glass-opacity: var(--oc-glass-popover-opacity);
+.mg-glass-popover {
+  --mg-glass-color: var(--surface-elevated);
+  --mg-glass-opacity: var(--mg-glass-popover-opacity);
 }
 
-.oc-glass-tooltip {
-  --oc-glass-color: var(--surface-elevated);
-  --oc-glass-opacity: var(--oc-glass-tooltip-opacity);
+.mg-glass-tooltip {
+  --mg-glass-color: var(--surface-elevated);
+  --mg-glass-opacity: var(--mg-glass-tooltip-opacity);
 }
 
-.oc-glass-panel {
-  --oc-glass-color: var(--surface-muted);
+.mg-glass-panel {
+  --mg-glass-color: var(--surface-muted);
 }
 
 /* Surfaces that are always on screen over the moving transcript: the
@@ -356,13 +356,13 @@
    under them is redrawn on every streamed frame, and in a headed streaming run
    that was most of the GPU process's work. Surfaces shown only for a while
    (menus, tooltips, the docks above the composer) keep the glass. */
-.oc-surface-floating {
+.mg-surface-floating {
   background-color: var(--surface-elevated);
 }
 
 /* The desktop composer box in dark themes: the text fields' faint sheen,
    fading down from the lit top edge. Light themes keep the plain fill. */
-.dark .oc-composer-sheen {
+.dark .mg-composer-sheen {
   background-image: linear-gradient(
     180deg,
     color-mix(in srgb, var(--foreground) 1%, transparent),
@@ -373,7 +373,7 @@
 /* The composer is a place to type, so its top line is as quiet as a text
    field's. In light themes the dropdown's bright top line made the box read
    as a raised slab; the hairline and shadows stay the dropdown's. */
-.oc-glass-floating.oc-composer-sheen {
+.mg-glass-floating.mg-composer-sheen {
   box-shadow:
     inset 0 1px 0 0 rgb(255 255 255 / 0.55),
     inset 0 0 0 1px rgb(0 0 0 / 0.04),
@@ -384,8 +384,8 @@
 }
 
 /* In dark themes the hairline and shadows stay the dropdown's, since it floats
-   over the chat. The selector outranks .dark .oc-glass-floating. */
-.dark .oc-glass-floating.oc-composer-sheen {
+   over the chat. The selector outranks .dark .mg-glass-floating. */
+.dark .mg-glass-floating.mg-composer-sheen {
   box-shadow:
     inset 0 1px 0 0 rgb(255 255 255 / 0.025),
     inset 0 0 0 1px rgb(255 255 255 / 0.08),
@@ -395,7 +395,7 @@
     0 6px 6px -3px rgb(0 0 0 / 0.16);
 }
 
-.oc-glass-floating {
+.mg-glass-floating {
   box-shadow:
     inset 0 1px 0 0 rgb(255 255 255 / 0.8),
     inset 0 0 0 1px rgb(0 0 0 / 0.04),
@@ -405,7 +405,7 @@
     0 12px 20px -4px rgb(0 0 0 / 0.08);
 }
 
-.dark .oc-glass-floating {
+.dark .mg-glass-floating {
   box-shadow:
     inset 0 1px 0 0 rgb(255 255 255 / 0.06),
     inset 0 0 0 1px rgb(255 255 255 / 0.08),
@@ -422,7 +422,7 @@
    container, which cut an outside ring's top edge, and an editor or diff
    painting its own background would cover an inset on the card itself.
    Needs a positioned element. */
-.oc-panel-edge {
+.mg-panel-edge {
   /* Its own stacking context, so the ring below can sit above every layer
      inside (a diff's sticky file header, editor overlays) without competing
      with anything outside the card. Not a backdrop root, so the work status
@@ -434,7 +434,7 @@
     0 4px 8px -3px rgb(0 0 0 / 0.12);
 }
 
-.oc-panel-edge::after {
+.mg-panel-edge::after {
   content: "";
   position: absolute;
   inset: 0;
@@ -449,7 +449,7 @@
 /* Dark themes add a faint lit top line to the hairline and a denser shadow,
    since a shadow barely shows on a dark page. Still lower than the floating
    card below, which is a dropdown. */
-.dark .oc-panel-edge {
+.dark .mg-panel-edge {
   box-shadow:
     0 1px 1px 0 rgb(0 0 0 / 0.35),
     0 4px 8px -3px rgb(0 0 0 / 0.45);
@@ -467,20 +467,20 @@
 :root {
   /* The chat's page colour, kept under its own name because the panel rules
      below redefine --surface-background and cannot mix from themselves. */
-  --oc-chat-background: var(--surface-background);
+  --mg-chat-background: var(--surface-background);
 }
 
-.oc-panel-edge:not([data-edge-floating]) {
-  --background: color-mix(in srgb, var(--surface-muted) 50%, var(--oc-chat-background));
-  --surface-background: color-mix(in srgb, var(--surface-muted) 50%, var(--oc-chat-background));
+.mg-panel-edge:not([data-edge-floating]) {
+  --background: color-mix(in srgb, var(--surface-muted) 50%, var(--mg-chat-background));
+  --surface-background: color-mix(in srgb, var(--surface-muted) 50%, var(--mg-chat-background));
 }
 
-.dark .oc-panel-edge:not([data-edge-floating]) {
+.dark .mg-panel-edge:not([data-edge-floating]) {
   --background: var(--surface-muted);
   --surface-background: var(--surface-muted);
 }
 
-.dark .oc-panel-edge::after {
+.dark .mg-panel-edge::after {
   box-shadow:
     inset 0 1px 0 0 color-mix(in srgb, var(--foreground) 3%, transparent),
     inset 0 0 0 1px color-mix(in srgb, var(--foreground) 6%, transparent);
@@ -489,20 +489,20 @@
 /* The work status card opened over the chat is a dropdown, and looks like
    one: the full edge, lit top included, with the dropdown's tight shadows
    (its widest one would be clipped where the context panel begins). */
-.oc-panel-edge[data-edge-floating] {
+.mg-panel-edge[data-edge-floating] {
   box-shadow:
     0 0 0 1px rgb(0 0 0 / 0.1),
     0 1px 2px -0.5px rgb(0 0 0 / 0.08),
     0 4px 8px -2px rgb(0 0 0 / 0.08);
 }
 
-.oc-panel-edge[data-edge-floating]::after {
+.mg-panel-edge[data-edge-floating]::after {
   box-shadow:
     inset 0 1px 0 0 rgb(255 255 255 / 0.8),
     inset 0 0 0 1px rgb(0 0 0 / 0.04);
 }
 
-.dark .oc-panel-edge[data-edge-floating] {
+.dark .mg-panel-edge[data-edge-floating] {
   box-shadow:
     0 0 0 1px rgb(0 0 0 / 0.36),
     0 1px 1px -0.5px rgb(0 0 0 / 0.22),
@@ -510,7 +510,7 @@
     0 6px 6px -3px rgb(0 0 0 / 0.16);
 }
 
-.dark .oc-panel-edge[data-edge-floating]::after {
+.dark .mg-panel-edge[data-edge-floating]::after {
   box-shadow:
     inset 0 1px 0 0 rgb(255 255 255 / 0.06),
     inset 0 0 0 1px rgb(255 255 255 / 0.08);
@@ -518,17 +518,17 @@
 
 /* A panel animating out drops its edge along with its fill. Listed for dark
    too, so it outranks the dark floating shadow above. */
-.oc-panel-edge[data-edge-hidden],
-.dark .oc-panel-edge[data-edge-hidden] {
+.mg-panel-edge[data-edge-hidden],
+.dark .mg-panel-edge[data-edge-hidden] {
   box-shadow: none;
 }
 
-.oc-panel-edge[data-edge-hidden]::after {
+.mg-panel-edge[data-edge-hidden]::after {
   opacity: 0;
 }
 
-/* Lit controls: the active tab pill (oc-raised) and every text field
-   (oc-raised oc-field). The hairline colour lives in --oc-raised-edge so
+/* Lit controls: the active tab pill (mg-raised) and every text field
+   (mg-raised mg-field). The hairline colour lives in --mg-raised-edge so
    states change only it. Edges are inset, so a field inside a clipping
    container keeps them. Layered as components, so a call site's shadow-none
    or ring-0 still drops the edge for a chromeless field.
@@ -540,21 +540,21 @@
    take the dropdown's lighting: a lit top edge, a soft sheen fading down and
    a shadow below. */
 @layer components {
-.oc-raised {
-  --oc-raised-edge: color-mix(in srgb, var(--foreground) 10%, transparent);
+.mg-raised {
+  --mg-raised-edge: color-mix(in srgb, var(--foreground) 10%, transparent);
   box-shadow:
-    inset 0 0 0 1px var(--oc-raised-edge),
+    inset 0 0 0 1px var(--mg-raised-edge),
     0 1px 2px 0 rgb(0 0 0 / 0.06);
 }
 
-.oc-field {
+.mg-field {
   box-shadow:
-    inset 0 0 0 1px var(--oc-raised-edge),
+    inset 0 0 0 1px var(--mg-raised-edge),
     inset 0 1px 2px 0 rgb(0 0 0 / 0.04);
 }
 
-.dark .oc-raised {
-  --oc-raised-edge: color-mix(in srgb, var(--foreground) 6%, transparent);
+.dark .mg-raised {
+  --mg-raised-edge: color-mix(in srgb, var(--foreground) 6%, transparent);
   background-image: linear-gradient(
     180deg,
     color-mix(in srgb, var(--foreground) 1%, transparent),
@@ -562,7 +562,7 @@
   );
   box-shadow:
     inset 0 1px 0 0 color-mix(in srgb, var(--foreground) 1.5%, transparent),
-    inset 0 0 0 1px var(--oc-raised-edge),
+    inset 0 0 0 1px var(--mg-raised-edge),
     0 1px 1px 0 rgb(0 0 0 / 0.28),
     0 2px 3px -2px rgb(0 0 0 / 0.2);
 }
@@ -570,7 +570,7 @@
 /* A text field shares the controls' light but sits a tone lower: its fill is
    washed halfway toward the canvas, so a field reads as a place to type and
    the buttons and pickers beside it as things to press. */
-.dark .oc-raised.oc-field {
+.dark .mg-raised.mg-field {
   background-image: linear-gradient(
     color-mix(in srgb, var(--surface-background) 50%, transparent),
     color-mix(in srgb, var(--surface-background) 50%, transparent)
@@ -578,42 +578,42 @@
 }
 
 /* A chromeless field keeps its transparent fill. */
-.dark .oc-raised.bg-transparent {
+.dark .mg-raised.bg-transparent {
   background-image: none;
 }
 
 /* A text field shows focus by brightening its own hairline, with no ring
    around it: the caret already marks where typing goes. An invalid field
    keeps the error colour, focused or not. */
-.oc-field:focus,
-.oc-field:focus-within {
-  --oc-raised-edge: color-mix(in srgb, var(--foreground) 26%, transparent);
+.mg-field:focus,
+.mg-field:focus-within {
+  --mg-raised-edge: color-mix(in srgb, var(--foreground) 26%, transparent);
 }
 
-.oc-field:is([aria-invalid="true"], [data-invalid]),
-.oc-field:is([aria-invalid="true"], [data-invalid]):is(:focus, :focus-within) {
-  --oc-raised-edge: var(--status-error);
+.mg-field:is([aria-invalid="true"], [data-invalid]),
+.mg-field:is([aria-invalid="true"], [data-invalid]):is(:focus, :focus-within) {
+  --mg-raised-edge: var(--status-error);
 }
 
 /* The track a raised pill moves in reads as pressed in. */
-.oc-recessed {
+.mg-recessed {
   box-shadow: inset 0 1px 2px 0 rgb(0 0 0 / 0.05);
 }
 
-.dark .oc-recessed {
+.dark .mg-recessed {
   box-shadow: inset 0 1px 2px 0 rgb(0 0 0 / 0.4);
 }
 
 /* Filled buttons (primary, destructive, info) keep their tinted border as the
    edge and take the controls' light on top of it: a lit top line and a short
    shadow, the dark themes' faint sheen. Pressed, the button sinks flat. */
-.oc-raised-button {
+.mg-raised-button {
   box-shadow:
     inset 0 1px 0 0 rgb(255 255 255 / 0.45),
     0 1px 2px 0 rgb(0 0 0 / 0.08);
 }
 
-.dark .oc-raised-button {
+.dark .mg-raised-button {
   background-image: linear-gradient(
     180deg,
     color-mix(in srgb, var(--foreground) 1%, transparent),
@@ -625,10 +625,10 @@
     0 2px 3px -2px rgb(0 0 0 / 0.2);
 }
 
-.oc-raised-button:active,
-.oc-raised:is(button, [role="button"]):active {
+.mg-raised-button:active,
+.mg-raised:is(button, [role="button"]):active {
   background-image: none;
-  box-shadow: inset 0 0 0 1px var(--oc-raised-edge, transparent);
+  box-shadow: inset 0 0 0 1px var(--mg-raised-edge, transparent);
 }
 
 /* Flat surfaces in the layout (cards, list tiles) separate from the page by
@@ -636,19 +636,19 @@
    below, so it reads the same on the canvas, in a dialog and in light and
    dark themes: a tile is one step, a block inside it (an icon square, a
    neutral pill) is the next, and hover adds a step to what it sits on. */
-.oc-tile {
+.mg-tile {
   background-color: color-mix(in srgb, var(--foreground) 4%, transparent);
 }
 
-.oc-tile-inset {
+.mg-tile-inset {
   background-color: color-mix(in srgb, var(--foreground) 6%, transparent);
 }
 
-.oc-tile-hover:hover {
+.mg-tile-hover:hover {
   background-color: color-mix(in srgb, var(--foreground) 3%, transparent);
 }
 
-.oc-tile.oc-tile-hover:hover {
+.mg-tile.mg-tile-hover:hover {
   background-color: color-mix(in srgb, var(--foreground) 7%, transparent);
 }
 }
@@ -658,7 +658,7 @@
    (a menu closed with Escape hands focus back to its trigger), so rings
    surfaced at random. A focused control takes the hover fill instead, which
    still shows where Tab is. Unlayered, so it outranks the ring utilities on
-   every component; text fields mark focus with their own edge (oc-field). */
+   every component; text fields mark focus with their own edge (mg-field). */
 :focus-visible {
   --tw-ring-color: transparent;
   --tw-ring-offset-width: 0px;
@@ -671,14 +671,14 @@
 
 /* A modal window (dialogs, the command palette, Settings) lifts off the
    dimmed page: a wide soft shadow plus a tighter one under the edge. */
-.oc-modal-shadow {
+.mg-modal-shadow {
   box-shadow:
     0 2px 6px -1px rgb(0 0 0 / 0.08),
     0 12px 28px -6px rgb(0 0 0 / 0.16),
     0 32px 72px -12px rgb(0 0 0 / 0.24);
 }
 
-.dark .oc-modal-shadow {
+.dark .mg-modal-shadow {
   box-shadow:
     0 2px 6px -1px rgb(0 0 0 / 0.3),
     0 12px 28px -6px rgb(0 0 0 / 0.45),
@@ -687,12 +687,12 @@
 
 /* Window corners for modal windows. A squircle needs a larger radius than a
    circular arc to look the same size; it reads as a continuous curve. */
-.oc-window-corners {
+.mg-window-corners {
   border-radius: 0.75rem;
 }
 
 @supports (corner-shape: squircle) {
-  .oc-window-corners {
+  .mg-window-corners {
     corner-shape: squircle;
     border-radius: 1.25rem;
   }
@@ -708,13 +708,13 @@
    Mobile: the overlay is mounted beside the pill/box in [data-dictation-host],
    so those siblings hide and the overlay's inner [data-dictation-glass]
    layer is the surface. */
-.oc-surface-floating[data-dictating] > :not([data-dictation-chain]),
-.oc-surface-floating[data-dictating] [data-dictation-chain] > :not([data-dictation-chain], .oc-dictation-overlay),
-[data-dictation-host]:has(> .oc-dictation-overlay) > :not(.oc-dictation-overlay) {
+.mg-surface-floating[data-dictating] > :not([data-dictation-chain]),
+.mg-surface-floating[data-dictating] [data-dictation-chain] > :not([data-dictation-chain], .mg-dictation-overlay),
+[data-dictation-host]:has(> .mg-dictation-overlay) > :not(.mg-dictation-overlay) {
   opacity: 0;
 }
 
-.oc-glass-backdrop {
+.mg-glass-backdrop {
   -webkit-backdrop-filter: blur(4px);
   backdrop-filter: blur(4px);
 }
@@ -745,30 +745,30 @@ html[data-glass-redraw-guard] body::before {
 /* The recap hint floats in the band above the composer; a panel docked
    there (queue, suggestion, BTW) would push it up over the transcript, so it
    hides while any panel is mounted. See ComposerFloatingPanel. */
-[data-composer-bound][data-floating-panel] .oc-recap-hint {
+[data-composer-bound][data-floating-panel] .mg-recap-hint {
   opacity: 0;
 }
 
 /* The same goes for a composer taller than at rest (a top row, more lines of
    text): the hint rides its top edge and would land on the transcript.
    See the composer slot observer in ChatContainer. */
-[data-composer-bound][data-composer-grown] .oc-recap-hint {
+[data-composer-bound][data-composer-grown] .mg-recap-hint {
   opacity: 0;
 }
 
 @supports not ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
-  .oc-glass-popover,
-  .oc-glass-tooltip,
-  .oc-glass-panel {
-    background-color: var(--oc-glass-color);
+  .mg-glass-popover,
+  .mg-glass-tooltip,
+  .mg-glass-panel {
+    background-color: var(--mg-glass-color);
   }
 }
 
 @media (prefers-reduced-transparency: reduce) {
-  .oc-glass-popover,
-  .oc-glass-tooltip,
-  .oc-glass-panel,
-  .oc-glass-backdrop {
+  .mg-glass-popover,
+  .mg-glass-tooltip,
+  .mg-glass-panel,
+  .mg-glass-backdrop {
     -webkit-backdrop-filter: none;
     backdrop-filter: none;
   }
@@ -778,10 +778,10 @@ html[data-glass-redraw-guard] body::before {
     content: none;
   }
 
-  .oc-glass-popover,
-  .oc-glass-tooltip,
-  .oc-glass-panel {
-    background-color: var(--oc-glass-color);
+  .mg-glass-popover,
+  .mg-glass-tooltip,
+  .mg-glass-panel {
+    background-color: var(--mg-glass-color);
   }
 }
 }

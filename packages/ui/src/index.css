@@ -9,7 +9,7 @@
    `.chat-message-column` width clamp and flashed message text to full width.
    A JS import is required because Lightning CSS inlines a CSS `@import`
    without resolving the relative `url(fonts/...)` references, leaving the
-   KaTeX font files unbundled (openchamber/openchamber#1880). */
+   KaTeX font files unbundled (magio/magio#1880). */
 @source "./**/*.{ts,tsx,css}";
 
 /* KaTeX theme overrides for light/dark mode */
@@ -52,30 +52,30 @@
 
 /* The interface's own start edge and the way toward its end. Text whose
    direction differs from the interface (a dir="auto" title, a path truncated
-   from its start with direction: rtl) aligns with oc-ui-start-align, so it lines up
+   from its start with direction: rtl) aligns with mg-ui-start-align, so it lines up
    with the rows around it in either layout. */
 :root {
-  --oc-ui-start: left;
-  --oc-to-inline-end: to right;
+  --mg-ui-start: left;
+  --mg-to-inline-end: to right;
 }
 
 :root[dir="rtl"] {
-  --oc-ui-start: right;
-  --oc-to-inline-end: to left;
+  --mg-ui-start: right;
+  --mg-to-inline-end: to left;
 }
 
-@utility oc-ui-start-align {
-  text-align: var(--oc-ui-start);
+@utility mg-ui-start-align {
+  text-align: var(--mg-ui-start);
 }
 
 /* Hover-revealed row actions cross-fade over a row's end instead of
    re-laying the row out: the text they cover fades away under them. The
-   masked element sits --oc-actions-inset from its nearest @container's start
-   edge; the actions reach --oc-actions-reserve in from that container's end
+   masked element sits --mg-actions-inset from its nearest @container's start
+   edge; the actions reach --mg-actions-reserve in from that container's end
    edge. */
-@utility oc-actions-mask {
-  --oc-actions-edge: calc(100cqw - var(--oc-actions-inset, 0px) - var(--oc-actions-reserve, 0px));
-  mask-image: linear-gradient(var(--oc-to-inline-end), #000 calc(var(--oc-actions-edge) - 14px), transparent calc(var(--oc-actions-edge) - 2px));
+@utility mg-actions-mask {
+  --mg-actions-edge: calc(100cqw - var(--mg-actions-inset, 0px) - var(--mg-actions-reserve, 0px));
+  mask-image: linear-gradient(var(--mg-to-inline-end), #000 calc(var(--mg-actions-edge) - 14px), transparent calc(var(--mg-actions-edge) - 2px));
 
   /* A title whose own direction differs from the interface (dir="auto") starts
      on the side the actions cover, so fading there would hide its first
@@ -83,21 +83,21 @@
   &:where(:root[dir="rtl"] *):dir(ltr),
   &:where(:root:not([dir="rtl"]) *):dir(rtl) {
     mask-image: none;
-    padding-inline-start: var(--oc-actions-reserve, 0px);
+    padding-inline-start: var(--mg-actions-reserve, 0px);
   }
 }
 
-/* A PR or issue reference coloured by its state (--oc-ref-tint). It is side
+/* A PR or issue reference coloured by its state (--mg-ref-tint). It is side
    context, so it rests a little blended into the muted text, its state still
    plain to read, and takes its full colour on hover or focus, its own or that
-   of an enclosing .oc-ref-tint-scope row. */
-@utility oc-ref-tint {
-  color: color-mix(in oklab, var(--oc-ref-tint) 75%, var(--muted-foreground));
+   of an enclosing .mg-ref-tint-scope row. */
+@utility mg-ref-tint {
+  color: color-mix(in oklab, var(--mg-ref-tint) 75%, var(--muted-foreground));
 
   &:hover,
   &:focus-visible,
-  :where(.oc-ref-tint-scope:hover, .oc-ref-tint-scope:focus-within) & {
-    color: var(--oc-ref-tint);
+  :where(.mg-ref-tint-scope:hover, .mg-ref-tint-scope:focus-within) & {
+    color: var(--mg-ref-tint);
   }
 }
 
@@ -108,9 +108,9 @@ button,
   -webkit-user-select: none !important;
 }
 
-:root.oc-theme-switching *,
-:root.oc-theme-switching *::before,
-:root.oc-theme-switching *::after {
+:root.mg-theme-switching *,
+:root.mg-theme-switching *::before,
+:root.mg-theme-switching *::after {
   transition: none !important;
   animation: none !important;
 }
@@ -165,8 +165,8 @@ button,
   [data-markdown="table-wrapper"],
   [data-markdown="mermaid-block"],
   .katex,
-  [data-openchamber-file-link="true"],
-  [data-openchamber-agent-mention="true"],
+  [data-magio-file-link="true"],
+  [data-magio-agent-mention="true"],
   [data-skill-name]
 ) {
   direction: ltr;
@@ -177,44 +177,44 @@ button,
 /* Native selection uses the theme's selection pair. */
 .message-content-text::selection,
 .message-content-text ::selection,
-.oc-file-preview::selection,
-.oc-file-preview ::selection {
-  background: var(--oc-text-selection);
+.mg-file-preview::selection,
+.mg-file-preview ::selection {
+  background: var(--mg-text-selection);
   color: var(--interactive-selection-foreground);
 }
 
-.oc-cm-selected-line {
+.mg-cm-selected-line {
   background: var(--interactive-selection);
   color: var(--interactive-selection-foreground);
 }
 
 /* These rectangles sit above glyphs, so the fill must remain translucent. */
-.oc-chat-comment-rect {
+.mg-chat-comment-rect {
   background-color: color-mix(in srgb, var(--interactive-selection) 35%, transparent);
 }
 
 /* Chat quotes waiting in the composer stay marked in their message, tinted
    like a text selection. The hovered or just-revealed one is painted in both
    layers, so the translucent fills stack into a stronger mark. */
-::highlight(oc-chat-quote),
-::highlight(oc-chat-quote-focus) {
-  background-color: var(--oc-text-selection);
+::highlight(mg-chat-quote),
+::highlight(mg-chat-quote-focus) {
+  background-color: var(--mg-text-selection);
 }
 
 /* In-conversation search (chat/search): every occurrence tinted, the current
    message's painted solid so the eye lands on it. */
-::highlight(oc-chat-search) {
+::highlight(mg-chat-search) {
   background-color: color-mix(in srgb, var(--primary) 30%, transparent);
 }
 
-::highlight(oc-chat-search-current) {
+::highlight(mg-chat-search-current) {
   background-color: var(--primary);
   color: var(--primary-foreground);
 }
 
 /* The inline comment editor sits in a band tinted like the selected lines it
    comments on. A diff passes its selected row's own fill instead. */
-.oc-inline-comment-band {
+.mg-inline-comment-band {
   background-color: var(--interactive-selection);
 }
 
@@ -526,12 +526,12 @@ div[data-chat-input-footer="true"] {
    overlay appears in the exact frame the mask hides the real header (no blink).
    ScrollShadow sets data-top-scroll when nothing is below the viewport and
    data-top-bottom-scroll when content is both above and below. */
-.oc-sticky-fade-overlay {
+.mg-sticky-fade-overlay {
   opacity: 0;
 }
 
-.oc-sticky-fade-root:has(.oc-sticky-fade-scroller[data-top-scroll="true"]) .oc-sticky-fade-overlay,
-.oc-sticky-fade-root:has(.oc-sticky-fade-scroller[data-top-bottom-scroll="true"]) .oc-sticky-fade-overlay {
+.mg-sticky-fade-root:has(.mg-sticky-fade-scroller[data-top-scroll="true"]) .mg-sticky-fade-overlay,
+.mg-sticky-fade-root:has(.mg-sticky-fade-scroller[data-top-bottom-scroll="true"]) .mg-sticky-fade-overlay {
   opacity: 1;
 }
 
@@ -551,7 +551,7 @@ div[data-chat-input-footer="true"] {
 }
 
 
-@keyframes oc-migrate-up {
+@keyframes mg-migrate-up {
   0% {
     opacity: 1;
     transform: translateY(0);
@@ -562,7 +562,7 @@ div[data-chat-input-footer="true"] {
   }
 }
 
-@keyframes oc-file-mention-marquee {
+@keyframes mg-file-mention-marquee {
   0% {
     transform: translateX(0%);
   }
@@ -579,7 +579,7 @@ div[data-chat-input-footer="true"] {
 }
 
 .file-mention-marquee {
-  animation: oc-file-mention-marquee var(--file-mention-marquee-duration, 4s) linear 0.2s 1 both;
+  animation: mg-file-mention-marquee var(--file-mention-marquee-duration, 4s) linear 0.2s 1 both;
   will-change: transform;
 }
 
@@ -680,8 +680,8 @@ svg.animate-spin {
 /* Native drag regions still intercept pointer input beneath portal dialogs.
    Restore them when the last dialog closes. Open menus do the same, so a
    click on the title bar reaches the page and dismisses the menu. */
-.oc-dialog-open .app-region-drag,
-.oc-menu-open .app-region-drag {
+.mg-dialog-open .app-region-drag,
+.mg-menu-open .app-region-drag {
   -webkit-app-region: no-drag;
 }
 
@@ -702,21 +702,21 @@ svg.animate-spin {
 }
 
 *::-webkit-scrollbar-thumb {
-  background: var(--oc-scrollbar-thumb);
+  background: var(--mg-scrollbar-thumb);
   border-radius: 6px;
   border: 2px solid transparent;
   background-clip: padding-box;
 }
 
 *::-webkit-scrollbar-thumb:hover {
-  background: var(--oc-scrollbar-thumb-hover);
+  background: var(--mg-scrollbar-thumb-hover);
   background-clip: padding-box;
 }
 
 .dark {
   color-scheme: dark;
-  --oc-scrollbar-thumb: oklch(0.6 0.02 80 / 0.18);
-  --oc-scrollbar-thumb-hover: oklch(0.6 0.02 80 / 0.36);
+  --mg-scrollbar-thumb: oklch(0.6 0.02 80 / 0.18);
+  --mg-scrollbar-thumb-hover: oklch(0.6 0.02 80 / 0.36);
 }
 
 [data-scrollbar="chat"]::-webkit-scrollbar-thumb {
@@ -730,12 +730,12 @@ svg.animate-spin {
 
 /* Fully hidden scrollbar for small mobile overlays (session switcher etc.)
    where a visible bar reads as chrome noise. Scrolling stays intact. */
-.oc-hide-scrollbar {
+.mg-hide-scrollbar {
   scrollbar-width: none;
   -ms-overflow-style: none;
 }
 
-.oc-hide-scrollbar::-webkit-scrollbar {
+.mg-hide-scrollbar::-webkit-scrollbar {
   display: none;
   width: 0;
   height: 0;
@@ -773,7 +773,7 @@ html:not(.dark) .chat-scroll {
 }
 
 [data-scrollbar="chat"]::-webkit-scrollbar-thumb {
-  background: var(--oc-scrollbar-thumb) !important;
+  background: var(--mg-scrollbar-thumb) !important;
   border-radius: 6px;
   border: 2px solid transparent;
   background-clip: padding-box;
@@ -781,20 +781,20 @@ html:not(.dark) .chat-scroll {
 
 [data-scrollbar="chat"].chat-scroll::-webkit-scrollbar-thumb,
 .chat-scroll::-webkit-scrollbar-thumb {
-  background: var(--oc-scrollbar-thumb) !important;
+  background: var(--mg-scrollbar-thumb) !important;
   border-radius: 6px;
   border: 2px solid transparent;
   background-clip: padding-box;
 }
 
 [data-scrollbar="chat"]::-webkit-scrollbar-thumb:hover {
-  background: var(--oc-scrollbar-thumb-hover) !important;
+  background: var(--mg-scrollbar-thumb-hover) !important;
   background-clip: padding-box;
 }
 
 [data-scrollbar="chat"].chat-scroll::-webkit-scrollbar-thumb:hover,
 .chat-scroll::-webkit-scrollbar-thumb:hover {
-  background: var(--oc-scrollbar-thumb-hover) !important;
+  background: var(--mg-scrollbar-thumb-hover) !important;
   background-clip: padding-box;
 }
 
@@ -822,7 +822,7 @@ html:not(.dark) .chat-scroll {
 /* Firefox scrollbar support */
 * {
   scrollbar-width: thin;
-  scrollbar-color: var(--oc-scrollbar-thumb) transparent;
+  scrollbar-color: var(--mg-scrollbar-thumb) transparent;
 }
 
 .scrollbar-hidden {
@@ -872,7 +872,7 @@ html:not(.dark) .chat-scroll {
   pointer-events: none;
   position: absolute;
   width: 6px;
-  background: var(--oc-scrollbar-thumb);
+  background: var(--mg-scrollbar-thumb);
   border-radius: 9999px;
   opacity: 0.8;
   transition: background-color 0.15s ease, opacity 0.15s ease;
@@ -885,7 +885,7 @@ html:not(.dark) .chat-scroll {
 
 .overlay-scrollbar__thumb:hover,
 .overlay-scrollbar__thumb:active {
-  background: var(--oc-scrollbar-thumb-hover);
+  background: var(--mg-scrollbar-thumb-hover);
   opacity: 1;
 }
 
@@ -899,17 +899,17 @@ html:not(.dark) .chat-scroll {
 }
 
 /* The collapsed session sidebar sliding out over the chat on hover
-   (Sidebar.tsx). `--oc-peek-offset` is the start side's sign. */
-@keyframes oc-sidebar-peek-in {
+   (Sidebar.tsx). `--mg-peek-offset` is the start side's sign. */
+@keyframes mg-sidebar-peek-in {
   from {
-    transform: translateX(var(--oc-peek-offset));
+    transform: translateX(var(--mg-peek-offset));
     opacity: 0;
   }
 }
 
-@keyframes oc-sidebar-peek-out {
+@keyframes mg-sidebar-peek-out {
   to {
-    transform: translateX(var(--oc-peek-offset));
+    transform: translateX(var(--mg-peek-offset));
     opacity: 0;
   }
 }
@@ -943,7 +943,7 @@ html:not(.dark) .chat-scroll {
 
 /* Row below the last hunk of a patch-only diff (PierreDiffViewer). Pierre
    draws no separator there, so this mirrors its on-demand separators. */
-.pierre-diff-wrapper [data-oc-trailing-expand] {
+.pierre-diff-wrapper [data-mg-trailing-expand] {
   display: flex;
   align-items: center;
   gap: 1ch;
@@ -958,34 +958,34 @@ html:not(.dark) .chat-scroll {
   cursor: pointer;
 }
 
-.pierre-diff-wrapper [data-oc-trailing-expand]::before {
+.pierre-diff-wrapper [data-mg-trailing-expand]::before {
   content: '\2193';
   display: block;
   flex-shrink: 0;
 }
 
-.pierre-diff-wrapper [data-oc-trailing-expand]:hover {
+.pierre-diff-wrapper [data-mg-trailing-expand]:hover {
   color: var(--diffs-fg, var(--surface-foreground));
 }
 
 /* Full file requested: same spinner and dimming as the separators. */
-.pierre-diff-wrapper diffs-container[data-oc-expand-loading] [data-oc-trailing-expand] {
+.pierre-diff-wrapper diffs-container[data-mg-expand-loading] [data-mg-trailing-expand] {
   cursor: default;
   pointer-events: none;
   opacity: 0.6;
 }
 
-.pierre-diff-wrapper diffs-container[data-oc-expand-loading] [data-oc-trailing-expand]::before {
+.pierre-diff-wrapper diffs-container[data-mg-expand-loading] [data-mg-trailing-expand]::before {
   content: '';
   width: 9px;
   height: 9px;
   border-radius: 50%;
   border: 1.5px solid currentColor;
   border-right-color: transparent;
-  animation: oc-trailing-expand-spin 0.8s linear infinite;
+  animation: mg-trailing-expand-spin 0.8s linear infinite;
 }
 
-@keyframes oc-trailing-expand-spin {
+@keyframes mg-trailing-expand-spin {
   to { transform: rotate(360deg); }
 }
 
@@ -1449,12 +1449,12 @@ html:not(.dark) .chat-scroll {
 }
 
 .markdown-content.markdown-reasoning a,
-.markdown-content.markdown-reasoning [data-openchamber-file-link="true"] {
+.markdown-content.markdown-reasoning [data-magio-file-link="true"] {
   color: var(--surface-muted-foreground) !important;
 }
 
 .markdown-content.markdown-reasoning a:hover,
-.markdown-content.markdown-reasoning [data-openchamber-file-link="true"]:hover {
+.markdown-content.markdown-reasoning [data-magio-file-link="true"]:hover {
   color: var(--surface-foreground) !important;
 }
 
@@ -1556,7 +1556,7 @@ html:not(.dark) .chat-scroll {
   color: var(--markdown-link-hover, var(--primary));
 }
 
-.markdown-content [data-openchamber-file-link="true"] {
+.markdown-content [data-magio-file-link="true"] {
   color: var(--markdown-link, var(--primary));
   cursor: pointer;
   text-decoration: underline;
@@ -1565,17 +1565,17 @@ html:not(.dark) .chat-scroll {
   -webkit-user-select: text !important;
 }
 
-.markdown-content [data-openchamber-file-link="true"]:hover {
+.markdown-content [data-magio-file-link="true"]:hover {
   color: var(--markdown-link-hover, var(--primary));
 }
 
 /* Agent/skill mentions use the primary accent, not the markdown link color */
-.markdown-content a[data-openchamber-agent-mention="true"],
+.markdown-content a[data-magio-agent-mention="true"],
 .markdown-content a[data-skill-name] {
   color: var(--primary);
 }
 
-.markdown-content a[data-openchamber-agent-mention="true"]:hover,
+.markdown-content a[data-magio-agent-mention="true"]:hover,
 .markdown-content a[data-skill-name]:hover {
   color: var(--primary);
 }
@@ -1804,7 +1804,7 @@ html:not(.dark) .chat-scroll {
 /* First uncached open of a session shows a hydration skeleton; the real
    timeline replacing it fades in once instead of popping. Cached session
    switches never carry this class and stay instant. */
-@keyframes oc-chat-hydration-reveal {
+@keyframes mg-chat-hydration-reveal {
   from {
     opacity: 0;
   }
@@ -1813,9 +1813,9 @@ html:not(.dark) .chat-scroll {
   }
 }
 
-.oc-chat-hydration-reveal,
+.mg-chat-hydration-reveal,
 [data-timeline-reveal='fading'] {
-  animation: oc-chat-hydration-reveal 100ms ease-out both;
+  animation: mg-chat-hydration-reveal 100ms ease-out both;
 }
 
 /* Timeline root while a freshly opened session is still being put in place
@@ -1826,7 +1826,7 @@ html:not(.dark) .chat-scroll {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .oc-chat-hydration-reveal,
+  .mg-chat-hydration-reveal,
   [data-timeline-reveal='fading'] {
     animation: none;
   }
@@ -1836,9 +1836,9 @@ html:not(.dark) .chat-scroll {
    compositor-only properties, deliberately nothing heavier: during a long
    stream the follow scroll masks the entrance anyway, so the effect only
    really shows on short replies, and those must not pay for a GPU filter.
-   Blocks committed in the same tick cascade via --oc-md-enter-delay set
+   Blocks committed in the same tick cascade via --mg-md-enter-delay set
    inline by the renderer. */
-@keyframes oc-md-block-enter {
+@keyframes mg-md-block-enter {
   from {
     opacity: 0;
     transform: translateY(10px);
@@ -1849,13 +1849,13 @@ html:not(.dark) .chat-scroll {
   }
 }
 
-.oc-md-block-enter {
-  animation: oc-md-block-enter 320ms cubic-bezier(0.22, 1, 0.36, 1) both;
-  animation-delay: var(--oc-md-enter-delay, 0ms);
+.mg-md-block-enter {
+  animation: mg-md-block-enter 320ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: var(--mg-md-enter-delay, 0ms);
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .oc-md-block-enter {
+  .mg-md-block-enter {
     animation: none;
   }
 }
@@ -1867,7 +1867,7 @@ html:not(.dark) .chat-scroll {
    keyframes, so once the sweep ends the title carries no mask at all. The
    mask is three element widths wide (opaque, ramp, clear) and slides from
    showing its clear third to showing its opaque third. */
-@keyframes oc-text-generate {
+@keyframes mg-text-generate {
   from {
     -webkit-mask-image: linear-gradient(to right, #000 33.333%, transparent 66.667%);
     mask-image: linear-gradient(to right, #000 33.333%, transparent 66.667%);
@@ -1882,16 +1882,16 @@ html:not(.dark) .chat-scroll {
   }
 }
 
-.oc-text-generate {
+.mg-text-generate {
   -webkit-mask-repeat: no-repeat;
   mask-repeat: no-repeat;
   -webkit-mask-size: 300% 100%;
   mask-size: 300% 100%;
-  animation: oc-text-generate 280ms ease-out;
+  animation: mg-text-generate 280ms ease-out;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .oc-text-generate {
+  .mg-text-generate {
     animation: none;
   }
 }
@@ -2117,14 +2117,14 @@ textarea[data-terminal-hidden-input="true"]::placeholder {
 /* libghostty-vt terminal surface. The canvas draws the grid and cursor; the
    textarea only receives keyboard, IME and clipboard events and follows the
    cursor so IME candidates appear where the user types. */
-.terminal-viewport-container .oc-terminal-canvas {
+.terminal-viewport-container .mg-terminal-canvas {
   display: block;
   width: 100%;
   height: 100%;
   cursor: text;
 }
 
-.terminal-viewport-container .oc-terminal-input {
+.terminal-viewport-container .mg-terminal-input {
   position: absolute;
   left: 4px;
   top: 4px;
@@ -2139,7 +2139,7 @@ textarea[data-terminal-hidden-input="true"]::placeholder {
   outline: none !important;
 }
 
-.terminal-viewport-container .oc-terminal-scrollbar {
+.terminal-viewport-container .mg-terminal-scrollbar {
   position: absolute;
   top: 4px;
   right: 1px;
@@ -2150,18 +2150,18 @@ textarea[data-terminal-hidden-input="true"]::placeholder {
   touch-action: none;
 }
 
-.terminal-viewport-container .oc-terminal-scrollbar-thumb {
+.terminal-viewport-container .mg-terminal-scrollbar-thumb {
   position: absolute;
   left: 1px;
   right: 1px;
   top: 0;
   border-radius: 3px;
-  background: var(--oc-scrollbar-thumb);
+  background: var(--mg-scrollbar-thumb);
   transition: background-color 120ms ease-out;
 }
 
-.terminal-viewport-container .oc-terminal-scrollbar:hover .oc-terminal-scrollbar-thumb {
-  background: var(--oc-scrollbar-thumb-hover);
+.terminal-viewport-container .mg-terminal-scrollbar:hover .mg-terminal-scrollbar-thumb {
+  background: var(--mg-scrollbar-thumb-hover);
 }
 
 /* Mobile Terminal Optimizations */
@@ -2267,7 +2267,7 @@ html.desktop-runtime
 html.desktop-runtime [class*="cursor-pointer"] {
   cursor: default !important;
 }
-html.desktop-runtime .markdown-content [data-openchamber-file-link="true"] {
+html.desktop-runtime .markdown-content [data-magio-file-link="true"] {
   cursor: default;
 }
 

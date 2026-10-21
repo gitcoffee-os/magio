@@ -4,8 +4,8 @@ import { cssMaskUrl, GUEST_RAIL_ICON_MASK_SIZE } from './guestRailIconMask';
 
 describe('cssMaskUrl', () => {
   test('quotes a tokenized asset url', () => {
-    expect(cssMaskUrl('http://127.0.0.1/api/guests/hello/icon.svg?oc_url_token=abc'))
-      .toBe('url("http://127.0.0.1/api/guests/hello/icon.svg?oc_url_token=abc")');
+    expect(cssMaskUrl('http://127.0.0.1/api/guests/hello/icon.svg?mg_url_token=abc'))
+      .toBe('url("http://127.0.0.1/api/guests/hello/icon.svg?mg_url_token=abc")');
   });
 
   test('escapes quotes in the url', () => {

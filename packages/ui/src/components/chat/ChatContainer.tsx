@@ -36,7 +36,7 @@ const STATUS_OVERLAY_RESERVED_HEIGHT = 40;
 // for this many consecutive frames, or after the cap.
 const TIMELINE_SETTLE_STABLE_FRAMES = 2;
 const TIMELINE_SETTLE_CAP_MS = 300;
-// Mirrors the oc-chat-hydration-reveal duration in index.css.
+// Mirrors the mg-chat-hydration-reveal duration in index.css.
 const TIMELINE_REVEAL_FADE_MS = 100;
 // After a turn starts or ends, how long the transcript settles before an
 // overgrown history is cut back: past the scroll hook's 2 s send glide and
@@ -117,7 +117,7 @@ import { isChatDirectoryPath } from '@/lib/chatDirectories';
 
 const EMPTY_MESSAGES: Array<{ info: Message; parts: Part[] }> = [];
 const IDLE_SESSION_STATUS = { type: 'idle' as const };
-const CHAT_FORCE_SCROLL_BOTTOM_EVENT = 'openchamber:chat-force-scroll-bottom';
+const CHAT_FORCE_SCROLL_BOTTOM_EVENT = 'magio:chat-force-scroll-bottom';
 const DEFAULT_RETRY_MESSAGE = 'Quota limit reached. Retrying automatically.';
 const DRAFT_EXIT_DURATION_MS = 120;
 const COMPOSER_MOVE_DURATION_MS = 180;
@@ -756,7 +756,7 @@ const DraftWelcome: React.FC<{ exiting?: boolean }> = ({ exiting = false }) => {
 
     return (
         <div className={cn(
-            'oc-draft-center flex min-h-0 flex-1 flex-col items-center justify-center px-6 text-center transition-opacity duration-[120ms] ease-out motion-reduce:transition-none',
+            'mg-draft-center flex min-h-0 flex-1 flex-col items-center justify-center px-6 text-center transition-opacity duration-[120ms] ease-out motion-reduce:transition-none',
             exiting && 'pointer-events-none opacity-0',
         )}>
             <h1 className="text-balance text-3xl font-normal tracking-tight text-foreground">
@@ -769,7 +769,7 @@ const DraftWelcome: React.FC<{ exiting?: boolean }> = ({ exiting = false }) => {
             </h1>
             <DraftPresetChips
                 onSubmit={(starter) => useInputStore.getState().requestPresetSubmit(starter.submitText, starter.ref.type)}
-                className="oc-draft-starters mt-8 max-w-md"
+                className="mg-draft-starters mt-8 max-w-md"
             />
         </div>
     );
@@ -1304,7 +1304,7 @@ export const ChatContainer: React.FC<ChatContainerProps> = ({
     // the chat (its composer, or nothing focused after clicking its text)
     // opens this bar. With several chat columns on screen, an unfocused
     // Cmd+F goes to the column the pointer last pressed in. Search is opt-in;
-    // while it is off the shortcut is left alone. VS Code has no OpenChamber
+    // while it is off the shortcut is left alone. VS Code has no Magio
     // server and so no index to search.
     const chatRootRef = React.useRef<HTMLDivElement>(null);
     const lastPressedInsideRef = React.useRef(false);
@@ -1871,7 +1871,7 @@ export const ChatContainer: React.FC<ChatContainerProps> = ({
                        mobile keyboard slide and the pill morph move them as
                        one rider with the box instead of leaving them to jump
                        when the slot resizes (see mobileComposerMorph). */
-                    <div className="oc-composer-riders absolute bottom-full inset-x-0" data-composer-riders="true">
+                    <div className="mg-composer-riders absolute bottom-full inset-x-0" data-composer-riders="true">
                         <ScrollToBottomButton
                             visible={timelineController.showScrollToBottom}
                             working={sessionIsWorking}
@@ -1915,7 +1915,7 @@ export const ChatContainer: React.FC<ChatContainerProps> = ({
                             <div
                                 ref={registerFloatingPanelClearanceReader}
                                 className={cn(
-                                    'oc-recap-hint pointer-events-none absolute bottom-full inset-x-0 mb-2 transition-opacity duration-300 ease-out',
+                                    'mg-recap-hint pointer-events-none absolute bottom-full inset-x-0 mb-2 transition-opacity duration-300 ease-out',
                                     !viewportAtEnd && 'opacity-0',
                                 )}
                                 style={{ transform: 'translateY(calc(-1 * var(--chat-floating-panel-clearance, 0px)))' }}

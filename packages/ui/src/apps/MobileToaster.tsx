@@ -4,7 +4,7 @@ import { Toaster } from '@/components/ui/sonner';
 
 // Below sonner's 600px breakpoint `mobileOffset` replaces `offset`, so both
 // carry the same top: under the notch, inside the visible part of the screen.
-const TOP_OFFSET = 'calc(var(--oc-safe-area-top, 0px) + var(--oc-visual-viewport-offset-top, 0px) + 16px)';
+const TOP_OFFSET = 'calc(var(--mg-safe-area-top, 0px) + var(--mg-visual-viewport-offset-top, 0px) + 16px)';
 
 /**
  * Sonner fixes its toaster to the layout viewport. iOS Safari does not shrink
@@ -26,7 +26,7 @@ function useVisualViewportOffsetTop(wrapperRef: React.RefObject<HTMLDivElement |
       const next = `${Math.max(0, Math.round(viewport.offsetTop))}px`;
       if (next === current) return;
       current = next;
-      wrapper.style.setProperty('--oc-visual-viewport-offset-top', next);
+      wrapper.style.setProperty('--mg-visual-viewport-offset-top', next);
     };
     apply();
     viewport.addEventListener('scroll', apply);

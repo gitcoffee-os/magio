@@ -12,15 +12,15 @@ import { importVSCodeTheme } from '../packages/ui/src/lib/theme/vscode/import';
 import { compactTheme, requireTheme, type ThemeDefinition } from '../packages/ui/src/lib/theme/definition';
 import { mixColor, onColor, readableText } from '../packages/ui/src/lib/theme/color';
 
-// The source checkout must be installed beside OpenChamber. It is read-only.
+// The source checkout must be installed beside Magio. It is read-only.
 const sourceRoot = resolve(import.meta.dirname, '../../opencode/packages/ui/src');
 const sourceDirectory = join(sourceRoot, 'theme/themes');
-const defaultOutput = join(homedir(), '.config/openchamber/themes');
+const defaultOutput = join(homedir(), '.config/magio/themes');
 const primitiveCss = readFileSync(join(sourceRoot, 'styles/tokens/colors.css'), 'utf8');
 const primitiveTokens = Object.fromEntries([...primitiveCss.matchAll(/--(v2-[a-z0-9-]+):\s*(#[\da-f]+)\s*;/gi)].map((match) => [match[1], match[2]]));
 const hex = z.templateLiteral(['#', z.string()]).refine((value) => /^#(?:[\da-f]{3}|[\da-f]{4}|[\da-f]{6}|[\da-f]{8})$/i.test(value));
 const reference = z.templateLiteral(['var(--', z.string(), ')']).refine((value) => /^var\(--[a-z0-9-]+\)$/.test(value));
-// OC-2 ships icon-weak-base as "C7C7C7", without the #.
+// MG-2 ships icon-weak-base as "C7C7C7", without the #.
 const bareHex = z.string().regex(/^[\da-f]{6}$/i).transform((value) => hex.parse(`#${value}`));
 const colors = { neutral: hex, primary: hex, success: hex, warning: hex, error: hex, info: hex };
 const overrides = {
@@ -195,18 +195,18 @@ async function main() {
     help: { type: 'boolean', short: 'h', default: false },
   }, allowPositionals: false });
   if (values.help) {
-    console.log(`Convert OpenCode App themes to OpenChamber custom themes.
+    console.log(`Convert OpenCode App themes to Magio custom themes.
 
 bun run themes:port:opencode [options]
 
   --theme ID       Convert one theme; repeat to select several
   --mode MODE      light, dark, or both (default)
-  --output PATH    Output directory; defaults to ~/.config/openchamber/themes
+  --output PATH    Output directory; defaults to ~/.config/magio/themes
   --dry-run        Validate conversion without writing files
   --list           List available theme IDs
   --help           Show this help
 
-Requires an installed OpenCode checkout at ../opencode beside OpenChamber.
+Requires an installed OpenCode checkout at ../opencode beside Magio.
 Existing identical files are skipped. Different files are never overwritten.`);
     return;
   }

@@ -57,7 +57,7 @@ describe('checkForUpdates', () => {
 
   it('returns available=true when both API and npm confirm a newer version', async () => {
     fetchMock
-      .when('api.openchamber.dev', {
+      .when('api.magio.exmay.com', {
         ok: true,
         json: async () => ({
           latestVersion: '1.10.0',
@@ -93,7 +93,7 @@ describe('checkForUpdates', () => {
     // Only the mirror is mocked. A stray call to registry.npmjs.org would reject,
     // drop npm cross-verification, and flip available to false.
     fetchMock
-      .when('api.openchamber.dev', {
+      .when('api.magio.exmay.com', {
         ok: true,
         json: async () => ({
           latestVersion: '1.10.0',
@@ -101,7 +101,7 @@ describe('checkForUpdates', () => {
           releaseNotes: '## [1.10.0]\n\n- New',
         }),
       })
-      .when('mirror.example.com/npm/@openchamber%2Fweb', {
+      .when('mirror.example.com/npm/@magio%2Fweb', {
         ok: true,
         json: async () => ({
           'dist-tags': { latest: '1.10.0' },
@@ -118,7 +118,7 @@ describe('checkForUpdates', () => {
       expect(result.available).toBe(true);
       expect(result.version).toBe('1.10.0');
       expect(
-        fetchMock.mock.calls.some(([url]) => String(url) === 'https://mirror.example.com/npm/@openchamber%2Fweb'),
+        fetchMock.mock.calls.some(([url]) => String(url) === 'https://mirror.example.com/npm/@magio%2Fweb'),
       ).toBe(true);
     } finally {
       if (previousLower === undefined) delete process.env.npm_config_registry;
@@ -134,11 +134,11 @@ describe('checkForUpdates', () => {
     process.env.npm_config_registry = '';
     process.env.NPM_CONFIG_REGISTRY = 'https://test-user:test-password@mirror.example.com/npm/';
     fetchMock
-      .when('api.openchamber.dev', {
+      .when('api.magio.exmay.com', {
         ok: true,
         json: async () => ({ latestVersion: '1.10.0', updateAvailable: true }),
       })
-      .when('mirror.example.com/npm/@openchamber%2Fweb', {
+      .when('mirror.example.com/npm/@magio%2Fweb', {
         ok: true,
         json: async () => ({ 'dist-tags': { latest: '1.10.0' } }),
       });
@@ -148,7 +148,7 @@ describe('checkForUpdates', () => {
       const npmCall = fetchMock.mock.calls.find(([url]) => String(url).includes('mirror.example.com'));
 
       expect(result.available).toBe(true);
-      expect(npmCall[0]).toBe('https://mirror.example.com/npm/@openchamber%2Fweb');
+      expect(npmCall[0]).toBe('https://mirror.example.com/npm/@magio%2Fweb');
       expect(npmCall[0]).not.toContain('test-password');
       expect(npmCall[1].headers.Authorization).toBe(`Basic ${Buffer.from('test-user:test-password').toString('base64')}`);
     } finally {
@@ -163,7 +163,7 @@ describe('checkForUpdates', () => {
 
   it('returns available=false when API claims update but npm has same version', async () => {
     fetchMock
-      .when('api.openchamber.dev', {
+      .when('api.magio.exmay.com', {
         ok: true,
         json: async () => ({
           latestVersion: '1.10.0',
@@ -185,7 +185,7 @@ describe('checkForUpdates', () => {
 
   it('returns available=false when npm only has a prerelease of the current version', async () => {
     fetchMock
-      .when('api.openchamber.dev', Promise.reject(new Error('Network error')))
+      .when('api.magio.exmay.com', Promise.reject(new Error('Network error')))
       .when('registry.npmjs.org', {
         ok: true,
         json: async () => ({
@@ -200,7 +200,7 @@ describe('checkForUpdates', () => {
 
   it('accepts electron desktop update claims without npm cross-checking', async () => {
     fetchMock
-      .when('api.openchamber.dev', {
+      .when('api.magio.exmay.com', {
         ok: true,
         json: async () => ({
           latestVersion: '1.10.0',
@@ -229,11 +229,11 @@ describe('checkForUpdates', () => {
 
   it('still checks for updates in enterprise mode but reports no usage', async () => {
     fetchMock
-      .when('api.openchamber.dev', {
+      .when('api.magio.exmay.com', {
         ok: true,
         json: async () => ({ latestVersion: '1.10.0', updateAvailable: true, releaseNotes: '' }),
       });
-    process.env.OPENCHAMBER_ENTERPRISE_MODE = '1';
+    process.env.MAGIO_ENTERPRISE_MODE = '1';
     try {
       const result = await checkForUpdates({
         appType: 'desktop-electron',
@@ -247,35 +247,35 @@ describe('checkForUpdates', () => {
       expect(sent.reportUsage).toBe(false);
       expect(sent.installId).toBeUndefined();
     } finally {
-      delete process.env.OPENCHAMBER_ENTERPRISE_MODE;
+      delete process.env.MAGIO_ENTERPRISE_MODE;
     }
   });
 
   it('resolves an Android APK asset when the update API returns an AAB', async () => {
     fetchMock
-      .when('api.openchamber.dev', {
+      .when('api.magio.exmay.com', {
         ok: true,
         json: async () => ({
           latestVersion: '1.10.0',
           updateAvailable: true,
-          downloadUrl: 'https://github.com/openchamber/openchamber/releases/download/v1.10.0/OpenChamber-1.10.0-42-android.aab',
+          downloadUrl: 'https://github.com/gitcoffee-os/magio/releases/download/v1.10.0/Magio-1.10.0-42-android.aab',
         }),
       })
-      .when('api.github.com/repos/openchamber/openchamber/releases/tags/v1.10.0', {
+      .when('api.github.com/repos/gitcoffee-os/magio/releases/tags/v1.10.0', {
         ok: true,
         json: async () => ({
           assets: [
             {
-              name: 'OpenChamber-1.10.0-42-android.aab',
-              browser_download_url: 'https://downloads.example/OpenChamber-1.10.0-42-android.aab',
+              name: 'Magio-1.10.0-42-android.aab',
+              browser_download_url: 'https://downloads.example/Magio-1.10.0-42-android.aab',
             },
             {
               name: 'app-release.apk',
               browser_download_url: 'https://downloads.example/app-release.apk',
             },
             {
-              name: 'OpenChamber-1.10.0-42-android.apk',
-              browser_download_url: 'https://downloads.example/OpenChamber-1.10.0-42-android.apk',
+              name: 'Magio-1.10.0-42-android.apk',
+              browser_download_url: 'https://downloads.example/Magio-1.10.0-42-android.apk',
             },
           ],
         }),
@@ -287,12 +287,12 @@ describe('checkForUpdates', () => {
       currentVersion: '1.9.10',
     });
 
-    expect(result.downloadUrl).toBe('https://downloads.example/OpenChamber-1.10.0-42-android.apk');
+    expect(result.downloadUrl).toBe('https://downloads.example/Magio-1.10.0-42-android.apk');
   });
 
   it('keeps a direct Android APK URL from the update API', async () => {
-    const apkUrl = 'https://github.com/openchamber/openchamber/releases/download/v1.10.0/OpenChamber-1.10.0-42-android.apk';
-    fetchMock.when('api.openchamber.dev', {
+    const apkUrl = 'https://github.com/gitcoffee-os/magio/releases/download/v1.10.0/Magio-1.10.0-42-android.apk';
+    fetchMock.when('api.magio.exmay.com', {
       ok: true,
       json: async () => ({
         latestVersion: '1.10.0',
@@ -313,7 +313,7 @@ describe('checkForUpdates', () => {
 
   it('returns available=false when API claims update but npm is behind', async () => {
     fetchMock
-      .when('api.openchamber.dev', {
+      .when('api.magio.exmay.com', {
         ok: true,
         json: async () => ({
           latestVersion: '1.10.0',
@@ -336,7 +336,7 @@ describe('checkForUpdates', () => {
   // --- Scenario: API says no update, npm agrees ---
 
   it('returns available=false when API says no update and versions match', async () => {
-    fetchMock.when('api.openchamber.dev', {
+    fetchMock.when('api.magio.exmay.com', {
       ok: true,
       json: async () => ({
         latestVersion: '1.9.10',
@@ -353,7 +353,7 @@ describe('checkForUpdates', () => {
 
   it('returns available=true from npm fallback when API is unreachable and npm has newer version', async () => {
     fetchMock
-      .when('api.openchamber.dev', Promise.reject(new Error('Network error')))
+      .when('api.magio.exmay.com', Promise.reject(new Error('Network error')))
       .when('registry.npmjs.org', {
         ok: true,
         json: async () => ({
@@ -373,7 +373,7 @@ describe('checkForUpdates', () => {
 
   it('returns available=false from npm fallback when API is unreachable and versions match', async () => {
     fetchMock
-      .when('api.openchamber.dev', Promise.reject(new Error('Network error')))
+      .when('api.magio.exmay.com', Promise.reject(new Error('Network error')))
       .when('registry.npmjs.org', {
         ok: true,
         json: async () => ({
@@ -390,7 +390,7 @@ describe('checkForUpdates', () => {
 
   it('returns available=false when API returns non-ok status and versions match on npm', async () => {
     fetchMock
-      .when('api.openchamber.dev', {
+      .when('api.magio.exmay.com', {
         ok: false,
         status: 500,
         json: async () => ({}),
@@ -411,7 +411,7 @@ describe('checkForUpdates', () => {
 
   it('returns available=false when both sources are unreachable', async () => {
     fetchMock
-      .when('api.openchamber.dev', Promise.reject(new Error('Network error')))
+      .when('api.magio.exmay.com', Promise.reject(new Error('Network error')))
       .when('registry.npmjs.org', Promise.reject(new Error('Registry unreachable')));
 
     const result = await checkForUpdates({ currentVersion: '1.9.10' });
@@ -429,10 +429,10 @@ describe('getCurrentVersion', () => {
 
 describe('getUpdateCommand', () => {
   it('pins the exact target version instead of re-resolving the latest dist-tag', () => {
-    expect(getUpdateCommand('npm', { targetVersion: '1.24.1' })).toBe('npm install -g @openchamber/web@1.24.1');
-    expect(getUpdateCommand('pnpm', { targetVersion: 'v1.24.1' })).toBe('pnpm add -g @openchamber/web@1.24.1');
-    expect(getUpdateCommand('yarn', { targetVersion: '1.24.1' })).toBe('yarn global add @openchamber/web@1.24.1');
-    expect(getUpdateCommand('bun', { targetVersion: '1.25.0-beta.1' })).toContain('add -g @openchamber/web@1.25.0-beta.1');
+    expect(getUpdateCommand('npm', { targetVersion: '1.24.1' })).toBe('npm install -g @magio/web@1.24.1');
+    expect(getUpdateCommand('pnpm', { targetVersion: 'v1.24.1' })).toBe('pnpm add -g @magio/web@1.24.1');
+    expect(getUpdateCommand('yarn', { targetVersion: '1.24.1' })).toBe('yarn global add @magio/web@1.24.1');
+    expect(getUpdateCommand('bun', { targetVersion: '1.25.0-beta.1' })).toContain('add -g @magio/web@1.25.0-beta.1');
   });
 
   describe('pnpm build approvals', () => {
@@ -452,7 +452,7 @@ describe('getUpdateCommand', () => {
       for (const version of ['10.4.0', '10.34.6', '11.28.2', '12.11.2']) {
         stubPnpmVersion(`${version}\n`);
         expect(getUpdateCommand('pnpm', { targetVersion: '1.24.1' })).toBe(
-          'pnpm add -g --allow-build=msgpackr-extract --allow-build=node-pty @openchamber/web@1.24.1',
+          'pnpm add -g --allow-build=msgpackr-extract --allow-build=node-pty @magio/web@1.24.1',
         );
       }
     });
@@ -460,15 +460,15 @@ describe('getUpdateCommand', () => {
     it('leaves the flag out where pnpm rejects it or the version is unknown', () => {
       for (const version of ['9.15.9', '10.3.0', '']) {
         stubPnpmVersion(`${version}\n`);
-        expect(getUpdateCommand('pnpm', { targetVersion: '1.24.1' })).toBe('pnpm add -g @openchamber/web@1.24.1');
+        expect(getUpdateCommand('pnpm', { targetVersion: '1.24.1' })).toBe('pnpm add -g @magio/web@1.24.1');
       }
       stubPnpmVersion('', 1);
-      expect(getUpdateCommand('pnpm', { targetVersion: '1.24.1' })).toBe('pnpm add -g @openchamber/web@1.24.1');
+      expect(getUpdateCommand('pnpm', { targetVersion: '1.24.1' })).toBe('pnpm add -g @magio/web@1.24.1');
     });
   });
 
   it('falls back to the latest dist-tag when no target version is given', () => {
-    expect(getUpdateCommand('npm')).toBe('npm install -g @openchamber/web@latest');
+    expect(getUpdateCommand('npm')).toBe('npm install -g @magio/web@latest');
   });
 
   it('rejects a target version that is not a concrete version', () => {
@@ -497,7 +497,7 @@ describe('executeUpdate', () => {
   });
 
   it('reports success when the installed version matches the target', () => {
-    stubSpawnSync({ listingStdout: '└── @openchamber/web@1.24.1' });
+    stubSpawnSync({ listingStdout: '└── @magio/web@1.24.1' });
     const result = executeUpdate('npm', { targetVersion: '1.24.1' });
     expect(result.success).toBe(true);
     expect(result.installedVersion).toBe('1.24.1');
@@ -511,7 +511,7 @@ describe('executeUpdate', () => {
   });
 
   it('fails when the package manager exits successfully but installed the wrong version', () => {
-    stubSpawnSync({ listingStdout: '└── @openchamber/web@1.19.0' });
+    stubSpawnSync({ listingStdout: '└── @magio/web@1.19.0' });
     const result = executeUpdate('npm', { targetVersion: '1.24.1' });
     expect(result.success).toBe(false);
     expect(result.error).toContain('1.19.0');
@@ -540,8 +540,8 @@ describe('detectPackageManagerDetails', () => {
   });
 
   it('keeps reporting a copy no package manager installed after the first detection', async () => {
-    vi.stubEnv('OPENCHAMBER_RUNTIME', '');
-    vi.stubEnv('OPENCHAMBER_PACKAGE_MANAGER', '');
+    vi.stubEnv('MAGIO_RUNTIME', '');
+    vi.stubEnv('MAGIO_PACKAGE_MANAGER', '');
     // No package manager answers, as on a server where an unpacked tarball runs.
     spawnSync.mockImplementation(() => ({ status: 1, stdout: '', stderr: '' }));
     vi.resetModules();

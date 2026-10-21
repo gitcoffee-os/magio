@@ -59,7 +59,7 @@ describe('createRuntimeUrlResolver', () => {
       realtimeBaseUrl: 'https://realtime.example/root',
     });
 
-    expect(urls.sse('/api/openchamber/events')).toBe('https://realtime.example/root/api/openchamber/events');
+    expect(urls.sse('/api/magio/events')).toBe('https://realtime.example/root/api/magio/events');
     expect(urls.websocket('/api/global/event/ws', { lastEventId: 'evt-1' })).toBe(
       'wss://realtime.example/root/api/global/event/ws?lastEventId=evt-1',
     );
@@ -83,8 +83,8 @@ describe('createRuntimeUrlResolver', () => {
 
   test('uses injected desktop API base URL for packaged WebSocket URLs', () => {
     withWindow({
-      location: { origin: 'openchamber-ui://app', href: 'openchamber-ui://app/index.html' },
-      __OPENCHAMBER_API_BASE_URL__: 'http://127.0.0.1:57123',
+      location: { origin: 'magio-ui://app', href: 'magio-ui://app/index.html' },
+      __MAGIO_API_BASE_URL__: 'http://127.0.0.1:57123',
     }, () => {
       const urls = createRuntimeUrlResolver({});
 
@@ -96,19 +96,19 @@ describe('createRuntimeUrlResolver', () => {
     setRuntimeExtraHeaders({ 'CF-Access-Client-Id': 'client-id' });
     try {
       withWindow({
-        location: { origin: 'openchamber-ui://app', href: 'openchamber-ui://app/index.html' },
-        __OPENCHAMBER_API_BASE_URL__: 'https://remote.example',
-        __OPENCHAMBER_LOCAL_ORIGIN__: 'http://127.0.0.1:57123',
+        location: { origin: 'magio-ui://app', href: 'magio-ui://app/index.html' },
+        __MAGIO_API_BASE_URL__: 'https://remote.example',
+        __MAGIO_LOCAL_ORIGIN__: 'http://127.0.0.1:57123',
       }, () => {
         const urls = createRuntimeUrlResolver({});
         const sse = new URL(urls.sse('/api/global/event'));
         const ws = new URL(urls.websocket('/api/global/event/ws'));
 
         expect(sse.origin).toBe('http://127.0.0.1:57123');
-        expect(sse.pathname).toBe('/api/openchamber/realtime-proxy/sse');
+        expect(sse.pathname).toBe('/api/magio/realtime-proxy/sse');
         expect(sse.searchParams.get('url')).toBe('https://remote.example/api/global/event');
         expect(ws.origin).toBe('ws://127.0.0.1:57123');
-        expect(ws.pathname).toBe('/api/openchamber/realtime-proxy/ws');
+        expect(ws.pathname).toBe('/api/magio/realtime-proxy/ws');
         expect(ws.searchParams.get('url')).toBe('wss://remote.example/api/global/event/ws');
       });
     } finally {
@@ -122,16 +122,16 @@ describe('createRuntimeUrlResolver', () => {
     setLocalRuntimeUrlAuthToken('local-url-token', Date.now() + 60_000, 'http://127.0.0.1:57123');
     try {
       withWindow({
-        location: { origin: 'openchamber-ui://app', href: 'openchamber-ui://app/index.html' },
-        __OPENCHAMBER_API_BASE_URL__: 'https://remote.example',
-        __OPENCHAMBER_LOCAL_ORIGIN__: 'http://127.0.0.1:57123',
+        location: { origin: 'magio-ui://app', href: 'magio-ui://app/index.html' },
+        __MAGIO_API_BASE_URL__: 'https://remote.example',
+        __MAGIO_LOCAL_ORIGIN__: 'http://127.0.0.1:57123',
       }, () => {
         const urls = createRuntimeUrlResolver({});
         const sse = new URL(urls.sse('/api/global/event'));
         const target = new URL(sse.searchParams.get('url') || '');
 
-        expect(sse.searchParams.get('oc_url_token')).toBe('local-url-token');
-        expect(target.searchParams.get('oc_url_token')).toBe('remote-url-token');
+        expect(sse.searchParams.get('mg_url_token')).toBe('local-url-token');
+        expect(target.searchParams.get('mg_url_token')).toBe('remote-url-token');
       });
     } finally {
       setRuntimeExtraHeaders(null);
@@ -142,10 +142,10 @@ describe('createRuntimeUrlResolver', () => {
 
   test('reads injected desktop API base URL at call time', () => {
     withWindow({
-      location: { origin: 'openchamber-ui://app', href: 'openchamber-ui://app/index.html' },
+      location: { origin: 'magio-ui://app', href: 'magio-ui://app/index.html' },
     }, () => {
       const urls = createRuntimeUrlResolver({});
-      (window as typeof window & { __OPENCHAMBER_API_BASE_URL__?: string }).__OPENCHAMBER_API_BASE_URL__ = 'http://127.0.0.1:57123';
+      (window as typeof window & { __MAGIO_API_BASE_URL__?: string }).__MAGIO_API_BASE_URL__ = 'http://127.0.0.1:57123';
 
       expect(urls.api('/api/config/settings')).toBe('http://127.0.0.1:57123/api/config/settings');
       expect(urls.websocket('/api/global/event/ws')).toBe('ws://127.0.0.1:57123/api/global/event/ws');
@@ -164,20 +164,20 @@ describe('createRuntimeUrlResolver', () => {
   });
 
   test('adds short-lived URL auth query to realtime and authenticated asset URLs only', () => {
-    setRuntimeBearerToken('oc_client_secret');
-    setRuntimeUrlAuthToken('oc_url_secret', Date.now() + 60_000);
+    setRuntimeBearerToken('mg_client_secret');
+    setRuntimeUrlAuthToken('mg_url_secret', Date.now() + 60_000);
     try {
       const urls = createRuntimeUrlResolver({ apiBaseUrl: 'https://api.example' });
 
       expect(urls.api('/api/config/settings')).toBe('https://api.example/api/config/settings');
       expect(urls.authenticatedAsset('/api/projects/p1/icon', { v: 123 })).toBe(
-        'https://api.example/api/projects/p1/icon?v=123&oc_url_token=oc_url_secret',
+        'https://api.example/api/projects/p1/icon?v=123&mg_url_token=mg_url_secret',
       );
-      expect(urls.sse('/api/openchamber/events')).toBe(
-        'https://api.example/api/openchamber/events?oc_url_token=oc_url_secret',
+      expect(urls.sse('/api/magio/events')).toBe(
+        'https://api.example/api/magio/events?mg_url_token=mg_url_secret',
       );
       expect(urls.websocket('/api/global/event/ws', { lastEventId: 'evt-1' })).toBe(
-        'wss://api.example/api/global/event/ws?lastEventId=evt-1&oc_url_token=oc_url_secret',
+        'wss://api.example/api/global/event/ws?lastEventId=evt-1&mg_url_token=mg_url_secret',
       );
     } finally {
       setRuntimeBearerToken(null);
@@ -185,12 +185,12 @@ describe('createRuntimeUrlResolver', () => {
   });
 
   test('replaces existing short-lived URL auth query on relative authenticated URLs', () => {
-    setRuntimeUrlAuthToken('oc_url_secret', Date.now() + 60_000);
+    setRuntimeUrlAuthToken('mg_url_secret', Date.now() + 60_000);
     try {
       const urls = createRuntimeUrlResolver();
 
-      expect(urls.authenticatedAsset('/api/preview/proxy/abc/?oc_url_token=stale&x=1#top')).toBe(
-        '/api/preview/proxy/abc/?oc_url_token=oc_url_secret&x=1#top',
+      expect(urls.authenticatedAsset('/api/preview/proxy/abc/?mg_url_token=stale&x=1#top')).toBe(
+        '/api/preview/proxy/abc/?mg_url_token=mg_url_secret&x=1#top',
       );
     } finally {
       setRuntimeUrlAuthToken(null, null);
@@ -198,14 +198,14 @@ describe('createRuntimeUrlResolver', () => {
   });
 
   test('does not put the long-lived client token in URLs', () => {
-    setRuntimeBearerToken('oc_client_secret');
+    setRuntimeBearerToken('mg_client_secret');
     try {
       const urls = createRuntimeUrlResolver({ apiBaseUrl: 'https://api.example' });
-      expect(urls.sse('/api/openchamber/events')).toBe('https://api.example/api/openchamber/events');
+      expect(urls.sse('/api/magio/events')).toBe('https://api.example/api/magio/events');
       expect(urls.websocket('/api/global/event/ws')).toBe('wss://api.example/api/global/event/ws');
       expect(urls.authenticatedAsset('/api/projects/p1/icon')).toBe('https://api.example/api/projects/p1/icon');
-      expect(urls.assetWithUrlToken('/api/guests/hello/panel/index.html', 'oc_url_guest', { oc_ui: 'issue-page' })).toBe(
-        'https://api.example/api/guests/hello/panel/index.html?oc_ui=issue-page&oc_url_token=oc_url_guest',
+      expect(urls.assetWithUrlToken('/api/guests/hello/panel/index.html', 'mg_url_guest', { mg_ui: 'issue-page' })).toBe(
+        'https://api.example/api/guests/hello/panel/index.html?mg_ui=issue-page&mg_url_token=mg_url_guest',
       );
     } finally {
       setRuntimeBearerToken(null);

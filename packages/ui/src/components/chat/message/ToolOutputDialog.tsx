@@ -387,7 +387,7 @@ const ImagePreviewDialog: React.FC<{
                 className={cn(
                     // Same scrim as DialogOverlay, so the image viewer sits on
                     // the app the way every other dialog does.
-                    'oc-glass-backdrop absolute inset-0 bg-surface-overlay/60',
+                    'mg-glass-backdrop absolute inset-0 bg-surface-overlay/60',
                     isTransitioning && 'transition-opacity duration-150 ease-out',
                     isVisible ? 'opacity-100' : 'opacity-0'
                 )}
@@ -984,7 +984,7 @@ const ToolOutputDialog: React.FC<ToolOutputDialogProps> = ({ popup, onOpenChange
                         )}
                     </div>
                 </div>
-                <div className="flex-1 min-h-0 rounded-xl oc-tile overflow-hidden">
+                <div className="flex-1 min-h-0 rounded-xl mg-tile overflow-hidden">
                     <div className="tool-output-surface h-full max-h-[75vh] overflow-y-auto px-3 pe-4">
                         {popup.metadata?.input && typeof popup.metadata.input === 'object' &&
                             Object.keys(popup.metadata.input).length > 0 &&
@@ -1009,7 +1009,7 @@ const ToolOutputDialog: React.FC<ToolOutputDialogProps> = ({ popup, onOpenChange
                                                 : 'Input:'}
                                     </div>
                                     {isShellTool(metaTool) && getInputValue('command') ? (
-                                        <div className="tool-input-surface oc-tile rounded-xl mx-3">
+                                        <div className="tool-input-surface mg-tile rounded-xl mx-3">
                                             <WorkerHighlightedCode
                                                 language="bash"
                                                 code={getInputValue('command')!}
@@ -1020,7 +1020,7 @@ const ToolOutputDialog: React.FC<ToolOutputDialogProps> = ({ popup, onOpenChange
                                         </div>
                                     ) : isSubagentTool(metaTool) && getInputValue('prompt') ? (
                                         <div
-                                            className="tool-input-surface oc-tile rounded-xl font-mono whitespace-pre-wrap text-foreground/90 mx-3"
+                                            className="tool-input-surface mg-tile rounded-xl font-mono whitespace-pre-wrap text-foreground/90 mx-3"
                                             style={toolDisplayStyles.getPopupStyles()}
                                         >
                                             {getInputValue('description') ? `Task: ${getInputValue('description')}\n` : ''}
@@ -1028,7 +1028,7 @@ const ToolOutputDialog: React.FC<ToolOutputDialogProps> = ({ popup, onOpenChange
                                             {`Instructions:\n${getInputValue('prompt')}`}
                                         </div>
                                     ) : isWriteTool(metaTool) && getInputValue('content') ? (
-                                        <div className="tool-input-surface oc-tile rounded-xl mx-3">
+                                        <div className="tool-input-surface mg-tile rounded-xl mx-3">
                                             <PierreFile
                                                 file={{
                                                     name: writeTarget || 'new-file',
@@ -1046,7 +1046,7 @@ const ToolOutputDialog: React.FC<ToolOutputDialogProps> = ({ popup, onOpenChange
                                         </div>
                                     ) : (
                                         <div
-                                            className="tool-input-surface oc-tile rounded-xl font-mono whitespace-pre-wrap text-foreground/90 mx-3"
+                                            className="tool-input-surface mg-tile rounded-xl font-mono whitespace-pre-wrap text-foreground/90 mx-3"
                                             style={toolDisplayStyles.getPopupStyles()}
                                         >
                                             {formatInputForDisplay(input, meta.tool as string)}
@@ -1070,7 +1070,7 @@ const ToolOutputDialog: React.FC<ToolOutputDialogProps> = ({ popup, onOpenChange
                                 if (tool === 'grep') {
                                     return (
                                         renderGrepOutput(popup.content, isMobile) || (
-                                            <pre className="typography-code oc-tile-inset p-2 rounded-xl font-mono whitespace-pre-wrap">
+                                            <pre className="typography-code mg-tile-inset p-2 rounded-xl font-mono whitespace-pre-wrap">
                                                 {popup.content}
                                             </pre>
                                         )
@@ -1080,7 +1080,7 @@ const ToolOutputDialog: React.FC<ToolOutputDialogProps> = ({ popup, onOpenChange
                                 if (tool === 'glob') {
                                     return (
                                         renderGlobOutput(popup.content, isMobile) || (
-                                            <pre className="typography-code oc-tile-inset p-2 rounded-xl font-mono whitespace-pre-wrap">
+                                            <pre className="typography-code mg-tile-inset p-2 rounded-xl font-mono whitespace-pre-wrap">
                                                 {popup.content}
                                             </pre>
                                         )

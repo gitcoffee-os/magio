@@ -47,8 +47,8 @@ const SEND_ICON_SIZE_CLASS = 'h-4 w-4';
 const PREVIEW_FADE_PX = 20;
 
 const previewFadeStyle = (): React.CSSProperties => ({
-    maskImage: `linear-gradient(var(--oc-to-inline-end), black calc(100% - ${PREVIEW_FADE_PX}px), transparent)`,
-    WebkitMaskImage: `linear-gradient(var(--oc-to-inline-end), black calc(100% - ${PREVIEW_FADE_PX}px), transparent)`,
+    maskImage: `linear-gradient(var(--mg-to-inline-end), black calc(100% - ${PREVIEW_FADE_PX}px), transparent)`,
+    WebkitMaskImage: `linear-gradient(var(--mg-to-inline-end), black calc(100% - ${PREVIEW_FADE_PX}px), transparent)`,
 });
 
 export interface MobileCommentComposerHandlers {

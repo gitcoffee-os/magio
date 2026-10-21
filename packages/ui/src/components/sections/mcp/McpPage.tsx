@@ -525,7 +525,7 @@ const statusCardClass = (status: string | undefined): string => {
     case 'blocked':
       return 'bg-[var(--status-warning-background)]';
     default:
-      return 'oc-tile';
+      return 'mg-tile';
   }
 };
 

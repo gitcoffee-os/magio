@@ -28,7 +28,7 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
       const isTerminal = isTerminalEventTarget(active)
         || active?.matches('[data-terminal-hidden-input="true"]') === true;
       // The rendered Markdown preview is sized by the editor font too.
-      const isEditor = active?.closest('.cm-editor, .oc-file-preview') != null
+      const isEditor = active?.closest('.cm-editor, .mg-file-preview') != null
         && active?.closest('[data-chat-input="true"]') == null;
       if (action === 'zoom-reset') {
         if (isTerminal) state.setTerminalFontSize(14);
@@ -42,8 +42,8 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
         state.setFontSize(state.fontSize + (action === 'zoom-in' ? 10 : -10));
       }
     };
-    window.addEventListener('openchamber:zoom', handleZoom);
-    return () => window.removeEventListener('openchamber:zoom', handleZoom);
+    window.addEventListener('magio:zoom', handleZoom);
+    return () => window.removeEventListener('magio:zoom', handleZoom);
   }, []);
 
   return <>{children}</>;

@@ -26,7 +26,7 @@ export const BrowserAddressSuggestions: React.FC<{
 
   return (
     <div
-      className="oc-glass-popover oc-glass-floating absolute inset-x-0 top-full z-50 mt-1 overflow-hidden rounded-xl p-1"
+      className="mg-glass-popover mg-glass-floating absolute inset-x-0 top-full z-50 mt-1 overflow-hidden rounded-xl p-1"
       role="listbox"
       aria-label={t('contextPanel.browser.history.label')}
     >

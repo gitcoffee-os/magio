@@ -64,8 +64,8 @@ export const KnowledgeComposer: React.FC<{
   return (
     <div
       className={cn(
-        'oc-surface-elevated flex items-end gap-1 rounded-lg bg-[var(--surface-elevated)] py-1 pe-1 ps-3',
-        'oc-raised oc-field',
+        'mg-surface-elevated flex items-end gap-1 rounded-lg bg-[var(--surface-elevated)] py-1 pe-1 ps-3',
+        'mg-raised mg-field',
         disabled && 'opacity-50',
       )}
     >

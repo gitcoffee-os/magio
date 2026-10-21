@@ -120,11 +120,11 @@ const SourceCard: React.FC<{
       onClick={onSelect}
       aria-pressed={isActive}
       className={cn(
-        'oc-tile w-full min-h-24 text-start rounded-lg p-3.5 flex gap-3 items-start',
+        'mg-tile w-full min-h-24 text-start rounded-lg p-3.5 flex gap-3 items-start',
         'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
         isActive
           ? 'bg-interactive-selection text-interactive-selection-foreground'
-          : 'oc-tile-hover'
+          : 'mg-tile-hover'
       )}
     >
       <span className="min-w-0 flex-1 block">
@@ -473,7 +473,7 @@ export const SkillsCatalogPage: React.FC<SkillsCatalogPageProps> = ({ mode, onMo
                 setEditingCatalogId(null);
                 setCatalogDialogOpen(true);
               }}
-              className="min-h-24 text-start rounded-lg border border-dashed border-[color-mix(in_srgb,var(--foreground)_14%,transparent)] oc-tile-hover p-3.5 flex gap-3 items-start transition-colors"
+              className="min-h-24 text-start rounded-lg border border-dashed border-[color-mix(in_srgb,var(--foreground)_14%,transparent)] mg-tile-hover p-3.5 flex gap-3 items-start transition-colors"
             >
               <span className="flex items-center justify-center rounded-md bg-transparent text-muted-foreground w-8 h-8 shrink-0">
                 <Icon name="add" className="h-4 w-4" />

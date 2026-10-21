@@ -1,9 +1,9 @@
 {
-  "name": "@openchamber/example-tools-only",
+  "name": "@magio/example-tools-only",
   "version": "1.1.0",
   "private": true,
   "type": "module",
-  "openchamber": {
+  "magio": {
     "apiVersion": 1,
     "contributes": {
       "panel": {
@@ -40,6 +40,6 @@
     }
   },
   "dependencies": {
-    "@openchamber/sdk": "workspace:*"
+    "@magio/sdk": "workspace:*"
   }
 }

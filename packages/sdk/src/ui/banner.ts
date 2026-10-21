@@ -19,11 +19,11 @@ export type BannerHandle = Handle<BannerProps>;
 export const mountBanner = (root: Element, initial: BannerProps): BannerHandle => {
   ensureStyle(UI_CSS);
   let props = initial;
-  const node = el('div', 'oc-sdk oc-sdk-banner');
-  const text = el('div', 'oc-sdk-banner-text');
-  const title = el('div', 'oc-sdk-banner-title');
-  const body = el('div', 'oc-sdk-banner-body');
-  const slot = el('div', 'oc-sdk-banner-action');
+  const node = el('div', 'mg-sdk mg-sdk-banner');
+  const text = el('div', 'mg-sdk-banner-text');
+  const title = el('div', 'mg-sdk-banner-title');
+  const body = el('div', 'mg-sdk-banner-body');
+  const slot = el('div', 'mg-sdk-banner-action');
   text.append(title, body);
   node.append(text, slot);
   root.append(node);

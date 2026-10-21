@@ -18,7 +18,7 @@ export const ChangedPathLabel = ({ path, className }: { path: string; className?
   return (
     <span dir="ltr" className={cn('flex min-w-0 items-baseline overflow-hidden', className)} title={path}>
       <span
-        className="oc-ui-start-align min-w-0 truncate text-muted-foreground"
+        className="mg-ui-start-align min-w-0 truncate text-muted-foreground"
         style={{ direction: 'rtl', unicodeBidi: 'plaintext' }}
       >
         {path.slice(0, lastSlash)}

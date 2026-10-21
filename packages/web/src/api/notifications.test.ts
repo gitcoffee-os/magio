@@ -296,7 +296,7 @@ describe('web notifications API', () => {
     // SAFETY: `installWindowMock` installed `globalThis.window` for this test,
     // so the asserted shape describes this own mock; the bridge reads only its
     // `invoke`.
-    (globalThis.window as { __OPENCHAMBER_DESKTOP__?: unknown }).__OPENCHAMBER_DESKTOP__ = { invoke };
+    (globalThis.window as { __MAGIO_DESKTOP__?: unknown }).__MAGIO_DESKTOP__ = { invoke };
 
     const { createWebNotificationsAPI } = await import('./notifications');
     const api = createWebNotificationsAPI();

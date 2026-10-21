@@ -132,7 +132,7 @@ test('a declared tool rule sets the header, icon, and table body of a matching t
     await render();
     // Without a rule the built-in path runs: generic wrench, formatted tool name, JSON views.
     expect(container.querySelector('table')).toBeNull();
-    expect(container.querySelector('use[href="#oc-checkbox-circle"]')).toBeNull();
+    expect(container.querySelector('use[href="#mg-checkbox-circle"]')).toBeNull();
     expect(container.textContent).not.toContain('Tasks for DEMO');
 
     await act(async () => {
@@ -140,7 +140,7 @@ test('a declared tool rule sets the header, icon, and table body of a matching t
     });
     expect(container.textContent).toContain('Tasks for DEMO');
     expect(container.textContent).toContain('2 open');
-    expect(container.querySelector('use[href="#oc-checkbox-circle"]')).not.toBeNull();
+    expect(container.querySelector('use[href="#mg-checkbox-circle"]')).not.toBeNull();
     const headers = Array.from(container.querySelectorAll('th')).map((cell) => cell.textContent);
     expect(headers).toEqual(['id', 'title', 'assignee.name']);
     const rows = Array.from(container.querySelectorAll('tbody tr')).map((row) => (

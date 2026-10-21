@@ -3,7 +3,7 @@ import { FILE_TYPE_ICON_IDS } from '@/lib/fileTypeIconIds';
 
 type ThemeVariant = 'light' | 'dark';
 
-const FILE_TYPE_SPRITE_ROOT_ID = 'oc-file-type-icon-sprite-root';
+const FILE_TYPE_SPRITE_ROOT_ID = 'mg-file-type-icon-sprite-root';
 
 // The sprite holds every file-type icon (about 1 MB of SVG markup), so it
 // loads the first time an icon is asked for instead of with the app. Icons

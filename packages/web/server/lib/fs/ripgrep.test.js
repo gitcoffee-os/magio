@@ -19,7 +19,7 @@ describe('ripgrep resolver', () => {
   };
 
   beforeEach(async () => {
-    root = await mkdtemp(path.join(tmpdir(), 'oc-ripgrep-'));
+    root = await mkdtemp(path.join(tmpdir(), 'mg-ripgrep-'));
   });
   afterEach(async () => {
     await rm(root, { recursive: true, force: true });

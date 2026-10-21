@@ -19,7 +19,7 @@ const waitFor = async (check, timeoutMs = 5_000) => {
 const exists = (file) => fs.access(file).then(() => true, () => false);
 
 test('starts the command only after the old process exits, with its arguments intact', { skip: process.platform === 'win32' }, async (t) => {
-  const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'oc-relaunch-'));
+  const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'mg-relaunch-'));
   t.after(() => fs.rm(dir, { recursive: true, force: true }));
   const marker = path.join(dir, 'started');
   const old = spawn('/bin/sh', ['-c', 'read _'], { stdio: ['pipe', 'ignore', 'ignore'] });

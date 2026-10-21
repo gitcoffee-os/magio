@@ -177,7 +177,7 @@ export const MobileFullscreenSurface: React.FC<MobileFullscreenSurfaceProps> = (
         'flex flex-col bg-background text-foreground',
         isDialog
           ? 'h-[min(88dvh,860px)] w-full max-w-[720px] overflow-hidden rounded-2xl border border-border/70 shadow-[0_24px_64px_rgb(0_0_0_/_0.32)]'
-          : 'oc-keyboard-inset-surface oc-bottom-safe-surface fixed inset-0 z-50',
+          : 'mg-keyboard-inset-surface mg-bottom-safe-surface fixed inset-0 z-50',
       )}
       style={isDialog ? {
         // Scale/fade instead of the push slide: the card is not a navigation
@@ -187,7 +187,7 @@ export const MobileFullscreenSurface: React.FC<MobileFullscreenSurfaceProps> = (
         transform: entered ? 'none' : 'scale(0.97)',
         transition: `opacity ${ENTER_DURATION_MS}ms ease-out, transform ${ENTER_DURATION_MS}ms cubic-bezier(0.32, 0.72, 0, 1)`,
       } : {
-        paddingTop: 'var(--oc-safe-area-top, 0px)',
+        paddingTop: 'var(--mg-safe-area-top, 0px)',
         // Push-style enter: slide in from the right edge; settled state drops
         // the transform entirely so the surface isn't kept on a compositing
         // layer (iOS clips those to the safe-area viewport).
@@ -205,7 +205,7 @@ export const MobileFullscreenSurface: React.FC<MobileFullscreenSurfaceProps> = (
       {!headerless ? (
         <header
           className={cn(
-            'flex h-[var(--oc-header-height,56px)] shrink-0 items-center gap-2 px-3',
+            'flex h-[var(--mg-header-height,56px)] shrink-0 items-center gap-2 px-3',
             !noHeaderBorder && 'border-b border-border/70',
           )}
         >
@@ -239,12 +239,12 @@ export const MobileFullscreenSurface: React.FC<MobileFullscreenSurfaceProps> = (
       ) : null}
       <div className="min-h-0 flex-1 overflow-hidden">
         {contentReady ? (
-          <div className="h-full" style={{ animation: 'oc-surface-content-in 200ms ease-out' }}>
+          <div className="h-full" style={{ animation: 'mg-surface-content-in 200ms ease-out' }}>
             {children}
           </div>
         ) : null}
       </div>
-      <style>{'@keyframes oc-surface-content-in { from { opacity: 0 } to { opacity: 1 } }'}</style>
+      <style>{'@keyframes mg-surface-content-in { from { opacity: 0 } to { opacity: 1 } }'}</style>
     </section>
   );
 
@@ -252,15 +252,15 @@ export const MobileFullscreenSurface: React.FC<MobileFullscreenSurfaceProps> = (
 
   return createPortal(
     <div
-      className="oc-keyboard-inset-surface oc-bottom-safe-surface fixed inset-0 z-50 flex items-center justify-center p-4 transition-opacity duration-200 ease-out"
+      className="mg-keyboard-inset-surface mg-bottom-safe-surface fixed inset-0 z-50 flex items-center justify-center p-4 transition-opacity duration-200 ease-out"
       style={{
         background: 'rgb(0 0 0 / 0.45)',
         opacity: entered ? 1 : 0,
         // 'chat' matches every other mobile overlay (the sessions sidebar keeps
         // its width); 'app' ignores the panels and centers on the window.
-        paddingLeft: dialogAlign === 'chat' ? 'max(1rem, var(--oc-chat-inset-left, 0px))' : '1rem',
-        paddingRight: dialogAlign === 'chat' ? 'max(1rem, var(--oc-chat-inset-right, 0px))' : '1rem',
-        paddingTop: 'max(1rem, var(--oc-safe-area-top, 0px))',
+        paddingLeft: dialogAlign === 'chat' ? 'max(1rem, var(--mg-chat-inset-left, 0px))' : '1rem',
+        paddingRight: dialogAlign === 'chat' ? 'max(1rem, var(--mg-chat-inset-right, 0px))' : '1rem',
+        paddingTop: 'max(1rem, var(--mg-safe-area-top, 0px))',
       }}
       onClick={onClose}
     >

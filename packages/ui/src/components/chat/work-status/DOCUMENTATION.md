@@ -25,11 +25,11 @@ selected session even without metrics, so a saved collapsed state can reopen.
 It is **not** a context-panel surface. It is not registered in
 `lib/surfaces/registry.ts`, has no rail icon, no tab, no persisted width and no
 resizer. It is a card inside the chat column — rounded, with the dropdown's
-hairline ring (`oc-panel-edge`, shared with the context panel card), a faint
+hairline ring (`mg-panel-edge`, shared with the context panel card), a faint
 fill and its own margin — rather than a docked pane flush against the window
 edge. Opened over the transcript it is a dropdown and takes the dropdown's
 full edge, lit top and tight shadows included (`data-edge-floating`).
-When it overlays the transcript, it uses the shared `oc-glass-panel` surface;
+When it overlays the transcript, it uses the shared `mg-glass-panel` surface;
 the inline card keeps its lighter, non-blurred fill instead.
 
 ## Placement
@@ -530,11 +530,11 @@ something other than "tools available".
 
 Written by the flows that already attach a thread — sending a message with
 issues, PRs or guest items attached in the composer, session creation from an
-issue or PR in `NewWorktreeDialog`, and an agent calling the `openchamber`
+issue or PR in `NewWorktreeDialog`, and an agent calling the `magio`
 tool's `session.link`. There is no manual "link this" control: attaching a
 thread to the work *is* the act of linking it. A message's references are
 written in one server operation (`sessionActions.addLinkedIssues`): each
-operation sends the items to link, and the OpenChamber server decides the new
+operation sends the items to link, and the Magio server decides the new
 list from a fresh read inside the session's write queue, so a link an agent
 made while the request was in flight survives it.
 
@@ -549,12 +549,12 @@ the removal through the same server operation (`setLinkedIssue(…, false)`) the
 attach flows use — one writer for the list, so a link cannot be dropped by a
 path that does not know the others. The write
 is deliberately user-initiated: an agent links but never removes, so it cannot
-drop a link the user set (`packages/web/server/lib/openchamber-sessions/session-link.js`).
+drop a link the user set (`packages/web/server/lib/magio-sessions/session-link.js`).
 A failed removal reports `chat.workStatus.linkedIssues.unlinkFailed` rather than
 leaving the row looking removed.
 
 Stored in session metadata as a **snapshot** (`lib/linkedIssues.ts`, namespace
-`openchamber.linked_issues`), persisted through the same server-owned metadata
+`magio.linked_issues`), persisted through the same server-owned metadata
 store as pinned messages. Number, title, url, author and avatar only — the
 body,
 comments and state belong to GitHub, and mirroring them would mean owning their
@@ -610,7 +610,7 @@ the quota loader treats a working proxy as a transient disconnected runtime
 and skips the initial load.
 
 Quotas, MCP status, skills, agent memory and the Linear/GitHub logins are all
-served by whichever OpenChamber instance is connected, and each was cached
+served by whichever Magio instance is connected, and each was cached
 globally or by directory alone — which two instances can share. A switch left
 the previous instance's answers on screen, and its Linear login usable against
 a runtime that has no Linear. `apps/runtimeEndpointReset.ts` now drops all of

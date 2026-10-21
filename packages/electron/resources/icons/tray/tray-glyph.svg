@@ -1,10 +1,10 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none"
-     stroke="#000" stroke-linejoin="round" stroke-linecap="round">
-  <g stroke-width="2.3">
-    <path d="M16 2.5 L28.5 9.5 L28.5 23 L16 30 L3.5 23 L3.5 9.5 Z"/>
-    <path d="M3.5 9.5 L16 16.25 L28.5 9.5"/>
-    <path d="M16 16.25 L16 30"/>
-  </g>
-  <!-- thinner stroke for the diamond on the top face -->
-  <path stroke-width="1.5" d="M16 6.5 L21.5 9.4 L16 12.3 L10.5 9.4 Z"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none">
+  <!-- C-spark as a menu bar template: solid black, macOS tints it with the
+       system appearance. Coordinates are baked from the 1024-space source art
+       (mark spans 168..856) so no renderer has to resolve a group transform:
+       main spark 3.96..28.04, companion upper right. -->
+  <path d="M16 3.96 C16.56 11.38, 20.62 15.44, 28.04 16 C20.62 16.56, 16.56 20.62, 16 28.04 C15.44 20.62, 11.38 16.56, 3.96 16 C11.38 15.44, 15.44 11.38, 16 3.96 Z"
+        fill="#000000"/>
+  <path d="M25.31 4.83 C25.48 7.05, 26.7 8.27, 28.92 8.44 C26.7 8.61, 25.48 9.83, 25.31 12.05 C25.14 9.83, 23.92 8.61, 21.7 8.44 C23.92 8.27, 25.14 7.05, 25.31 4.83 Z"
+        fill="#000000"/>
 </svg>

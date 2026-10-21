@@ -6,7 +6,7 @@ import { createProjectConfigRuntime } from './project-config.js';
 import { createProjectIdFromPath } from './project-id.js';
 
 const createRuntime = async () => {
-  const tempRoot = await mkdtemp(path.join(os.tmpdir(), 'oc-scheduled-project-config-'));
+  const tempRoot = await mkdtemp(path.join(os.tmpdir(), 'mg-scheduled-project-config-'));
   const runtime = createProjectConfigRuntime({
     fsPromises: await import('fs/promises'),
     path,
@@ -728,7 +728,7 @@ describe('project-config loop reconciliation', () => {
   });
 
   it('serializes concurrent writes across two runtimes sharing a projects dir', async () => {
-    const tempRoot = await mkdtemp(path.join(os.tmpdir(), 'oc-project-lock-contention-'));
+    const tempRoot = await mkdtemp(path.join(os.tmpdir(), 'mg-project-lock-contention-'));
     const fsPromises = await import('fs/promises');
     try {
       const runtimeA = createProjectConfigRuntime({
@@ -828,7 +828,7 @@ describe('project-config loop reconciliation', () => {
   });
 
   it('release does not unlink a lock stolen by another holder', async () => {
-    const tempRoot = await mkdtemp(path.join(os.tmpdir(), 'oc-project-lock-own-'));
+    const tempRoot = await mkdtemp(path.join(os.tmpdir(), 'mg-project-lock-own-'));
     const realFs = await import('fs/promises');
     let enteredCritical;
     const entered = new Promise((resolve) => {

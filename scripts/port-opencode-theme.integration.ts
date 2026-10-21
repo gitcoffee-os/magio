@@ -73,7 +73,7 @@ test('dark variants keep the authored accent and status seeds', async () => {
 
 test('authored v2 accents win over the seeds', async () => {
   // OpenCode's own theme keeps a legacy peach seed but authors a blue accent.
-  const source = await load('oc-2');
+  const source = await load('mg-2');
   for (const mode of ['light', 'dark'] as const) {
     const { colors } = requireTheme(convertTheme(source, mode));
     const hue = colorHue(colors.primary.base, colors.surface.background)!;
@@ -125,7 +125,7 @@ test('CLI works outside the repo, dry-run writes nothing, and errors are nonzero
   const directory = await mkdtemp(join(tmpdir(), 'app-theme-cli-test-'));
   const run = (...args: string[]) => spawnSync('bun', [cli, ...args], { cwd: directory, encoding: 'utf8' });
   try {
-    const dry = run('--theme', 'oc-2', '--mode', 'dark', '--dry-run', '--output', join(directory, 'output'));
+    const dry = run('--theme', 'mg-2', '--mode', 'dark', '--dry-run', '--output', join(directory, 'output'));
     assert.equal(dry.status, 0, dry.stderr);
     assert.match(dry.stdout, /Validated 1 variants/);
     assert.deepEqual(await readdir(directory), []);

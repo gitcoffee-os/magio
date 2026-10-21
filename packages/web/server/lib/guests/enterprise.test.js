@@ -57,9 +57,9 @@ const writeGuest = async (root, id, contributes = {}) => {
   await fs.mkdir(path.join(root, 'panel'), { recursive: true });
   await fs.writeFile(path.join(root, 'panel', 'index.html'), '<html></html>');
   await fs.writeFile(path.join(root, 'package.json'), JSON.stringify({
-    name: `@openchamber/${id}`,
+    name: `@magio/${id}`,
     version: '1.0.0',
-    openchamber: {
+    magio: {
       apiVersion: 1,
       contributes: { panel: { id, name: id, icon: 'window', entry: 'panel/index.html' }, ...contributes },
     },
@@ -68,15 +68,15 @@ const writeGuest = async (root, id, contributes = {}) => {
 
 describe('extensions in enterprise mode', () => {
   afterEach(() => {
-    delete process.env.OPENCHAMBER_ENTERPRISE_MODE;
+    delete process.env.MAGIO_ENTERPRISE_MODE;
   });
 
   test('refuses to install a package that could send data out, and installs one that cannot', async () => {
-    const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'oc-ext-enterprise-'));
+    const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'mg-ext-enterprise-'));
     const persistPath = path.join(dir, 'extensions.json');
     await writeGuest(path.join(dir, 'reach'), 'reach-out', withOrigins);
     await writeGuest(path.join(dir, 'quiet'), 'stay-home');
-    process.env.OPENCHAMBER_ENTERPRISE_MODE = '1';
+    process.env.MAGIO_ENTERPRISE_MODE = '1';
 
     const refused = await installGuestFromPath(path.join(dir, 'reach'), persistPath);
     expect(refused).toEqual({ ok: false, code: 'enterprise-mode', capabilities: ['origins'] });
@@ -85,7 +85,7 @@ describe('extensions in enterprise mode', () => {
   });
 
   test('drops an installed package\'s approved grants once enterprise mode turns on', async () => {
-    const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'oc-ext-enterprise-'));
+    const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'mg-ext-enterprise-'));
     const persistPath = path.join(dir, 'extensions.json');
     await writeGuest(path.join(dir, 'reach'), 'reach-later', withOrigins);
     expect((await installGuestFromPath(path.join(dir, 'reach'), persistPath)).ok).toBe(true);
@@ -95,13 +95,13 @@ describe('extensions in enterprise mode', () => {
     expect(approved.capabilityGrants).toEqual(['origins']);
     expect(toPublicGuest(approved).storageId).toEqual(expect.any(String));
 
-    process.env.OPENCHAMBER_ENTERPRISE_MODE = '1';
+    process.env.MAGIO_ENTERPRISE_MODE = '1';
     const [guest] = await listInstalledGuests({ persistPath });
     expect(guest.enterpriseBlocked).toEqual(['origins']);
     expect(guest.capabilityGrants).not.toContain('origins');
     expect(toPublicGuest(guest)).not.toHaveProperty('storageId');
 
-    delete process.env.OPENCHAMBER_ENTERPRISE_MODE;
+    delete process.env.MAGIO_ENTERPRISE_MODE;
     const [restored] = await listInstalledGuests({ persistPath });
     expect(restored.enterpriseBlocked).toBeUndefined();
     expect(restored.capabilityGrants).toEqual(['origins']);

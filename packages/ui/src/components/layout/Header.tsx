@@ -170,7 +170,7 @@ export const Header: React.FC = () => {
       return null;
     }
 
-    const injected = (window as unknown as { __OPENCHAMBER_MACOS_MAJOR__?: unknown }).__OPENCHAMBER_MACOS_MAJOR__;
+    const injected = (window as unknown as { __MAGIO_MACOS_MAJOR__?: unknown }).__MAGIO_MACOS_MAJOR__;
     if (typeof injected === 'number' && Number.isFinite(injected) && injected > 0) {
       return injected;
     }
@@ -395,7 +395,7 @@ export const Header: React.FC = () => {
 
   const currentSessionTitle = React.useMemo(() => {
     if (!currentSessionId) {
-      return activeProjectLabel ?? 'OpenChamber';
+      return activeProjectLabel ?? 'Magio';
     }
     const trimmedTitle = currentSession?.title?.trim();
     return trimmedTitle && trimmedTitle.length > 0 ? trimmedTitle : 'Untitled Session';
@@ -699,21 +699,21 @@ export const Header: React.FC = () => {
       return '88px';
     }
     if (isTabletStandalonePwa) {
-      return 'max(calc(0.75rem + var(--oc-wco-left-inset, 0px)), 5.5rem)';
+      return 'max(calc(0.75rem + var(--mg-wco-left-inset, 0px)), 5.5rem)';
     }
     if ((!isDesktopApp || usesFramelessChrome) && !isVSCode) {
-      return 'calc(0.75rem + var(--oc-wco-left-inset, 0px))';
+      return 'calc(0.75rem + var(--mg-wco-left-inset, 0px))';
     }
     return '0.75rem';
   }, [isDesktopApp, isDesktopWindowFullscreen, isMacPlatform, isTabletStandalonePwa, isVSCode, usesFramelessChrome]);
   const titlebarRightInset = (!isDesktopApp || usesFramelessChrome) && !isVSCode
-    ? 'calc(0.75rem + var(--oc-wco-right-inset, 0px))'
+    ? 'calc(0.75rem + var(--mg-wco-right-inset, 0px))'
     : '0.75rem';
   const isRtl = direction === 'rtl';
   // The edge the persistent TitlebarLeftControls overlay starts from. When the
   // sidebar is open this space is owned by the sidebar's top strip, so the header
   // drops back to its normal content padding there. Published as
-  // `--oc-titlebar-start-inset` so the overlay and the sidebar strip share it.
+  // `--mg-titlebar-start-inset` so the overlay and the sidebar strip share it.
   const titlebarStartInset = isRtl ? titlebarRightInset : titlebarLeftInset;
   const titlebarEndInset = isRtl ? titlebarLeftInset : titlebarRightInset;
   // Frameless in-window controls render on their physical side: in the overlay
@@ -724,7 +724,7 @@ export const Header: React.FC = () => {
     if (typeof document === 'undefined') {
       return;
     }
-    document.documentElement.style.setProperty('--oc-titlebar-start-inset', titlebarStartInset);
+    document.documentElement.style.setProperty('--mg-titlebar-start-inset', titlebarStartInset);
   }, [titlebarStartInset]);
 
   // Space reserved at the header's start for the persistent overlay when the
@@ -734,10 +734,10 @@ export const Header: React.FC = () => {
   // a no-drag carve under the control cluster. Both animate so the session title
   // slides in/out in lockstep with the sidebar. When the sidebar is open the
   // overlay is over the sidebar, so the header only keeps normal content padding.
-  const headerInsetSpacerWidth = isSidebarOpen ? '0.75rem' : 'var(--oc-titlebar-start-inset, 0.75rem)';
+  const headerInsetSpacerWidth = isSidebarOpen ? '0.75rem' : 'var(--mg-titlebar-start-inset, 0.75rem)';
   const headerControlsSpacerWidth = isSidebarOpen
     ? '0px'
-    : 'calc(var(--oc-titlebar-controls-width, 5.5rem) + 0.5rem)';
+    : 'calc(var(--mg-titlebar-controls-width, 5.5rem) + 0.5rem)';
 
   useEffect(() => {
     if (!isDesktopApp || !isMacPlatform) {
@@ -765,11 +765,11 @@ export const Header: React.FC = () => {
     };
 
     void syncFullscreenState();
-    window.addEventListener('openchamber:window-resized', onResize);
+    window.addEventListener('magio:window-resized', onResize);
 
     return () => {
       disposed = true;
-      window.removeEventListener('openchamber:window-resized', onResize);
+      window.removeEventListener('magio:window-resized', onResize);
     };
   }, [isDesktopApp, isMacPlatform]);
 
@@ -807,7 +807,7 @@ export const Header: React.FC = () => {
     // The macOS floor is a little lower so the 44px titlebar is not lifted
     // back to 3rem; it still grows with the interface scale past that.
     const remFloor = isDesktopApp && isMacPlatform ? '2.75rem' : '3rem';
-    const height = `max(${remFloor}, ${titlebarMinHeight}, var(--oc-wco-titlebar-height, 0px))`;
+    const height = `max(${remFloor}, ${titlebarMinHeight}, var(--mg-wco-titlebar-height, 0px))`;
 
     // VS Code and non-frameless desktop size their own header, and frameless
     // Electron with controls at the header's end keeps the pe-0 class and no
@@ -836,7 +836,7 @@ export const Header: React.FC = () => {
       return;
     }
     publishedHeaderHeightRef.current = height;
-    document.documentElement.style.setProperty('--oc-header-height', `${height}px`);
+    document.documentElement.style.setProperty('--mg-header-height', `${height}px`);
   }, []);
   const updateHeaderHeight = React.useCallback(() => {
     if (typeof document === 'undefined') {
@@ -1131,7 +1131,7 @@ export const Header: React.FC = () => {
                   </button>
                 </form>
               ) : isNewSessionDraftOpen ? null : (
-                <span dir="auto" className="oc-ui-start-align truncate typography-ui-label text-[14px] font-normal leading-tight text-foreground max-w-full">
+                <span dir="auto" className="mg-ui-start-align truncate typography-ui-label text-[14px] font-normal leading-tight text-foreground max-w-full">
                   {currentSessionTitle}
                 </span>
               )}
@@ -1279,7 +1279,7 @@ export const Header: React.FC = () => {
                   </button>
                 </form>
               ) : (
-                <span dir="auto" className="block overflow-hidden whitespace-nowrap oc-ui-start-align text-[13px] font-medium leading-4 text-foreground max-w-full">
+                <span dir="auto" className="block overflow-hidden whitespace-nowrap mg-ui-start-align text-[13px] font-medium leading-4 text-foreground max-w-full">
                   {isNewSessionDraftOpen ? t('sessions.switcher.draftTitle') : currentSessionTitle}
                 </span>
               )}

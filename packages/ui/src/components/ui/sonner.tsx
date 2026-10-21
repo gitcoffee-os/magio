@@ -102,7 +102,7 @@ const Toaster = ({ position = "bottom-right", ...props }: ToasterProps) => {
       toastOptions={{
         classNames: {
           toast:
-            "oc-surface-elevated group/toast toast !rounded-[var(--radius-xl)] !border-0 !px-3.5 !py-3 !gap-2.5 !text-foreground [&_[data-cancel]+[data-button]]:!ms-2",
+            "mg-surface-elevated group/toast toast !rounded-[var(--radius-xl)] !border-0 !px-3.5 !py-3 !gap-2.5 !text-foreground [&_[data-cancel]+[data-button]]:!ms-2",
           title: "typography-ui-label !font-medium !text-foreground",
           description: "typography-meta !text-muted-foreground !mt-0.5",
           actionButton:

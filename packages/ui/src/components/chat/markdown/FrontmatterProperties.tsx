@@ -1,6 +1,6 @@
 import type { Frontmatter, FrontmatterValue } from './frontmatter';
 
-const CODE_CLASS = 'oc-surface-code m-0 whitespace-pre-wrap break-words font-mono text-[0.95em]';
+const CODE_CLASS = 'mg-surface-code m-0 whitespace-pre-wrap break-words font-mono text-[0.95em]';
 
 const PropertyValue = ({ value }: { value: FrontmatterValue }) => {
   if (value.kind === 'list') {
@@ -29,7 +29,7 @@ export const FrontmatterProperties = ({ frontmatter }: { frontmatter: Frontmatte
     <dl className="mb-4 grid grid-cols-[fit-content(40%)_minmax(0,1fr)] items-baseline gap-x-4 gap-y-1.5 rounded-lg border border-[var(--interactive-border)] px-3 py-2.5 typography-meta">
       {frontmatter.properties.map(({ key, value }, index) => (
         <div key={index} className="contents">
-          <dt dir="auto" className="oc-ui-start-align break-words text-muted-foreground">{key}</dt>
+          <dt dir="auto" className="mg-ui-start-align break-words text-muted-foreground">{key}</dt>
           <dd className="m-0 min-w-0 break-words text-foreground"><PropertyValue value={value} /></dd>
         </div>
       ))}

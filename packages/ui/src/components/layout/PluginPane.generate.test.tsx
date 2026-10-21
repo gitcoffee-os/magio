@@ -3,8 +3,8 @@ import React, { act } from 'react';
 import { createRoot } from 'react-dom/client';
 import { OpenCode } from '@opencode/client';
 import { Window } from 'happy-dom';
-import { hostMessageSchema } from '@openchamber/sdk/schemas';
-import type { GuestMessage, HostMessage } from '@openchamber/sdk';
+import { hostMessageSchema } from '@magio/sdk/schemas';
+import type { GuestMessage, HostMessage } from '@magio/sdk';
 
 import { ThemeSystemContext, type ThemeContextValue } from '@/contexts/theme-system-context';
 import { getDefaultTheme } from '@/lib/theme/themes';
@@ -90,7 +90,7 @@ test('a generate answer that arrives after its panel closed reaches the reopened
     const send = async (message: GuestMessage) => {
       await act(async () => { window.dispatchEvent(new MessageEvent('message', { source: frameWindow, data: message })); });
     };
-    await send({ channel: 'openchamber.sdk', v: 1, type: 'hello' });
+    await send({ channel: 'magio.sdk', v: 1, type: 'hello' });
     return { received, send };
   };
   const settle = async () => {
@@ -100,44 +100,44 @@ test('a generate answer that arrives after its panel closed reaches the reopened
   try {
     const first = await openPanel();
     expect(first.received.find((message) => message.type === 'ready')).toMatchObject({ payload: { features: { lateGenerateResults: true } } });
-    await first.send({ channel: 'openchamber.sdk', v: 1, type: 'generate', id: 'oc-1', payload: { prompt: 'Write a brief' } });
+    await first.send({ channel: 'magio.sdk', v: 1, type: 'generate', id: 'mg-1', payload: { prompt: 'Write a brief' } });
     expect(answers).toHaveLength(1);
 
     // An answer while the panel is open goes back as the call's result, and nothing is kept.
-    await first.send({ channel: 'openchamber.sdk', v: 1, type: 'generate', id: 'oc-2', payload: { prompt: 'Quick one' } });
+    await first.send({ channel: 'magio.sdk', v: 1, type: 'generate', id: 'mg-2', payload: { prompt: 'Quick one' } });
     answers[1]('Quick.');
     await settle();
-    expect(first.received.find((message) => message.type === 'result' && message.id === 'oc-2')).toMatchObject({ ok: true, payload: { text: 'Quick.' } });
+    expect(first.received.find((message) => message.type === 'result' && message.id === 'mg-2')).toMatchObject({ ok: true, payload: { text: 'Quick.' } });
 
     await act(async () => root.render(pane(false)));
     answers[0]('The brief.');
     await settle();
-    expect(first.received.some((message) => message.type === 'result' && message.id === 'oc-1')).toBe(false);
+    expect(first.received.some((message) => message.type === 'result' && message.id === 'mg-1')).toBe(false);
 
     // The hidden pane a slash command loads is nobody's panel: it is not
     // offered the kept answer, and what it asks for is not kept either.
     const hidden = await openPanel(true);
     const hiddenReady = hidden.received.find((message) => message.type === 'ready');
     expect(hiddenReady?.type === 'ready' ? hiddenReady.payload.features?.lateGenerateResults : 'no ready').toBeUndefined();
-    await hidden.send({ channel: 'openchamber.sdk', v: 1, type: 'generate-late-listen' });
+    await hidden.send({ channel: 'magio.sdk', v: 1, type: 'generate-late-listen' });
     expect(late(hidden.received)).toEqual([]);
-    await hidden.send({ channel: 'openchamber.sdk', v: 1, type: 'generate', id: 'oc-1', payload: { prompt: 'From a command' } });
+    await hidden.send({ channel: 'magio.sdk', v: 1, type: 'generate', id: 'mg-1', payload: { prompt: 'From a command' } });
     await act(async () => root.render(pane(false)));
     answers[2]('Not kept.');
     await settle();
 
     const second = await openPanel();
     expect(late(second.received)).toEqual([]);
-    await second.send({ channel: 'openchamber.sdk', v: 1, type: 'generate-late-listen' });
+    await second.send({ channel: 'magio.sdk', v: 1, type: 'generate-late-listen' });
     expect(late(second.received).map((message) => message.type === 'generate-late' && message.payload)).toEqual([
       { request: { prompt: 'Write a brief' }, ok: true, result: { text: 'The brief.' } },
     ]);
 
     // Handed over once: listening again, or another panel, gets nothing more.
-    await second.send({ channel: 'openchamber.sdk', v: 1, type: 'generate-late-listen' });
+    await second.send({ channel: 'magio.sdk', v: 1, type: 'generate-late-listen' });
     await act(async () => root.render(pane(false)));
     const third = await openPanel();
-    await third.send({ channel: 'openchamber.sdk', v: 1, type: 'generate-late-listen' });
+    await third.send({ channel: 'magio.sdk', v: 1, type: 'generate-late-listen' });
     expect(late(second.received)).toHaveLength(1);
     expect(late(third.received)).toEqual([]);
   } finally {

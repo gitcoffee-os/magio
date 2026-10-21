@@ -17,14 +17,14 @@ import { setCapabilityGrants, writeExtensionStore } from './persist.js';
 import { SERVICE_TOKEN_ENV, recordGuestService } from './service-registry.js';
 
 const writeFixture = async () => {
-  const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'oc-service-'));
+  const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'mg-service-'));
   const persistPath = path.join(dir, 'extensions.json');
   const packageRoot = path.join(dir, 'docker');
   await fs.mkdir(path.join(packageRoot, 'service'), { recursive: true });
   await fs.writeFile(path.join(packageRoot, 'service', 'main.js'), `
 import http from 'node:http';
-const port = Number(process.env.OPENCHAMBER_SERVICE_PORT);
-const token = process.env.OPENCHAMBER_SERVICE_TOKEN;
+const port = Number(process.env.MAGIO_SERVICE_PORT);
+const token = process.env.MAGIO_SERVICE_TOKEN;
 http.createServer((req, res) => {
   if (req.headers.authorization !== \`Bearer \${token}\`) {
     res.writeHead(401);

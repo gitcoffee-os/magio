@@ -39,7 +39,7 @@ export const COMPOSER_EDITOR_THEME_SPEC = {
     // it extend beyond the glyphs without changing CodeMirror's line geometry.
     //
     // CodeMirror recolours it for dark editors through `&dark .cm-cursor`,
-    // which needs the theme to declare itself dark. OpenChamber themes are not
+    // which needs the theme to declare itself dark. Magio themes are not
     // only light or dark, so the cursor takes the elevated field foreground
     // instead. `&.cm-editor` matches the specificity of that `&dark` rule, and
     // theme styles mount after the base theme, so this wins in every variant.
@@ -134,14 +134,14 @@ export const NATIVE_SELECTION_THEME_SPEC = {
     // re-renders its caret UI after every keystroke's decoration redraw, which
     // arrives as severe input lag. The handles only exist while a RANGE is
     // selected — exactly when there is no caret — so the native caret (and the
-    // drawn cursor layer's absence) are scoped to `.oc-native-range`, which
+    // drawn cursor layer's absence) are scoped to `.mg-native-range`, which
     // `composerNativeSelectionExtension` sets on the editor whenever the main
     // selection is non-empty. Typing stays on the transparent-native-caret
     // fast path.
-    '&.cm-editor.oc-native-range .cm-content, &.cm-editor.oc-native-range .cm-content .cm-line': {
+    '&.cm-editor.mg-native-range .cm-content, &.cm-editor.mg-native-range .cm-content .cm-line': {
         caretColor: 'var(--surface-elevated-foreground) !important',
     },
-    '&.oc-native-range .cm-scroller > .cm-cursorLayer': {
+    '&.mg-native-range .cm-scroller > .cm-cursorLayer': {
         display: 'none',
     },
     // The layers live beside the content, as children of the scroller.
@@ -154,7 +154,7 @@ const composerNativeSelectionTheme = EditorView.theme(NATIVE_SELECTION_THEME_SPE
 
 /**
  * The native-selection arrangement, installed outside CodeMirror's iOS branch:
- * the theme above plus the `.oc-native-range` marker class that scopes its
+ * the theme above plus the `.mg-native-range` marker class that scopes its
  * caret rules to the moments a range is actually selected. `editorAttributes`
  * re-evaluates on every update, so the class follows the selection with no
  * listener of its own.
@@ -162,7 +162,7 @@ const composerNativeSelectionTheme = EditorView.theme(NATIVE_SELECTION_THEME_SPE
 export const composerNativeSelectionExtension: Extension = [
     composerNativeSelectionTheme,
     EditorView.editorAttributes.of((view) =>
-        view.state.selection.main.empty ? null : { class: 'oc-native-range' }),
+        view.state.selection.main.empty ? null : { class: 'mg-native-range' }),
 ];
 
 /**

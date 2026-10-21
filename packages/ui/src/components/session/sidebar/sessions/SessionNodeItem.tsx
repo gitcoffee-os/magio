@@ -960,7 +960,7 @@ function SessionNodeItemComponent(props: SessionNodeItemProps): React.ReactNode 
           key={session.id}
           style={{ paddingInlineStart: TIMELINE_ROW_LEFT_PX }}
           className={cn(
-            'oc-ref-tint-scope group relative my-0.5 flex items-center rounded-md pe-2.5',
+            'mg-ref-tint-scope group relative my-0.5 flex items-center rounded-md pe-2.5',
             isOneLineTimelineRow ? 'py-1' : 'py-1.5',
             isActive && 'bg-interactive-selection/70 text-interactive-selection-foreground',
           )}
@@ -980,7 +980,7 @@ function SessionNodeItemComponent(props: SessionNodeItemProps): React.ReactNode 
             directoryIndicator={null}
             prBadge={primaryRef ? (
               <span
-                className={cn('inline-flex flex-shrink-0 items-center gap-1 typography-micro', primaryRef.color ? 'oc-ref-tint' : 'text-muted-foreground')}
+                className={cn('inline-flex flex-shrink-0 items-center gap-1 typography-micro', primaryRef.color ? 'mg-ref-tint' : 'text-muted-foreground')}
                 style={primaryRef.color ? refTintStyle(primaryRef.color) : undefined}
               >
                 <Icon name={primaryRef.icon} className="h-3 w-3" />
@@ -1025,22 +1025,22 @@ function SessionNodeItemComponent(props: SessionNodeItemProps): React.ReactNode 
   const showActivityDuration = (isStreaming || showUnreadStatus) && hasActivityDuration;
   // Hover-revealed actions cross-fade over the row's right end instead of
   // pushing the title: the meta they cover fades out and the title's tail
-  // fades away under them (`oc-actions-mask`), so nothing moves. The reserve
+  // fades away under them (`mg-actions-mask`), so nothing moves. The reserve
   // is how far the actions reach in from the row content's right edge: their
   // width less the 6px they sit nearer the row edge (16px buttons, 20px on
   // two-line timeline rows, 2px apart).
   const actionsReserveClass = isTimelineRow && !isOneLineTimelineRow
-    ? ['[--oc-actions-reserve:14px]', '[--oc-actions-reserve:36px]', '[--oc-actions-reserve:58px]', '[--oc-actions-reserve:80px]'][extraHoverActions]
-    : ['[--oc-actions-reserve:10px]', '[--oc-actions-reserve:28px]', '[--oc-actions-reserve:46px]', '[--oc-actions-reserve:64px]'][extraHoverActions];
+    ? ['[--mg-actions-reserve:14px]', '[--mg-actions-reserve:36px]', '[--mg-actions-reserve:58px]', '[--mg-actions-reserve:80px]'][extraHoverActions]
+    : ['[--mg-actions-reserve:10px]', '[--mg-actions-reserve:28px]', '[--mg-actions-reserve:46px]', '[--mg-actions-reserve:64px]'][extraHoverActions];
   // An open row menu (dropdown or right-click) keeps the actions shown, so
   // what they cover gives way too, hover or not.
   const actionsMaskClass = alwaysShowActions
     ? undefined
     : isSessionMenuOpen
-      ? 'oc-actions-mask'
+      ? 'mg-actions-mask'
       : isVSCode
-        ? 'group-hover:oc-actions-mask'
-        : 'group-hover:oc-actions-mask group-has-[:focus-visible]:oc-actions-mask';
+        ? 'group-hover:mg-actions-mask'
+        : 'group-hover:mg-actions-mask group-has-[:focus-visible]:mg-actions-mask';
   const coveredMetaFadeClass = isSessionMenuOpen ? 'opacity-0' : hideOnHoverClass;
   const pinnedLabel = t('sessions.sidebar.session.status.pinned');
   const pinnedMarkerContent = (
@@ -1162,7 +1162,7 @@ function SessionNodeItemComponent(props: SessionNodeItemProps): React.ReactNode 
   const handleOpenInEditorClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
     event.stopPropagation();
-    void runtimeApis?.vscode?.executeCommand('openchamber.openSessionInEditor', session.id, sessionTitle);
+    void runtimeApis?.vscode?.executeCommand('magio.openSessionInEditor', session.id, sessionTitle);
   };
 
   const handleRowSelect = (event?: React.MouseEvent<HTMLElement>) => {
@@ -1674,7 +1674,7 @@ function SessionNodeItemComponent(props: SessionNodeItemProps): React.ReactNode 
           type="button"
           className={cn(
             'inline-flex flex-shrink-0 items-center gap-1 rounded typography-micro hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-default disabled:no-underline',
-            primaryRef.color ? 'oc-ref-tint' : 'text-muted-foreground',
+            primaryRef.color ? 'mg-ref-tint' : 'text-muted-foreground',
           )}
           style={primaryRef.color ? refTintStyle(primaryRef.color) : undefined}
           disabled={!primaryRef.url}
@@ -1835,7 +1835,7 @@ function SessionNodeItemComponent(props: SessionNodeItemProps): React.ReactNode 
                 // level from an 8px edge, then the slot and a 6px gap.
                 style={{ paddingInlineStart: hasTreeSlot ? sessionTreeRowPaddingLeft(depth) : TIMELINE_ROW_LEFT_PX }}
                 className={cn(
-                  'oc-ref-tint-scope group relative my-0.5 flex cursor-pointer items-center rounded-md pe-2.5',
+                  'mg-ref-tint-scope group relative my-0.5 flex cursor-pointer items-center rounded-md pe-2.5',
                   hasTreeSlot && 'gap-1.5',
                   // Tree rows sit a little tighter than the timeline's.
                   isTimelineRow ? (isOneLineTimelineRow ? 'py-1' : 'py-1.5') : 'py-[3px]',
@@ -1900,7 +1900,7 @@ function SessionNodeItemComponent(props: SessionNodeItemProps): React.ReactNode 
                 <TooltipContent side="right" sideOffset={8} className="max-w-xs text-start">
                   <div className="flex min-w-44 flex-col gap-1.5 text-start text-xs">
                     <div className="flex items-center justify-between gap-3">
-                      <span dir="auto" className="oc-ui-start-align min-w-0 truncate font-medium text-foreground">{sessionTitle}</span>
+                      <span dir="auto" className="mg-ui-start-align min-w-0 truncate font-medium text-foreground">{sessionTitle}</span>
                       <span className="flex-shrink-0 text-muted-foreground" title={sessionUpdatedLabel}>{sessionCompactUpdatedLabel}</span>
                     </div>
                     {tooltipProjectLabel ? (
@@ -1913,7 +1913,7 @@ function SessionNodeItemComponent(props: SessionNodeItemProps): React.ReactNode 
                       <div className="flex min-w-0 items-center gap-1.5 text-muted-foreground">
                         {branchInSpace
                           ? <Icon name="box-3" className="h-3 w-3 flex-shrink-0" aria-hidden={false} role="img" aria-label={t('sessions.sidebar.group.space')} />
-                          : <Icon name="git-branch" className={cn('h-3 w-3 flex-shrink-0', branchPrIconColor && 'oc-ref-tint')} style={branchPrIconColor ? refTintStyle(branchPrIconColor) : undefined} />}
+                          : <Icon name="git-branch" className={cn('h-3 w-3 flex-shrink-0', branchPrIconColor && 'mg-ref-tint')} style={branchPrIconColor ? refTintStyle(branchPrIconColor) : undefined} />}
                         <span className="min-w-0 truncate">{tooltipBranchLabel}</span>
                       </div>
                     ) : null}

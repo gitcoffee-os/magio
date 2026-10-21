@@ -232,7 +232,7 @@ export const LinearSettings: React.FC = () => {
                           return (
                             <div
                               key={workspace.id}
-                              className="flex items-center justify-between gap-3 oc-tile-inset rounded-md px-3 py-2"
+                              className="flex items-center justify-between gap-3 mg-tile-inset rounded-md px-3 py-2"
                             >
                               <div className="min-w-0">
                                 <div className="truncate text-sm font-medium text-foreground">{workspaceName}</div>

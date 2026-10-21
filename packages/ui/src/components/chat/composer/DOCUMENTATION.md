@@ -174,7 +174,7 @@ updates it.
 
 In a normal session view the composer slot is an absolute layer over the
 bottom of the transcript (`ChatContainer`), and the input box is an opaque
-surface (`oc-surface-floating`): it is always on screen over the moving
+surface (`mg-surface-floating`): it is always on screen over the moving
 transcript, and a blur there was redrawn on every streamed frame (see the rule
 in `design-system.css`). The draft screen and the expanded editor keep the slot
 in flow. A `ResizeObserver` on the slot publishes its height as
@@ -224,7 +224,7 @@ mobile keyboard choreography is unchanged: the form inside the slot is still
 the keyboard mover and the column shrinks around it at settle.
 
 The box clips its contents, so popups anchor to the wrapper outside it. The
-dictation overlay (`.oc-dictation-overlay`) never shows the composer's own
+dictation overlay (`.mg-dictation-overlay`) never shows the composer's own
 contents through it: a CSS rule in `design-system.css` hides them while it is
 up, leaving the box as the single surface on desktop and the overlay itself on
 mobile. On desktop the footer's
@@ -314,9 +314,9 @@ saved. One setting covers both cases: a split by model kind read as a puzzle of
 exceptions in Settings, and nobody needs the files for one kind of model only.
 The browser annotation screenshot and comment-field image pastes keep
 attaching. The bytes go through the active runtime's OpenCode route (the
-OpenChamber server's proxy, the VS Code bridge, the relay for a phone), so the
+Magio server's proxy, the VS Code bridge, the relay for a phone), so the
 file lands on the machine OpenCode runs on, which may not be the user's. Why
-OpenCode writes the file and not the OpenChamber server: only OpenCode knows
+OpenCode writes the file and not the Magio server: only OpenCode knows
 its temp folder and its filesystem, and an external OpenCode or a space runs
 elsewhere than the server.
 Large pastes (about 2,000 characters or 25 lines) follow the composer setting
@@ -846,16 +846,16 @@ second half. The floating composer slot (`data-composer-slot="floating"`, in
 see — the new one on expand, the old one on collapse — so its
 `ResizeObserver` publishes one final inset instead of chasing frames. The
 status row, recap hint and scroll-to-end button share one zero-height anchor
-on the slot's top edge (`data-composer-riders`, class `oc-composer-riders`):
+on the slot's top edge (`data-composer-riders`, class `mg-composer-riders`):
 the keyboard choreography slides it as a mover and the morph moves it with the
 box's top edge through the individual `translate` property, so nothing above
 the composer jumps when the slot resizes. The
-motion starts on the `oc:keyboard-anim` event for its direction, runs on the
+motion starts on the `mg:keyboard-anim` event for its direction, runs on the
 shared keyboard timing (`lib/mobileKeyboardTiming.ts`) the composer slide
-also uses, and ends on `oc:keyboard-settled`; a fallback timer runs it alone
+also uses, and ends on `mg:keyboard-settled`; a fallback timer runs it alone
 without a keyboard. The transcript rides it through
 `lib/scroll/keyboardFollowGlide.ts` (owned by `useChatTimelineScroll`): the
-morph announces `oc:composer-morph` (`hold` with how far the transcript's end
+morph announces `mg:composer-morph` (`hold` with how far the transcript's end
 moves, `glide` and `release` when it runs without a keyboard), the glide holds every
 automatic end write while a transition runs, lets the geometry land in one
 step, and drives scrollTop on the same curve. Mobile browsers, Android and
@@ -869,10 +869,10 @@ Each of these cost a debugging round on a device:
   composited scrolling layers for that, a multi-second stall on long chats.
   `.chat-scroll` keeps a constant `clientHeight` across keyboard transitions
   (`mobile.css`): it extends below its shrunken region by
-  `max(--oc-kb-layout - --oc-app-bottom-safe, 0)` and carries
-  `padding-bottom: --oc-kb-scroll-inset`, so opening or closing the keyboard is
+  `max(--mg-kb-layout - --mg-app-bottom-safe, 0)` and carries
+  `padding-bottom: --mg-kb-scroll-inset`, so opening or closing the keyboard is
   one `scrollTop` write over rows already mounted.
-- **Movers get inline transforms.** The composer and `.oc-draft-center` slide
+- **Movers get inline transforms.** The composer and `.mg-draft-center` slide
   with transform/transition set inline by the choreography: WebKit does not
   reliably start a transition when a transform changes through a CSS custom
   property.
@@ -881,17 +881,17 @@ Each of these cost a debugging round on a device:
   about mid-transition, so a swap committed in the same task as `focus()` stays
   invisible. `flushSync` the swap and call `focus()` in the first
   `requestAnimationFrame`.
-- **The hide intent races React.** `oc:keyboard-intent {open:false}` arrives a
+- **The hide intent races React.** `mg:keyboard-intent {open:false}` arrives a
   few milliseconds after blur; the Capacitor blur branch commits
   `setFocused(false)` with `flushSync` so the collapse is not skipped.
 - **Hide starts from `focusout`.** `keyboardWillHide` arrives late over the
   bridge; `isTextInput` counts `isContentEditable`, so CodeMirror qualifies.
 - **The caret is held while things move.** The native caret ignores transforms
-  and jumps after the motion; `.oc-kb-caret-hold` hides it until about 250 ms
+  and jumps after the motion; `.mg-kb-caret-hold` hides it until about 250 ms
   after settle, and targets `.cm-cursor` / `.cm-dropCursor` too, because
   CodeMirror draws its own.
-- **Rows around the composer key off `oc-composer-expanded`**, set in the same
-  frame as the pill swap. `oc-keyboard-open` lands with the bridge event about
+- **Rows around the composer key off `mg-composer-expanded`**, set in the same
+  frame as the pill swap. `mg-keyboard-open` lands with the bridge event about
   100 ms later and makes a second visible jump.
 - **A composited child inside a sliding ancestor blinks.** Position it without
   compositing (`SortableTabsStrip`'s `nonCompositedIndicator`).
@@ -904,7 +904,7 @@ Each of these cost a debugging round on a device:
 Mobile browsers have no choreography: Safari pans instead of resizing. The
 fullscreen and draft composers are `position: fixed` and pinned to the visual
 viewport, so no ancestor root may carry a `transform`, and the header is hidden
-through `oc-browser-kb-fullscreen` instead of out-stacking it. The keyboard
+through `mg-browser-kb-fullscreen` instead of out-stacking it. The keyboard
 opens only for a `focus()` inside the tap's own call stack.
 
 When swap and keyboard timing looks wrong, record before guessing: an
@@ -964,7 +964,7 @@ re-resolved by text and context whenever the marked message re-renders or
 remounts. Offsets only break ties. Quotes sent before anchors existed are
 found only when their text appears once in the message.
 
-A quote taken inside a page the agent showed (`openchamber_render`) has `page: { partId }` in its anchor: its text stream is the page's body, measured and re-found inside the page's frame. The layer does not paint those marks; it publishes them, asks for reveals and hears clicks through `message/pageQuoteBridge.ts` (see `message/parts/DOCUMENTATION.md`).
+A quote taken inside a page the agent showed (`magio_render`) has `page: { partId }` in its anchor: its text stream is the page's body, measured and re-found inside the page's frame. The layer does not paint those marks; it publishes them, asks for reveals and hears clicks through `message/pageQuoteBridge.ts` (see `message/parts/DOCUMENTATION.md`).
 
 ## Mobile comment mode
 
@@ -1017,7 +1017,7 @@ ends or the message unmounts.
 Voice: the comment shell mounts its own `ComposerDictation` whose insert
 callbacks target the comment draft (insert-and-send attaches; it never sends).
 While it is mounted, the composer's wrapper-level dictation engine is not —
-two engines would both answer the global `openchamber:dictation-toggle`
+two engines would both answer the global `magio:dictation-toggle`
 event, and a transcript meant for one editor must not reach the other. A
 recording in flight when comment mode opens is discarded by that swap.
 

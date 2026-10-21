@@ -16,10 +16,10 @@ export type EmptyHandle = Handle<EmptyProps>;
 export const mountEmpty = (root: Element, initial: EmptyProps): EmptyHandle => {
   ensureStyle(UI_CSS);
   let props = initial;
-  const shell = el('div', 'oc-sdk oc-sdk-empty');
-  const title = el('h2', 'oc-sdk-empty-title');
-  const body = el('p', 'oc-sdk-empty-body');
-  const slot = el('div', 'oc-sdk-empty-action');
+  const shell = el('div', 'mg-sdk mg-sdk-empty');
+  const title = el('h2', 'mg-sdk-empty-title');
+  const body = el('p', 'mg-sdk-empty-body');
+  const slot = el('div', 'mg-sdk-empty-action');
   shell.append(title, body, slot);
   root.append(shell);
   let action: ButtonHandle | null = null;

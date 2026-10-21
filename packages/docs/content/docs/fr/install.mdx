@@ -1,6 +1,6 @@
 ---
 title: Installation
-description: Installez OpenChamber sur le desktop, le web, VS Code ou votre téléphone.
+description: Installez Magio sur le desktop, le web, VS Code ou votre téléphone.
 ---
 
 # Installation
@@ -14,24 +14,24 @@ Choisissez l’application qui correspond à votre façon de travailler :
 
 ## Desktop
 
-Téléchargez la dernière version depuis la [page de téléchargement](https://openchamber.dev/download/) ou depuis [GitHub Releases](https://github.com/openchamber/openchamber/releases/latest), puis ouvrez-la. Linux dispose de paquets `.deb`, `.rpm` et AppImage.
+Téléchargez la dernière version depuis la [page de téléchargement](https://magio.exmay.com/download/) ou depuis [GitHub Releases](https://github.com/gitcoffee-os/magio/releases/latest), puis ouvrez-la. Linux dispose de paquets `.deb`, `.rpm` et AppImage.
 
-L’application desktop embarque sa propre copie d’[OpenCode](https://opencode.ai) (l’agent IA de code sur lequel tourne OpenChamber), il n’y a donc rien d’autre à installer.
+L’application desktop embarque sa propre copie d’[OpenCode](https://opencode.ai) (l’agent IA de code sur lequel tourne Magio), il n’y a donc rien d’autre à installer.
 
 ## Web + PWA
 
 L’application web a besoin d’[OpenCode](https://opencode.ai) et de Node.js 24.14 ou plus récent sur la machine qui l’exécute.
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/openchamber/openchamber/main/scripts/install.sh | bash
-openchamber --ui-password be-creative-here
+curl -fsSL https://raw.githubusercontent.com/gitcoffee-os/magio/main/scripts/install.sh | bash
+magio --ui-password be-creative-here
 ```
 
-Ouvrez l’URL affichée par la CLI (en général `http://localhost:3000`). Vous devriez voir la liste des sessions OpenChamber. Pour la garder sous la main, utilisez l’option « Installer » dans la barre d’adresse du navigateur et ajoutez-la comme application.
+Ouvrez l’URL affichée par la CLI (en général `http://localhost:3000`). Vous devriez voir la liste des sessions Magio. Pour la garder sous la main, utilisez l’option « Installer » dans la barre d’adresse du navigateur et ajoutez-la comme application.
 
 ## VS Code
 
-Installez OpenChamber depuis le [VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=fedaykindev.openchamber). Cursor, Windsurf et Trae l’installent depuis [Open VSX](https://open-vsx.org/extension/FedaykinDev/openchamber). L’extension a besoin d’[OpenCode](https://opencode.ai) installé ; la vue OpenChamber s’ouvre ensuite dans la barre latérale.
+Installez Magio depuis le [VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=fedaykindev.magio). Cursor, Windsurf et Trae l’installent depuis [Open VSX](https://open-vsx.org/extension/FedaykinDev/magio). L’extension a besoin d’[OpenCode](https://opencode.ai) installé ; la vue Magio s’ouvre ensuite dans la barre latérale.
 
 ## Mobile
 

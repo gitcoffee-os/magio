@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import type { HostClient } from '@openchamber/sdk';
+import type { HostClient } from '@magio/sdk';
 
 export const PROVIDER = 'tasks-demo';
 

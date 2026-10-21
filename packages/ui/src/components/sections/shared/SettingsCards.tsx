@@ -33,7 +33,7 @@ const TONE_CLASS = {
   warning: 'bg-[var(--status-warning)]/15 text-[var(--status-warning)]',
   error: 'bg-[var(--status-error)]/15 text-[var(--status-error)]',
   info: 'bg-[var(--status-info)]/15 text-[var(--status-info)]',
-  neutral: 'oc-tile-inset text-muted-foreground',
+  neutral: 'mg-tile-inset text-muted-foreground',
 } satisfies Record<SettingsCardTone, string>;
 
 export const SettingsCardPill: React.FC<{ tone: SettingsCardTone; children: React.ReactNode }> = ({ tone, children }) => (
@@ -44,7 +44,7 @@ export const SettingsCardPill: React.FC<{ tone: SettingsCardTone; children: Reac
 
 /** Small outlined chip for the card footer (scope, source). */
 export const SettingsCardChip: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <span className="oc-tile-inset shrink-0 rounded-full px-2 py-px text-[10px] font-medium">
+  <span className="mg-tile-inset shrink-0 rounded-full px-2 py-px text-[10px] font-medium">
     {children}
   </span>
 );
@@ -89,7 +89,7 @@ export const SettingsCard: React.FC<SettingsCardProps> = ({ icon, title, subtitl
   const body = (
     <>
       <div className="flex items-start justify-between gap-2">
-        <span className={cn('oc-tile-inset flex size-10 shrink-0 items-center justify-center rounded-[10px]', muted && 'opacity-60')}>
+        <span className={cn('mg-tile-inset flex size-10 shrink-0 items-center justify-center rounded-[10px]', muted && 'opacity-60')}>
           {icon}
         </span>
         {badges ? <span className="flex min-w-0 flex-wrap justify-end gap-1">{badges}</span> : null}
@@ -122,13 +122,13 @@ export const SettingsCard: React.FC<SettingsCardProps> = ({ icon, title, subtitl
       onClick={onOpen}
       className={cn(
         CARD_CLASS,
-        'oc-tile oc-tile-hover h-full w-full',
+        'mg-tile mg-tile-hover h-full w-full',
       )}
     >
       {body}
     </button>
   ) : (
-    <div className={cn(CARD_CLASS, 'oc-tile h-full')}>{body}</div>
+    <div className={cn(CARD_CLASS, 'mg-tile h-full')}>{body}</div>
   );
 
   if (!hasActions || !actions) return card;
@@ -189,10 +189,10 @@ export const SettingsAddCard: React.FC<{
     className={cn(
       CARD_CLASS,
       // The one card drawn with a line: an empty slot reads as a dashed outline.
-      'oc-tile-hover items-center justify-center gap-2 text-center border border-dashed border-[color-mix(in_srgb,var(--foreground)_14%,transparent)] text-muted-foreground hover:text-foreground',
+      'mg-tile-hover items-center justify-center gap-2 text-center border border-dashed border-[color-mix(in_srgb,var(--foreground)_14%,transparent)] text-muted-foreground hover:text-foreground',
     )}
   >
-    <span className="oc-tile-inset flex size-10 items-center justify-center rounded-[10px]">
+    <span className="mg-tile-inset flex size-10 items-center justify-center rounded-[10px]">
       <Icon name="add" className="size-5" />
     </span>
     <span className="typography-ui-label font-medium">{label}</span>

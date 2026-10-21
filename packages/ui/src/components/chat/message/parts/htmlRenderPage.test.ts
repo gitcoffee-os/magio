@@ -57,9 +57,9 @@ const mountPage = (answerState?: HtmlRenderAnswerState, body = BODY) => {
     // The bootstrap and the answer script, in the order the page runs them.
     const script = [...source.matchAll(/<script>([\s\S]*?)<\/script>/g)].map((match) => match[1]).join(';');
     if (!script) throw new Error('no bootstrap');
-    const answerJson = /<script type="application\/json" id="oc-html-render-answer">[\s\S]*?<\/script>/.exec(source)?.[0] ?? '';
+    const answerJson = /<script type="application\/json" id="mg-html-render-answer">[\s\S]*?<\/script>/.exec(source)?.[0] ?? '';
     win.document.body.innerHTML = body;
-    win.document.head.innerHTML = `<style id="oc-html-render-theme"></style>${answerJson}`;
+    win.document.head.innerHTML = `<style id="mg-html-render-theme"></style>${answerJson}`;
     // happy-dom does not run a script the test appends, so the scripts run
     // with the page's globals passed in by name.
     const globals = {
@@ -139,7 +139,7 @@ describe('the page bootstrap', () => {
 
         page.send(htmlRenderMarksMessage(marks));
 
-        const painted = page.highlights.get('oc-chat-quote') ?? [];
+        const painted = page.highlights.get('mg-chat-quote') ?? [];
         expect(painted).toHaveLength(1);
         expect(painted[0]?.toString()).toBe('fix it');
         // It is the second occurrence, the one in "then fix it later".
@@ -148,10 +148,10 @@ describe('the page bootstrap', () => {
         if (painted[0]) before.setEnd(painted[0].startContainer, painted[0].startOffset);
         expect(before.toString().length).toBe(start);
         // The unresolvable mark paints nothing, and nothing is drawn stronger.
-        expect(page.highlights.get('oc-chat-quote-focus')).toBeUndefined();
+        expect(page.highlights.get('mg-chat-quote-focus')).toBeUndefined();
 
         page.send(htmlRenderMarksMessage([]));
-        expect(page.highlights.get('oc-chat-quote')).toBeUndefined();
+        expect(page.highlights.get('mg-chat-quote')).toBeUndefined();
     });
 
     test('flashes a quote the host asks to reveal', () => {
@@ -159,7 +159,7 @@ describe('the page bootstrap', () => {
         const start = stream.indexOf('bold');
         page.send(htmlRenderRevealMessage({ text: 'bold text', prefix: stream.slice(0, start), suffix: stream.slice(start + 9, start + 41), start }));
 
-        expect(page.highlights.get('oc-chat-quote-flash')?.[0]?.toString()).toBe('bold text');
+        expect(page.highlights.get('mg-chat-quote-flash')?.[0]?.toString()).toBe('bold text');
     });
 
     test('drops its selection when the host clears it, without reporting that back', async () => {
@@ -417,9 +417,9 @@ describe('the page scrollbar', () => {
         const root = page.win.document.documentElement;
 
         page.send(htmlRenderPointerMessage(true));
-        expect(root.hasAttribute('data-oc-pointer')).toBe(true);
+        expect(root.hasAttribute('data-mg-pointer')).toBe(true);
         page.send(htmlRenderPointerMessage(false));
-        expect(root.hasAttribute('data-oc-pointer')).toBe(false);
+        expect(root.hasAttribute('data-mg-pointer')).toBe(false);
     });
 });
 
@@ -428,7 +428,7 @@ describe('a page that waits for an answer', () => {
         const page = mountPage({ waiting: true, answer: null });
 
         // The page's own script, as an option's click handler would run it.
-        page.run('window.openchamber.submit({layout:"b"},"Layout B").then(function(){window.parent.postMessage({type:"test:sent",answer:window.openchamber.answer},"*");});');
+        page.run('window.magio.submit({layout:"b"},"Layout B").then(function(){window.parent.postMessage({type:"test:sent",answer:window.magio.answer},"*");});');
         expect(page.reports.at(-1)).toEqual({ kind: 'submit', id: 1, submission: { summary: 'Layout B', data: { layout: 'b' } } });
 
         page.send(htmlRenderSubmitReply(1));

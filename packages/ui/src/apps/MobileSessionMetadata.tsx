@@ -207,19 +207,19 @@ const SessionMetadataOverlay: React.FC<{
   if (!shouldRender) return null;
 
   return (
-    <div ref={wrapperRef} className="fixed inset-x-0 bottom-0 top-[calc(var(--oc-safe-area-top,0px)+var(--oc-header-height,56px))] z-20 pointer-events-none">
+    <div ref={wrapperRef} className="fixed inset-x-0 bottom-0 top-[calc(var(--mg-safe-area-top,0px)+var(--mg-header-height,56px))] z-20 pointer-events-none">
       <div
         ref={panelRef}
         role="dialog"
         aria-label={t('mobile.header.openMetadataAria')}
         className={cn(
-          'oc-surface-elevated overflow-y-auto overscroll-contain rounded-[20px] border border-border/70 bg-surface-elevated p-2 shadow-[0_12px_32px_rgb(0_0_0_/_0.2)] will-change-transform',
+          'mg-surface-elevated overflow-y-auto overscroll-contain rounded-[20px] border border-border/70 bg-surface-elevated p-2 shadow-[0_12px_32px_rgb(0_0_0_/_0.2)] will-change-transform',
           isPopover ? 'absolute origin-top-left' : 'mx-3 mt-2',
           isExiting ? 'pointer-events-none' : 'pointer-events-auto',
         )}
         style={{
           animation: `${isExiting ? 'session-metadata-out' : 'session-metadata-in'} ${isExiting ? 140 : 170}ms cubic-bezier(0.32, 0.72, 0, 1) forwards`,
-          maxHeight: 'min(72dvh, calc(100dvh - var(--oc-safe-area-top, 0px) - var(--oc-header-height, 56px) - 1rem))',
+          maxHeight: 'min(72dvh, calc(100dvh - var(--mg-safe-area-top, 0px) - var(--mg-header-height, 56px) - 1rem))',
           ...(isPopover
             ? {
                 top: 8,

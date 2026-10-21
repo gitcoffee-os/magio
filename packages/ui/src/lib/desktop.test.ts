@@ -11,9 +11,9 @@ describe('clearing session notifications', () => {
   const desktopWindow = (platform: string) => {
     const calls: Array<{ command: string; args: { sessionId?: string } }> = [];
     globalThis.window = Object.assign(Object.create(null), {
-      __OPENCHAMBER_ELECTRON__: { runtime: 'electron' },
-      __OPENCHAMBER_PLATFORM__: platform,
-      __OPENCHAMBER_DESKTOP__: {
+      __MAGIO_ELECTRON__: { runtime: 'electron' },
+      __MAGIO_PLATFORM__: platform,
+      __MAGIO_DESKTOP__: {
         invoke: async (command: string, args: { sessionId?: string }) => {
           calls.push({ command, args });
           return null;
@@ -54,10 +54,10 @@ describe('desktop local origin', () => {
     Object.defineProperty(globalThis, 'window', {
       configurable: true,
       value: {
-        location: { origin: 'openchamber-ui://app' },
-        __OPENCHAMBER_ELECTRON__: options.electron ? { runtime: 'electron' } : undefined,
-        __OPENCHAMBER_LOCAL_ORIGIN__: options.localOrigin,
-        __OPENCHAMBER_API_BASE_URL__: options.apiBaseUrl,
+        location: { origin: 'magio-ui://app' },
+        __MAGIO_ELECTRON__: options.electron ? { runtime: 'electron' } : undefined,
+        __MAGIO_LOCAL_ORIGIN__: options.localOrigin,
+        __MAGIO_API_BASE_URL__: options.apiBaseUrl,
       },
     });
   };

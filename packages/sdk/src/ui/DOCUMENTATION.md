@@ -2,7 +2,7 @@
 
 ## Purpose
 
-`@openchamber/sdk/ui` is a plain-DOM drawing kit for guest panels in the sandboxed iframe. Primitives only. The guest composes them into screens and owns the data. No React, no dependencies, no zod.
+`@magio/sdk/ui` is a plain-DOM drawing kit for guest panels in the sandboxed iframe. Primitives only. The guest composes them into screens and owns the data. No React, no dependencies, no zod.
 
 Do not import this from `packages/ui`. The iframe is not the host React tree.
 
@@ -10,7 +10,7 @@ Do not import this from `packages/ui`. The iframe is not the host React tree.
 
 Every `mountX(root, props)` returns `{ update(partial), dispose() }`.
 
-- `theme.ts`: `applyHostReady(ctx, document.documentElement)` writes host tokens as CSS variables (both host names and `--oc-*` aliases) plus `data-oc-surface` / `data-oc-theme`. `applyHostTheme` writes tokens only. Optional syntax colors map to `--oc-syntax-keyword`, `--oc-syntax-string`, `--oc-syntax-number`, `--oc-syntax-function`, `--oc-syntax-type`, `--oc-syntax-comment`, `--oc-syntax-variable`, and `--oc-syntax-operator`, with matching legacy `--syntax-*` names.
+- `theme.ts`: `applyHostReady(ctx, document.documentElement)` writes host tokens as CSS variables (both host names and `--mg-*` aliases) plus `data-mg-surface` / `data-mg-theme`. `applyHostTheme` writes tokens only. Optional syntax colors map to `--mg-syntax-keyword`, `--mg-syntax-string`, `--mg-syntax-number`, `--mg-syntax-function`, `--mg-syntax-type`, `--mg-syntax-comment`, `--mg-syntax-variable`, and `--mg-syntax-operator`, with matching legacy `--syntax-*` names.
 - `button.ts`: `mountButton`. Variants `default` (tinted primary), `secondary`, `outline`, `ghost`, `destructive`; sizes `default` 32px, `sm` 28px, `xs` 24px, matching the app's `Button`. `loading` shows a ring and blocks clicks.
 - `field.ts`: `mountTextField`. Input or textarea (`multiline`), optional label, helper, error, `password`, `mono`.
 - `search.ts`: `mountSearchField`. Leading search icon, clear button when non-empty, Escape clears.
@@ -28,7 +28,7 @@ Every `mountX(root, props)` returns `{ update(partial), dispose() }`.
 - `menu.ts`: `mountMenu`. Button trigger plus `role="menu"` popup. Items may be `destructive`, `disabled`, or `{ separator: true }`.
 - `text.ts`: `mountText`. Plain text through `textContent`; `![alt](https://…)` becomes `img`, `[label](https://…)` becomes `a` that calls `onOpenUrl`. `splitTextMedia` is the pure splitter.
 - `popover-anchor.ts`: `mountPopoverAnchor` binds an element to a host-positioned sandboxed popover. It owns per-opening IDs, hover/focus activity, scroll/removal cleanup and anchor focus restoration. Unlike `popup.ts`, its content lives outside the source frame. Feature-gate it with `ready.features.popovers`, render the child from `ready.popover`, and dispose bindings before replacing rows. See [Anchored popovers](../../API.md#anchored-popovers) for limits and host ownership.
-- `style.ts`: the kit CSS, `UI_CSS`, made of the scrollbar defaults, `UI_SIZE_CSS` (geometry, stays in the bundle) and `GUEST_UI_LOOK_CSS` (appearance, also served by the host to installed bundles; see the package `DOCUMENTATION.md`). A rule that changes both goes in both with the same selector. The look's light theme and dark theme differ only in `--oc-sdk-*` custom properties set on `:root` and `:root[data-oc-theme="dark"]` (control edge, fills, lift, dropdown light), mirroring the app's `oc-field`, `oc-raised`, `oc-raised-button` and `oc-glass-floating`. `dom.ts` `ensureStyle` injects it once. `popup.ts` places fixed popups (flips above when short on room) and wires outside-click, resize, and scroll to close. `option.ts` is the popup row shared by select and menu. `icons.ts` holds the four inline SVG shapes.
+- `style.ts`: the kit CSS, `UI_CSS`, made of the scrollbar defaults, `UI_SIZE_CSS` (geometry, stays in the bundle) and `GUEST_UI_LOOK_CSS` (appearance, also served by the host to installed bundles; see the package `DOCUMENTATION.md`). A rule that changes both goes in both with the same selector. The look's light theme and dark theme differ only in `--mg-sdk-*` custom properties set on `:root` and `:root[data-mg-theme="dark"]` (control edge, fills, lift, dropdown light), mirroring the app's `mg-field`, `mg-raised`, `mg-raised-button` and `mg-glass-floating`. `dom.ts` `ensureStyle` injects it once. `popup.ts` places fixed popups (flips above when short on room) and wires outside-click, resize, and scroll to close. `option.ts` is the popup row shared by select and menu. `icons.ts` holds the four inline SVG shapes.
 
 ## Invariants
 
@@ -36,12 +36,12 @@ Every `mountX(root, props)` returns `{ update(partial), dispose() }`.
 - Call `applyHostReady` from `onReady` before the first mount. Without those tokens the kit has no colours.
 - The required `*Text` tokens come from the host's `lib/theme/readableColors.ts`. The SDK never duplicates the contrast calculation. `applyHostTheme` writes both naming schemes on every snapshot. Tinted button labels, badge text, banner titles and error text use these values; fills keep the base colors.
 - Syntax tokens are optional. Each theme snapshot clears a missing optional token, so a previous theme cannot leave a stale syntax color behind. Guests that need to support older snapshots should fall back to an existing semantic token in their own CSS.
-- Colours come only from `var(--host-name, var(--oc-alias, fallback))`. No literal hex in `style.ts`.
+- Colours come only from `var(--host-name, var(--mg-alias, fallback))`. No literal hex in `style.ts`.
 - Inputs and picker triggers use the elevated pair; hover/pressed colors layer over that fill. Popups scope the text foreground for nested neutral controls. Secondary buttons use the muted surface, selected tabs use the selection pair, and focus stays independent from primary actions.
 - A mount paints from `props`. The only hidden state is UI state: open popup, highlighted row, typed filter. `update()` merges props and keeps that state unless the related prop changed.
 - Every string lands through `textContent`. `mountText` is the only place that creates `a` and `img`, and only for `http(s)` URLs.
 - `dispose()` removes the node and every listener, including the document and window listeners a popup added.
-- `GUEST_SCROLLBAR_CSS` in `src/scrollbar-style.ts` owns native scrollbar defaults for the iframe document. The UI kit includes it, and the server appends the same stylesheet to served guest HTML so existing bundles get it too. Chromium/WebKit use 6px rounded thumbs and transparent tracks; Firefox uses the standard thin scrollbar. Like the app's overlay scrollbars, thumbs are invisible at rest and appear on hover or while the element scrolls: `ensureStyle` calls `installGuestScrollbarActivity`, one passive capturing `scroll` listener per document that sets `data-oc-scrolling` and clears it after a quiet second. Colors follow `--oc-muted`, including later theme snapshots. Forced-colors mode uses the system text color. Scrolling itself remains browser-owned.
+- `GUEST_SCROLLBAR_CSS` in `src/scrollbar-style.ts` owns native scrollbar defaults for the iframe document. The UI kit includes it, and the server appends the same stylesheet to served guest HTML so existing bundles get it too. Chromium/WebKit use 6px rounded thumbs and transparent tracks; Firefox uses the standard thin scrollbar. Like the app's overlay scrollbars, thumbs are invisible at rest and appear on hover or while the element scrolls: `ensureStyle` calls `installGuestScrollbarActivity`, one passive capturing `scroll` listener per document that sets `data-mg-scrolling` and clears it after a quiet second. Colors follow `--mg-muted`, including later theme snapshots. Forced-colors mode uses the system text color. Scrolling itself remains browser-owned.
 - Focus is `box-shadow` on `:focus-visible`, never `outline`. Disabled is `opacity: .5; pointer-events: none`.
 - Popups render inside the mount wrapper with `position: fixed`; a transformed ancestor would break placement, so guests should not transform the kit's parents.
 - Tests run in `bun:test` without a DOM. Test the pure helpers (`navigation.ts`, `filterSelectOptions`, `splitTextMedia`, `clampProgress`); keep painting thin.

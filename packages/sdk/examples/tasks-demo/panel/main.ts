@@ -1,5 +1,5 @@
-import { connectHost } from '@openchamber/sdk';
-import { applyHostReady } from '@openchamber/sdk/ui';
+import { connectHost } from '@magio/sdk';
+import { applyHostReady } from '@magio/sdk/ui';
 import { attachPayload, loadTasks } from './tasks.ts';
 import { mountBoard } from './board.ts';
 

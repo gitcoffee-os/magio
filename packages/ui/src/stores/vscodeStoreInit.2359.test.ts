@@ -7,8 +7,8 @@ import { afterEach, describe, expect, mock, test } from 'bun:test';
  * VS Code workspace folder rather than the stale persisted directory.
  */
 
-const WORKSPACE = '/tmp/oc-ws-project-a';
-const STALE = '/tmp/oc-ws-other';
+const WORKSPACE = '/tmp/mg-ws-project-a';
+const STALE = '/tmp/mg-ws-other';
 
 const storage = new Map<string, string>([
   ['lastDirectory', STALE],
@@ -17,7 +17,7 @@ const storage = new Map<string, string>([
 
 interface TestWindow {
   __VSCODE_CONFIG__?: { workspaceFolder: string; workspaceFolders: { name: string; path: string }[] };
-  __OPENCHAMBER_HOME__?: string;
+  __MAGIO_HOME__?: string;
   localStorage: Storage;
   matchMedia: () => { matches: boolean };
   addEventListener: () => void;
@@ -63,9 +63,9 @@ const installWindow = () => {
   setTestWindow({
     __VSCODE_CONFIG__: {
       workspaceFolder: WORKSPACE,
-      workspaceFolders: [{ name: 'oc-ws-project-a', path: WORKSPACE }],
+      workspaceFolders: [{ name: 'mg-ws-project-a', path: WORKSPACE }],
     },
-    __OPENCHAMBER_HOME__: WORKSPACE,
+    __MAGIO_HOME__: WORKSPACE,
     localStorage: testLocalStorage,
     matchMedia: () => ({ matches: false }),
     addEventListener: () => undefined,

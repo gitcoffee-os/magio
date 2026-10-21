@@ -33,8 +33,8 @@ import { createProviderReadCache } from '../provider-read-cache/index.js';
 import { createTrackedItemReaders } from '../tracked-items/readers.js';
 import { createTrackedItemsPersistence } from '../tracked-items/persistence.js';
 import { registerTrackedItemsRoutes } from '../tracked-items/routes.js';
-import { registerOpenChamberSessionRoutes } from '../openchamber-sessions/routes.js';
-import { registerOpenChamberControlRoutes } from '../openchamber-control/routes.js';
+import { registerMagioSessionRoutes } from '../magio-sessions/routes.js';
+import { registerMagioControlRoutes } from '../magio-control/routes.js';
 import { registerMarkdownImageGrantRoutes } from '../markdown-image-grants/routes.js';
 import { registerSkillRoutes } from './skill-routes.js';
 import { registerPluginRoutes } from './plugin-routes.js';
@@ -91,7 +91,7 @@ export const createFeatureRoutesRuntime = (dependencies) => {
   } = dependencies;
   const gitRuntimeIdentity = Object.freeze({
     id: `server_${crypto.randomUUID()}`,
-    platform: process.env.OPENCHAMBER_RUNTIME === 'desktop' ? 'desktop' : 'web',
+    platform: process.env.MAGIO_RUNTIME === 'desktop' ? 'desktop' : 'web',
   });
 
   let quotaProviders = null;
@@ -212,10 +212,10 @@ export const createFeatureRoutesRuntime = (dependencies) => {
       spawn,
       resolveGitBinaryForSpawn,
       createFsSearchRuntime,
-      openchamberDataDir,
+      magioDataDir,
       onGuestDeactivated,
       surfaceViewerHeaders,
-      openchamberUserConfigRoot,
+      magioUserConfigRoot,
       managedChatsRoot,
       normalizeDirectoryPath,
       resolveProjectDirectory,
@@ -253,10 +253,10 @@ export const createFeatureRoutesRuntime = (dependencies) => {
       sessionKnowledgeRuntime,
       scheduledTasksRuntime,
       scheduledTaskService,
-      openChamberSessionService,
-      openChamberControlService,
+      magioSessionService,
+      magioControlService,
       waitForOpenCodeReady,
-      getOpenChamberEventClients,
+      getMagioEventClients,
       writeSseEvent,
       emitSessionCreatedEvent,
       permissionAutoAcceptRuntime,
@@ -264,7 +264,7 @@ export const createFeatureRoutesRuntime = (dependencies) => {
       messageQueueRuntime,
       routingRuntime,
       globalEventHub,
-      openchamberVersion,
+      magioVersion,
     } = routeDependencies;
 
     registerSettingsUtilityRoutes(app, {
@@ -278,7 +278,7 @@ export const createFeatureRoutesRuntime = (dependencies) => {
     registerPermissionAutoAcceptRoutes(app, permissionAutoAcceptRuntime);
     registerMessageQueueRoutes(app, messageQueueRuntime);
     registerRoutingRoutes(app, routingRuntime);
-    // Before the generic OpenCode proxy: swallows the `openchamber/auto` model
+    // Before the generic OpenCode proxy: swallows the `magio/auto` model
     // switch and routes the sends that follow it.
     registerRoutingPromptRewrite(app, routingRuntime);
 
@@ -306,7 +306,7 @@ export const createFeatureRoutesRuntime = (dependencies) => {
       fsPromises,
       path,
       crypto,
-      openchamberDataDir,
+      magioDataDir,
       sanitizeProjects,
       readSettingsFromDiskMigrated,
       persistSettings,
@@ -321,11 +321,11 @@ export const createFeatureRoutesRuntime = (dependencies) => {
       projectConfigRuntime,
       scheduledTasksRuntime,
       scheduledTaskService,
-      getOpenChamberEventClients,
+      getMagioEventClients,
       writeSseEvent,
     });
 
-    registerOpenChamberSessionRoutes(app, {
+    registerMagioSessionRoutes(app, {
       readSettingsFromDiskMigrated,
       sanitizeProjects,
       validateDirectoryPath,
@@ -333,10 +333,10 @@ export const createFeatureRoutesRuntime = (dependencies) => {
       getOpenCodeAuthHeaders,
       waitForOpenCodeReady,
       emitSessionCreatedEvent,
-      sessionService: openChamberSessionService,
+      sessionService: magioSessionService,
     });
 
-    registerOpenChamberControlRoutes(app, { controlService: openChamberControlService });
+    registerMagioControlRoutes(app, { controlService: magioControlService });
 
     registerMarkdownImageGrantRoutes(app, {
       fsPromises,
@@ -405,13 +405,13 @@ export const createFeatureRoutesRuntime = (dependencies) => {
     registerSessionGoalRoutes(app);
     const gitBinary = resolveGitBinaryForSpawn();
     const gitlabAuthStore = createSourceControlAuthStore({
-      filePath: path.join(openchamberDataDir, 'source-control-auth.json'),
+      filePath: path.join(magioDataDir, 'source-control-auth.json'),
       // GitLab OAuth tokens live two hours; the store renews them before they lapse.
       refreshOAuthToken: async ({ origin, refreshToken }) => refreshGitLabAccessToken({
         origin, refreshToken, clientId: await resolveGitLabClientId(origin, readSettingsFromDisk),
       }),
     });
-    // A GitHub account is either one OpenChamber stores or the gh CLI login
+    // A GitHub account is either one Magio stores or the gh CLI login
     // the user switched to; reads already accept both, so Git transport
     // (fork PR worktrees, clones) must too.
     const resolveSourceControlAccount = async ({ provider, instance, accountId, credentialRevision }) => {
@@ -423,28 +423,28 @@ export const createFeatureRoutesRuntime = (dependencies) => {
       getTransportRevision: (directory) => readEffectiveGitTransportRevision(directory, { gitBinary }),
     });
     const contributorProvenance = createContributorProvenanceStore({
-      filePath: path.join(openchamberDataDir, 'git-contributor-provenance.json'),
+      filePath: path.join(magioDataDir, 'git-contributor-provenance.json'),
       resolveRepositoryIdentity: resolveTransportRepository,
       resolveGitPaths: resolveRepositoryGitPaths,
       fsImpl: fsPromises,
     });
     const sourceControlAuditStore = createSourceControlAuditStore({
-      filePath: path.join(openchamberDataDir, 'source-control-audit.json'),
+      filePath: path.join(magioDataDir, 'source-control-audit.json'),
       fsImpl: fsPromises,
     });
     const sshCredentialStore = createManagedSshCredentialStore({
-      filePath: path.join(openchamberDataDir, 'git-ssh-credentials.json'),
+      filePath: path.join(magioDataDir, 'git-ssh-credentials.json'),
       fsImpl: fsPromises,
     });
     const managedSshInventory = createManagedSshInventory({
       store: sshCredentialStore,
-      snapshotRoot: path.join(openchamberDataDir, 'git-ssh-operation-keys'),
+      snapshotRoot: path.join(magioDataDir, 'git-ssh-operation-keys'),
       discoveryRoot: path.join(os.homedir(), '.ssh'),
-      managedKeyRoot: path.join(openchamberDataDir, 'git-ssh-private-keys'),
+      managedKeyRoot: path.join(magioDataDir, 'git-ssh-private-keys'),
       fsImpl: fsPromises,
     });
     // What a repository's own `.git/config` names for pushing and pulling
-    // follows its grants: OpenChamber's credential helper for an account, the
+    // follows its grants: Magio's credential helper for an account, the
     // SSH wrapper with the key for a managed key, nothing for System Git.
     const syncRepositoryTransport = async (directory, read) => {
       if (typeof directory !== 'string' || !directory.trim() || !gitRepositoryCredentialRuntime) return;
@@ -470,7 +470,7 @@ export const createFeatureRoutesRuntime = (dependencies) => {
       onRepositoryTransportChanged: syncRepositoryTransport,
       validateManagedSshCredential: managedSshInventory.assertAvailable,
       readManagedSshCredentialPresentation: managedSshInventory.presentation,
-      configRoot: openchamberDataDir,
+      configRoot: magioDataDir,
       resolveTransportRepository,
       auditStore: sourceControlAuditStore,
       runtimeIdentity: gitRuntimeIdentity,
@@ -488,7 +488,7 @@ export const createFeatureRoutesRuntime = (dependencies) => {
         readContributorProvenance: contributorProvenance.read,
       },
       gitlab: {
-        configRoot: openchamberDataDir,
+        configRoot: magioDataDir,
         store: gitlabAuthStore,
         readSettings: readSettingsFromDisk,
       },
@@ -500,14 +500,14 @@ export const createFeatureRoutesRuntime = (dependencies) => {
     // Live state of the linked pull requests, merge requests and issues the
     // clients show, refreshed here and pushed over the event stream.
     const findEventClient = (connectionId) => {
-      for (const client of getOpenChamberEventClients()) {
-        if (client.openchamberConnectionId === connectionId) return client;
+      for (const client of getMagioEventClients()) {
+        if (client.magioConnectionId === connectionId) return client;
       }
       return null;
     };
     const trackedItemsService = createTrackedItemsService({
       readers: createTrackedItemReaders({ readGitLabLiveSummaries: walkthroughBindingService.readGitLabLiveSummaries }),
-      persistence: createTrackedItemsPersistence({ dataDir: openchamberDataDir }),
+      persistence: createTrackedItemsPersistence({ dataDir: magioDataDir }),
       isConnectionOpen: (connectionId) => findEventClient(connectionId) !== null,
       send: (connectionId, event) => {
         const client = findEventClient(connectionId);
@@ -516,7 +516,7 @@ export const createFeatureRoutesRuntime = (dependencies) => {
           writeSseEvent(client, event);
           return true;
         } catch {
-          getOpenChamberEventClients().delete(client);
+          getMagioEventClients().delete(client);
           return false;
         }
       },
@@ -531,10 +531,10 @@ export const createFeatureRoutesRuntime = (dependencies) => {
       if (settlingDirectories.has(directory)) return;
       settlingDirectories.set(directory, setTimeout(() => {
         settlingDirectories.delete(directory);
-        const clients = getOpenChamberEventClients();
+        const clients = getMagioEventClients();
         for (const client of clients) {
           try {
-            writeSseEvent(client, { type: 'openchamber:source-control.activity', properties: { directory } });
+            writeSseEvent(client, { type: 'magio:source-control.activity', properties: { directory } });
           } catch {
             clients.delete(client);
           }
@@ -567,7 +567,7 @@ export const createFeatureRoutesRuntime = (dependencies) => {
       return profile;
     };
     const networkOperationStore = createGitNetworkOperationStore({
-      filePath: path.join(openchamberDataDir, 'git-network-operations.json'),
+      filePath: path.join(magioDataDir, 'git-network-operations.json'),
       fsImpl: fsPromises,
     });
     const gitCredentialResolver = createGitCredentialResolver({
@@ -579,7 +579,7 @@ export const createFeatureRoutesRuntime = (dependencies) => {
       }),
       lookupManagedSshKey: sshCredentialStore.lookup,
       fsImpl: fsPromises,
-      snapshotRoot: path.join(openchamberDataDir, 'git-ssh-operation-keys'),
+      snapshotRoot: path.join(magioDataDir, 'git-ssh-operation-keys'),
     });
     registerSkillRoutes(app, {
       fs,
@@ -624,7 +624,7 @@ export const createFeatureRoutesRuntime = (dependencies) => {
     gitRepositoryCredentialRuntime = createGitRepositoryCredentialRuntime({
       readBinding: (directory) => walkthroughBindingService.get(directory),
       credentialResolver: gitCredentialResolver,
-      dataDir: openchamberDataDir,
+      dataDir: magioDataDir,
       fsPromises,
       getActivePort: routeDependencies.getActivePort ?? (() => null),
       getActiveHost: routeDependencies.getActiveHost ?? (() => null),
@@ -653,8 +653,8 @@ export const createFeatureRoutesRuntime = (dependencies) => {
       resolveGitIdentity,
       trustedDirectoriesConfig: createTrustedDirectoriesConfig({ gitBinary }),
     });
-    await registerBuiltInGuests({ persistPath: extensionsPersistPath(openchamberDataDir), root: routeDependencies.builtInExtensionsDir });
-    registerGuestRoutes(app, { openchamberDataDir, openchamberVersion, resolveGitBinaryForSpawn, resolveOptionalProjectDirectory, getSmallModelService, onGuestDeactivated, surfaceViewerHeaders });
+    await registerBuiltInGuests({ persistPath: extensionsPersistPath(magioDataDir), root: routeDependencies.builtInExtensionsDir });
+    registerGuestRoutes(app, { magioDataDir, magioVersion, resolveGitBinaryForSpawn, resolveOptionalProjectDirectory, getSmallModelService, onGuestDeactivated, surfaceViewerHeaders });
     gitWorktreeCreation = registerGitRoutes(app, {
       // Identities for accounts connected before identities carried one are
       // made the first time identities are listed: a moment someone asked for,
@@ -668,16 +668,16 @@ export const createFeatureRoutesRuntime = (dependencies) => {
       createHttpsCredentialReference,
       getSourceControlBinding: walkthroughBindingService.get,
       resolveSourceControlAccount,
-      errorRedactionSecrets: [openchamberDataDir],
+      errorRedactionSecrets: [magioDataDir],
       worktreeBootstrapStore,
       buildOpenCodeUrl,
       getOpenCodeAuthHeaders,
       emitWorktreeChanged: ({ directories, at }) => {
-        const clients = getOpenChamberEventClients();
+        const clients = getMagioEventClients();
         for (const client of clients) {
           try {
             writeSseEvent(client, {
-              type: 'openchamber:worktree-changed',
+              type: 'magio:worktree-changed',
               properties: { directories, at },
             });
           } catch {
@@ -691,7 +691,7 @@ export const createFeatureRoutesRuntime = (dependencies) => {
     registerMagicPromptRoutes(app, {
       fsPromises,
       path,
-      openchamberDataDir,
+      magioDataDir,
     });
     registerProjectContextRoutes(app, { projectContextRuntime });
     registerProjectDirectoryRoutes(app, {
@@ -714,14 +714,14 @@ export const createFeatureRoutesRuntime = (dependencies) => {
     registerSessionFoldersRoutes(app, {
       fsPromises,
       path,
-      openchamberDataDir,
+      magioDataDir,
       // Folders are shared by every client of this server; each one reads
       // them again when told they changed.
       onChanged: (updatedAt) => {
-        const clients = getOpenChamberEventClients();
+        const clients = getMagioEventClients();
         for (const client of clients) {
           try {
-            writeSseEvent(client, { type: 'openchamber:session-folders-changed', properties: { updatedAt } });
+            writeSseEvent(client, { type: 'magio:session-folders-changed', properties: { updatedAt } });
           } catch {
             clients.delete(client);
           }
@@ -742,7 +742,7 @@ export const createFeatureRoutesRuntime = (dependencies) => {
       buildAugmentedPath,
       resolveGitBinaryForSpawn,
       resolveRipgrepBinary,
-      openchamberUserConfigRoot,
+      magioUserConfigRoot,
       cloneRepository: networkOperations.cloneRepository,
       managedChatsRoot,
       environmentRuntime,

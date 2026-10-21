@@ -43,7 +43,7 @@ import { runBackgroundNetworkTask } from '@/lib/background-network';
 import { buildKnownSessionDirectories } from './sidebar/list/sessionListDirectories';
 import { sortProjectsByOrder } from './sidebar/list/projectSort';
 import { z } from 'zod';
-import { subscribeOpenchamberEvents } from '@/lib/openchamberEvents';
+import { subscribemagioEvents } from '@/lib/magioEvents';
 import {
   commitDiscoveredRawWorktreesByProject,
   ensureRawWorktreesByProjectScope,
@@ -170,7 +170,7 @@ const SessionSidebarComponent: React.FC<SessionSidebarProps> = ({
   );
   // The sidebar tree's +-buttons (project / group / folder) open a draft but,
   // unlike selecting an existing session, don't navigate. VS Code's compact view
-  // is driven by the openchamber:navigate event, so switch to chat explicitly
+  // is driven by the magio:navigate event, so switch to chat explicitly
   // (a no-op in the expanded side-by-side layout, which is always showing chat).
   const openNewSessionDraftFromTree = React.useCallback<typeof openNewSessionDraft>((options) => {
     // Starting a draft always leaves any full-page surface, even when a
@@ -178,7 +178,7 @@ const SessionSidebarComponent: React.FC<SessionSidebarProps> = ({
     useUIStore.getState().closeMainSurfaces();
     openNewSessionDraft(options);
     if (isVSCode) {
-      window.dispatchEvent(new CustomEvent('openchamber:navigate', { detail: { view: 'chat' } }));
+      window.dispatchEvent(new CustomEvent('magio:navigate', { detail: { view: 'chat' } }));
     }
   }, [isVSCode, openNewSessionDraft]);
   const updateStore = useUpdateStore(useShallow((s) => ({
@@ -598,7 +598,7 @@ const SessionSidebarComponent: React.FC<SessionSidebarProps> = ({
       }
     };
 
-    return subscribeOpenchamberEvents((event) => {
+    return subscribemagioEvents((event) => {
       if (event.type === 'session-created') {
         // A new session can only have changed its own project's worktrees.
         // When its project is not certain, every project is discovered.

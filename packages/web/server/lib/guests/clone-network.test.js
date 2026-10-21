@@ -13,7 +13,7 @@ afterEach(() => {
 // A stand-in git that behaves like a schannel-only Git for Windows whose system
 // config asks for OpenSSL (issue #4040): refuses unless a backend it has is set.
 const fakeGit = (script) => {
-  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'oc-fake-git-'));
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'mg-fake-git-'));
   dirs.push(dir);
   const file = path.join(dir, 'git');
   fs.writeFileSync(file, `#!/bin/sh\n${script}\n`, { mode: 0o755 });

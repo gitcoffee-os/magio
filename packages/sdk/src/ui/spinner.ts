@@ -12,9 +12,9 @@ export type SpinnerHandle = Handle<SpinnerProps>;
 export const mountSpinner = (root: Element, initial: SpinnerProps = {}): SpinnerHandle => {
   ensureStyle(UI_CSS);
   let props = initial;
-  const node = el('span', 'oc-sdk oc-sdk-spinner');
+  const node = el('span', 'mg-sdk mg-sdk-spinner');
   node.setAttribute('role', 'status');
-  const ring = el('span', 'oc-sdk-spinner-ring');
+  const ring = el('span', 'mg-sdk-spinner-ring');
   ring.setAttribute('aria-hidden', 'true');
   const label = el('span');
   node.append(ring, label);

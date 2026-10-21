@@ -10,11 +10,11 @@ import path from 'node:path';
 // GNOME re-matches open windows when the file appears, so the first launch
 // gets the icon a few seconds after this runs.
 
-const DESKTOP_FILE_NAME = 'openchamber.desktop';
-const WM_CLASS = 'openchamber';
-const MANAGED_KEY = 'X-OpenChamber-Managed';
-const ICON_RELATIVE_PATH = path.join('icons', 'hicolor', '512x512', 'apps', 'openchamber.png');
-const APPDIR_ICON_RELATIVE_PATH = path.join('usr', 'share', 'icons', 'hicolor', '512x512', 'apps', 'openchamber.png');
+const DESKTOP_FILE_NAME = 'magio.desktop';
+const WM_CLASS = 'magio';
+const MANAGED_KEY = 'X-Magio-Managed';
+const ICON_RELATIVE_PATH = path.join('icons', 'hicolor', '512x512', 'apps', 'magio.png');
+const APPDIR_ICON_RELATIVE_PATH = path.join('usr', 'share', 'icons', 'hicolor', '512x512', 'apps', 'magio.png');
 
 const resolveDataHome = (env, homeDir) => {
   const value = (env.XDG_DATA_HOME ?? '').trim();
@@ -29,8 +29,8 @@ const quoteExecArgument = (value) => `"${value.replace(/(["`$\\])/g, '\\$1')}"`.
 export const buildAppImageDesktopEntry = ({ appImagePath, iconPath }) => [
   '[Desktop Entry]',
   'Type=Application',
-  'Name=OpenChamber',
-  'Comment=Desktop runtime for OpenChamber',
+  'Name=Magio',
+  'Comment=Desktop runtime for Magio',
   `Exec=${escapeDesktopString(quoteExecArgument(appImagePath))} %U`,
   `TryExec=${escapeDesktopString(appImagePath)}`,
   `Icon=${escapeDesktopString(iconPath)}`,
@@ -147,7 +147,7 @@ export const reconcileAppImageDesktopEntry = async ({
   const appImagePath = (env.APPIMAGE ?? '').trim();
   const appDir = (env.APPDIR ?? '').trim();
   if (!path.isAbsolute(appImagePath) || !path.isAbsolute(appDir) || /[\r\n]/.test(appImagePath)) {
-    // An installed .deb or .rpm ships its own openchamber.desktop, which an
+    // An installed .deb or .rpm ships its own magio.desktop, which an
     // entry left by an earlier AppImage run would hide: ours takes precedence.
     // An extracted AppImage also runs without APPIMAGE; it keeps the entry.
     const installed = await findInstalledPackageEntry(env, desktopPath);

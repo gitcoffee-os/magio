@@ -78,7 +78,7 @@ const BASE = '/api/project-context/path_dGVzdA';
 
 describe('todo item routes', () => {
   const withRuntime = async (run) => {
-    const projectsDirPath = await fsPromises.mkdtemp(path.join(os.tmpdir(), 'oc-context-todos-http-'));
+    const projectsDirPath = await fsPromises.mkdtemp(path.join(os.tmpdir(), 'mg-context-todos-http-'));
     try {
       let counter = 0;
       const runtime = createProjectContextRuntime({ fsPromises, path, projectsDirPath, createId: () => `item-${++counter}` });

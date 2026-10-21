@@ -10,7 +10,7 @@ import { createRelayKeyStore } from '../../server/lib/relay/key-store.js';
 import { deriveServerId } from '../../server/lib/relay/signing-key.js';
 
 const withTempDir = async (fn) => {
-  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'oc-settings-accessors-'));
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'mg-settings-accessors-'));
   try {
     return await fn(dir);
   } finally {

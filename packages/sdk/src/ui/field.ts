@@ -22,10 +22,10 @@ export type TextFieldHandle = Handle<TextFieldProps>;
 export const mountTextField = (root: Element, initial: TextFieldProps): TextFieldHandle => {
   ensureStyle(UI_CSS);
   let props = initial;
-  const field = el('label', 'oc-sdk oc-sdk-field');
-  const caption = el('span', 'oc-sdk-field-label');
-  const input = props.multiline ? el('textarea', 'oc-sdk-input') : el('input', 'oc-sdk-input');
-  const note = el('span', 'oc-sdk-field-note');
+  const field = el('label', 'mg-sdk mg-sdk-field');
+  const caption = el('span', 'mg-sdk-field-label');
+  const input = props.multiline ? el('textarea', 'mg-sdk-input') : el('input', 'mg-sdk-input');
+  const note = el('span', 'mg-sdk-field-note');
   field.append(caption, input, note);
   root.append(field);
 

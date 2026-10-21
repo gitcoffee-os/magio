@@ -1,4 +1,4 @@
-# OpenChamber Mobile Handoff
+# Magio Mobile Handoff
 
 Status and process reference for the native iOS/Android apps. Written so work can continue after
 merge — either by finishing CI/release automation, or by adding features as follow-up fixes. The
@@ -11,7 +11,7 @@ renderer), not the desktop shell. The native app is a WKWebView (iOS) / Android 
 bundled copy of the web build; native capabilities are added via Capacitor plugins and two iOS app
 extensions.
 
-- App id / package: `com.openchamber.app`; app name `OpenChamber`.
+- App id / package: `com.magio.app`; app name `Magio`.
 - Capacitor config: `capacitor.config.json`. It is JSON because the Capacitor CLI reads a
   `capacitor.config.ts` through the TypeScript JS API (`transpileModule`), which TypeScript 7 no
   longer ships. Why its values are what they are:
@@ -20,7 +20,7 @@ extensions.
     blocked as mixed content even with cleartext allowed in the manifest. LAN transport is a core
     feature; iOS (`capacitor://`) has no such issue, and relay and tunnel traffic is TLS anyway.
   - Keyboard `resize: 'none'`: the WebView keeps its full height and the UI follows the keyboard
-    through the `--oc-keyboard-inset` CSS variable driven by `keyboardWillShow`
+    through the `--mg-keyboard-inset` CSS variable driven by `keyboardWillShow`
     (`useNativeMobileChrome`). The built-in `native` resize lands only after the keyboard
     animation ends, which looked like a ~1.5s lag.
   - StatusBar `overlaysWebView: true`.
@@ -99,13 +99,13 @@ iOS Simulator helpers: `mobile:sim:{boot,install,launch,run,serve,list,kill}` (s
   without Google Play Services. iOS uses the plugin's native scanner. CAMERA permission +
   `NSCameraUsageDescription` declared.
 - **Secure storage** — `@aparajita/capacitor-secure-storage` for connection tokens.
-- **Deep links** — `openchamber://` URL scheme; a reusable intent vocabulary (`apps/deepLinks.ts`)
+- **Deep links** — `magio://` URL scheme; a reusable intent vocabulary (`apps/deepLinks.ts`)
   used by notification taps, widgets, and Control Center. Cold-launch intents are stashed.
 - **Push notifications** — iOS APNs + Android FCM (see below). Presence-aware routing suppresses a
   device's push when an interactive (desktop/web) client is visible.
 - **iOS widgets + Control Center + Notification Service Extension** — WidgetKit extension
-  (`OpenChamberWidget`), a Control Center control, and an NSE (`OpenChamberNotificationService`)
-  that refreshes widgets from push. All share the App Group `group.com.openchamber.app`.
+  (`MagioWidget`), a Control Center control, and an NSE (`MagioNotificationService`)
+  that refreshes widgets from push. All share the App Group `group.com.magio.app`.
 - **Native chrome** — status bar (iOS overlay + safe-area; Android inset + themed background),
   keyboard handling (iOS CSS inset; Android native `adjustResize`), edge-swipe session switch,
   back-button handling, app-icon badge.
@@ -128,16 +128,16 @@ iOS Simulator helpers: `mobile:sim:{boot,install,launch,run,serve,list,kill}` (s
 
 ### iOS (`ios/App`)
 
-- Extensions: `OpenChamberWidget` (WidgetKit, deployment 17.0) and `OpenChamberNotificationService`
+- Extensions: `MagioWidget` (WidgetKit, deployment 17.0) and `MagioNotificationService`
   (NSE, 15.5), both hand-wired into `App.xcodeproj/project.pbxproj` and embedded via a copy phase.
-- App Group `group.com.openchamber.app` in all three targets' entitlements (app + widget + NSE).
-- `Info.plist`: `CFBundleURLTypes` scheme `openchamber`, `NSCameraUsageDescription`.
+- App Group `group.com.magio.app` in all three targets' entitlements (app + widget + NSE).
+- `Info.plist`: `CFBundleURLTypes` scheme `magio`, `NSCameraUsageDescription`.
 - Push entitlement (aps-environment) required.
 - APNs `mutable-content: 1` (set server/relay side) wakes the NSE to refresh widgets.
 
 ### Android (`android/app`)
 
-- `google-services.json` (committed; Firebase project `openchamber-8bf7e`). The Google Services
+- `google-services.json` (committed; Firebase project `magio-8bf7e`). The Google Services
   Gradle plugin is applied conditionally when the file exists; `@capacitor/push-notifications`
   brings `firebase-messaging`.
 - Manifest: permissions `INTERNET`, `CAMERA` (+ optional camera feature), `POST_NOTIFICATIONS`
@@ -160,7 +160,7 @@ iOS Simulator helpers: `mobile:sim:{boot,install,launch,run,serve,list,kill}` (s
   `StatusBar.setOverlaysWebView({ overlay: false })` moves the WebView below the status bar, yet
   Capacitor still injects the bar height as `--safe-area-inset-top` once the WebView is 140 or
   newer. Once that call succeeds on those versions (read from the WebView user agent),
-  `useNativeMobileChrome` adds `oc-android-below-status-bar` and `mobile.css` zeroes that inset; Android 15+
+  `useNativeMobileChrome` adds `mg-android-below-status-bar` and `mobile.css` zeroes that inset; Android 15+
   is edge-to-edge and keeps the injected value. Without it the app showed an empty strip under
   the status bar (#4803). The Android 14 emulator image ships WebView 113, so reproducing it
   needs a newer `com.android.webview` installed and selected.
@@ -175,11 +175,11 @@ iOS Simulator helpers: `mobile:sim:{boot,install,launch,run,serve,list,kill}` (s
 - **`embedded.mobileprovision` decodes as `.isoLatin1`.** It is a binary CMS envelope around a plist;
   `.ascii`/`.utf8` return nil and the APNs environment silently falls back. APNs delivery is grouped
   per token by the environment it registered with (Xcode build → sandbox, TestFlight/App Store →
-  production); `OPENCHAMBER_APNS_ENVIRONMENT` is only a global override. For "no push on the phone",
-  check `~/.config/openchamber/apns-tokens.json` and remember the phone talks to the installed
+  production); `MAGIO_APNS_ENVIRONMENT` is only a global override. For "no push on the phone",
+  check `~/.config/magio/apns-tokens.json` and remember the phone talks to the installed
   desktop app's server, which runs its own (possibly older) code.
 - **Native HTTP always sends the WebView's cookies**, whatever `credentials` says, so a leftover
-  `oc_ui_session` rides along with every request. That is why `/auth/session` lets an explicit
+  `mg_ui_session` rides along with every request. That is why `/auth/session` lets an explicit
   `Authorization: Bearer` decide alone: a revoked bearer must answer 401 even with a valid cookie.
   curl never reproduces this; an on-screen log of the cold-start decisions on the device did.
 - **Touch-target floors in `mobile.css` beat Tailwind sizes.** `button`, `[role=button]` and inputs
@@ -188,7 +188,7 @@ iOS Simulator helpers: `mobile:sim:{boot,install,launch,run,serve,list,kill}` (s
   an inline `minHeight: 0`.
 - **A custom Control Center icon** must be a custom SF Symbol (`swiftdraw --format sfsymbol`, default
   Small variants) built from an SVG that keeps its `transform` attributes, drawn with bold strokes,
-  referenced as `Label("…", image: "OCLogoSymbol")`. Control Center caches icons system-wide: after
+  referenced as `Label("…", image: "MGLogoSymbol")`. Control Center caches icons system-wide: after
   changing one, reboot the device.
 
 ## Validation
@@ -211,7 +211,7 @@ TestFlight / Play internal testing:
 ### iOS
 
 - Apple Developer account; App IDs for the app **and** both extensions
-  (`com.openchamber.app`, `.OpenChamberWidget`, `.OpenChamberNotificationService`), each enabled for
+  (`com.magio.app`, `.MagioWidget`, `.MagioNotificationService`), each enabled for
   the **App Group** and (app) **Push**.
 - Signing certificate + provisioning profiles for all three targets (extensions need their own).
 - App Store Connect API key for non-interactive TestFlight upload (`xcodebuild archive` +

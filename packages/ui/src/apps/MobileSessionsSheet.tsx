@@ -243,9 +243,9 @@ const MOBILE_TREE_BASE_PADDING_PX = 32;
 const treeRowLeft = (depth: number): number => MOBILE_TREE_BASE_PADDING_PX + depth * 12;
 const treeTextLeft = (depth: number): number => treeRowLeft(depth) + 20;
 /** Expansion keys of the "Pinned" and "In work" sections, alongside project ids. */
-const PINNED_SECTION_ID = 'openchamber:pinned';
-const WORK_SECTION_ID = 'openchamber:work';
-const TIME_LIST_SECTION_ID = 'openchamber:time-list';
+const PINNED_SECTION_ID = 'magio:pinned';
+const WORK_SECTION_ID = 'magio:work';
+const TIME_LIST_SECTION_ID = 'magio:time-list';
 // Chats are flat rows in both views, aligned with the timeline rows' text.
 const TIMELINE_CHAT_INDENT = 12;
 
@@ -518,7 +518,7 @@ const SessionRow: React.FC<{
             <span
               dir="auto"
               className={cn(
-                'block min-w-0 flex-1 truncate oc-ui-start-align typography-ui-label',
+                'block min-w-0 flex-1 truncate mg-ui-start-align typography-ui-label',
                 mobileSessionTitleClass({ active, unread: showUnreadDot, running: isStreaming, pending: pendingRequests }),
               )}
             >
@@ -633,7 +633,7 @@ const MobileRunRow: React.FC<{ run: MultiRunSummary; laneNodes: readonly Session
         <span className="flex min-w-0 flex-1 items-center gap-1.5">
           <ArrowsMerge className="size-3.5 shrink-0 text-muted-foreground" aria-hidden="true" />
           {/* Muted like an idle session title; the run's state shows in its mark. */}
-          <span dir="auto" className={cn('block min-w-0 flex-1 truncate oc-ui-start-align typography-ui-label', active ? 'text-primary' : 'text-muted-foreground')}>
+          <span dir="auto" className={cn('block min-w-0 flex-1 truncate mg-ui-start-align typography-ui-label', active ? 'text-primary' : 'text-muted-foreground')}>
             {run.title}
           </span>
         </span>
@@ -1060,7 +1060,7 @@ export const MobileSessionsSheet: React.FC<MobileSessionsSheetProps> = ({ open, 
     [childrenBySessionId],
   );
 
-  // Managed Chats (sessions under ~/.config/openchamber/chats) are not owned
+  // Managed Chats (sessions under ~/.config/magio/chats) are not owned
   // by any registered project; they get their own section above the project
   // tree, the same split the desktop sidebar makes. Temporary /btw forks are
   // dropped here as well.
@@ -2662,7 +2662,7 @@ export const MobileSessionsSheet: React.FC<MobileSessionsSheetProps> = ({ open, 
         {footer ? (
           <div
             className="flex shrink-0 items-center justify-between gap-2 border-t border-border/70 px-2 pt-1.5"
-            style={{ paddingBottom: 'calc(0.375rem + var(--oc-safe-area-bottom, 0px))' }}
+            style={{ paddingBottom: 'calc(0.375rem + var(--mg-safe-area-bottom, 0px))' }}
           >
             {footer.instanceLabel && footer.onOpenInstances ? (
               <Button
@@ -2805,7 +2805,7 @@ export const MobileSessionsSheet: React.FC<MobileSessionsSheetProps> = ({ open, 
     return (
       <div className="flex h-full min-h-0 flex-col">
         {/* No title: the list below says what this is, and the actions need the width. */}
-        <div className="flex h-[var(--oc-header-height,56px)] shrink-0 items-center justify-end gap-2 border-b border-border/70 px-4">
+        <div className="flex h-[var(--mg-header-height,56px)] shrink-0 items-center justify-end gap-2 border-b border-border/70 px-4">
           {trailingActions ? (
             <div className="flex shrink-0 items-center gap-2">{trailingActions}</div>
           ) : null}
@@ -2834,7 +2834,7 @@ export const MobileSessionsSheet: React.FC<MobileSessionsSheetProps> = ({ open, 
       }}
       ariaLabel={t('mobile.sessions.sheet.title')}
     >
-      <div className="flex h-[var(--oc-header-height,56px)] shrink-0 items-center gap-2 px-3">
+      <div className="flex h-[var(--mg-header-height,56px)] shrink-0 items-center gap-2 px-3">
         <button
           type="button"
           className="-ms-1 flex size-10 shrink-0 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-interactive-hover hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
@@ -2946,9 +2946,9 @@ const MobileSessionsDrawerContainer: React.FC<{
       aria-modal="true"
       aria-label={ariaLabel}
       aria-hidden={!open}
-      className="oc-keyboard-inset-surface fixed inset-0 z-50 flex flex-col bg-background text-foreground"
+      className="mg-keyboard-inset-surface fixed inset-0 z-50 flex flex-col bg-background text-foreground"
       style={{
-        paddingTop: 'var(--oc-safe-area-top, 0px)',
+        paddingTop: 'var(--mg-safe-area-top, 0px)',
         // Settled state drops the transform entirely so the drawer isn't kept
         // on a compositing layer (iOS clips those to the safe-area viewport).
         transform: entered ? 'none' : direction === 'rtl' ? 'translateX(100%)' : 'translateX(-100%)',

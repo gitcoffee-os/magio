@@ -63,7 +63,7 @@ export const StatusRow: React.FC<StatusRowProps> = ({
           WorkingPlaceholder, so the visible marks land on the same line.
           pe-2 evens out the far side: text glyph to edge lands ~10px, the
           same optical gap as the start. */}
-      <div className="oc-surface-floating inline-flex w-max max-w-full items-center gap-2 h-7 whitespace-nowrap rounded-full [corner-shape:round] ps-1.5 pe-2">
+      <div className="mg-surface-floating inline-flex w-max max-w-full items-center gap-2 h-7 whitespace-nowrap rounded-full [corner-shape:round] ps-1.5 pe-2">
         {/* overflow-x-clip: hiding one axis turns the other into `auto`, and a
             sub-pixel overshoot of the label (zoom, font metrics) gave the chip
             its own scrollbar. Clipping both axes cut descenders off at the

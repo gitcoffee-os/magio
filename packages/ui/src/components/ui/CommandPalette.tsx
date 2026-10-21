@@ -109,7 +109,7 @@ const LRM = '\u200E';
 /** Secondary text that loses its start, not its end, when it does not fit. */
 const LeadingTruncated: React.FC<{ text: string; className?: string }> = ({ text, className }) => (
   <span
-    className={cn('oc-ui-start-align min-w-0 truncate text-muted-foreground', className)}
+    className={cn('mg-ui-start-align min-w-0 truncate text-muted-foreground', className)}
     style={{ direction: 'rtl' }}
     title={text}
   >
@@ -459,7 +459,7 @@ export const CommandPalette: React.FC = () => {
       icon: <Icon name="bug" className="me-2 h-4 w-4" />,
       searchText: t('commandPalette.item.toggleMemoryDebug'),
       onSelect: run(() => {
-        window.dispatchEvent(new CustomEvent('openchamber:memory-debug-toggle'));
+        window.dispatchEvent(new CustomEvent('magio:memory-debug-toggle'));
       }),
     });
     // Search-only: typing "run", "stop" or an action's name finds them.
@@ -614,7 +614,7 @@ export const CommandPalette: React.FC = () => {
   nestedWorktreePrefixesRef.current = nestedWorktreePrefixes;
 
   // ---------------------------------------------------------------------------
-  // Message search (server index, opt-in; VS Code has no OpenChamber server)
+  // Message search (server index, opt-in; VS Code has no Magio server)
   // ---------------------------------------------------------------------------
   const messageSearchEnabled = useUIStore((state) => state.messageSearchEnabled);
   const messageSearchSupported = messageSearchEnabled && !isVSCodeRuntime();
@@ -1007,7 +1007,7 @@ export const CommandPalette: React.FC = () => {
                           onSelect={() => handleOpenSession(session)}
                         >
                           <Icon name="chat-ai-3" className="me-2 h-4 w-4" />
-                          <span dir="auto" className="min-w-0 flex-1 truncate oc-ui-start-align">{title}</span>
+                          <span dir="auto" className="min-w-0 flex-1 truncate mg-ui-start-align">{title}</span>
                           {projectLabel ? (
                             <span className="max-w-[180px] shrink-0 truncate text-muted-foreground typography-meta">{projectLabel}</span>
                           ) : null}

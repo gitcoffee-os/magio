@@ -9,7 +9,7 @@ export type IntegrationCatalogStatusTone = 'success' | 'warning' | 'neutral';
 const STATUS_TONE_CLASS = {
   success: 'bg-[var(--status-success)]/15 text-[var(--status-success)]',
   warning: 'bg-[var(--status-warning)]/15 text-[var(--status-warning)]',
-  neutral: 'oc-tile-inset text-muted-foreground',
+  neutral: 'mg-tile-inset text-muted-foreground',
 } satisfies Record<IntegrationCatalogStatusTone, string>;
 
 type IntegrationCatalogCardProps = {
@@ -45,11 +45,11 @@ export const IntegrationCatalogCard: React.FC<IntegrationCatalogCardProps> = ({
   children,
 }) => (
   <Collapsible open={open} onOpenChange={onOpenChange}>
-    <div data-settings-item={settingsItem} className="oc-tile overflow-hidden rounded-xl">
+    <div data-settings-item={settingsItem} className="mg-tile overflow-hidden rounded-xl">
       <CollapsibleTrigger
-        className="oc-tile-hover flex w-full min-w-0 items-center gap-3 px-4 py-3 text-start focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[var(--interactive-focus-ring)]"
+        className="mg-tile-hover flex w-full min-w-0 items-center gap-3 px-4 py-3 text-start focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[var(--interactive-focus-ring)]"
       >
-        <div className="oc-tile-inset flex size-10 shrink-0 items-center justify-center rounded-[10px]">
+        <div className="mg-tile-inset flex size-10 shrink-0 items-center justify-center rounded-[10px]">
           {logo}
         </div>
         <div className="min-w-0 flex-1">

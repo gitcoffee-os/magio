@@ -44,7 +44,7 @@ import { composeForkSessionMessage } from "@/lib/messages/executionMeta"
 import { findLatestUserModelChoice } from "@/lib/messages/userModelChoice"
 import { noteDraftSendWaiting, waitForPendingDraftWorktreeRequest } from "@/lib/worktrees/pendingDraftWorktree"
 import { waitForWorktreeBootstrap } from "@/lib/worktrees/worktreeBootstrap"
-import { getWorktreeSetupWaitEnabled } from "@/lib/openchamberConfig"
+import { getWorktreeSetupWaitEnabled } from "@/lib/magioConfig"
 import { resolveCreatedWorktreeStartDirectory, resolveStartDirectory, resolveWorktreeStartDirectory } from "@/lib/worktrees/worktreeStartDirectory"
 import { resolveProjectForSessionDirectory } from "@/lib/projectResolution"
 import {
@@ -465,9 +465,9 @@ export type SessionUIState = {
   /** Arms "press Esc again to stop" for `sessionId`, the selected session by default. */
   armAbortPrompt: (durationMs?: number, sessionId?: string) => number | null
   clearError: () => void
-  markSessionAsOpenChamberCreated: (sessionId: string) => void
-  isOpenChamberCreatedSession: (sessionId: string) => boolean
-  initializeNewOpenChamberSession: (sessionId: string, agents: unknown[]) => void
+  markSessionAsMagioCreated: (sessionId: string) => void
+  isMagioCreatedSession: (sessionId: string) => boolean
+  initializeNewMagioSession: (sessionId: string, agents: unknown[]) => void
   /** `cwd` is where the session runs inside the checkout; it defaults to the worktree root. */
   setWorktreeMetadata: (sessionId: string, metadata: WorktreeMetadata | null, cwd?: string) => void
   overrideNewSessionDraftTarget: (options: Record<string, unknown>) => void
@@ -1090,7 +1090,7 @@ export async function materializeOpenDraftSession(selection: {
     draft.title,
     draftDirectoryOverride,
     draftPins.notes.length > 0 || draftPins.plans.length > 0
-      ? { openchamber: { project_context_pins: draftPins } }
+      ? { magio: { project_context_pins: draftPins } }
       : undefined,
     "submitted-draft",
     {
@@ -1152,7 +1152,7 @@ export async function materializeOpenDraftSession(selection: {
     useSelectionStore.getState().saveAgentModelVariantForSession(created.id, effectiveDraftAgent, selection.providerID, selection.modelID, variantOverride)
   }
 
-  store.initializeNewOpenChamberSession(created.id, configState.agents ?? [])
+  store.initializeNewMagioSession(created.id, configState.agents ?? [])
 
   const permissionMode = permissionModeForNewSession(
     draftPermissionMode,
@@ -1721,16 +1721,16 @@ export const useSessionUIStore = create<SessionUIState>()((set, get) => ({
 
   clearError: () => set({ error: null }),
 
-  markSessionAsOpenChamberCreated: (sessionId) =>
+  markSessionAsMagioCreated: (sessionId) =>
     set((s) => {
       const next = new Set(s.webUICreatedSessions)
       next.add(sessionId)
       return { webUICreatedSessions: next }
     }),
 
-  isOpenChamberCreatedSession: (sessionId) => get().webUICreatedSessions.has(sessionId),
+  isMagioCreatedSession: (sessionId) => get().webUICreatedSessions.has(sessionId),
 
-  initializeNewOpenChamberSession: () => {
+  initializeNewMagioSession: () => {
     // Stub — was a no-op in old store
   },
 
@@ -2251,12 +2251,12 @@ export const useSessionUIStore = create<SessionUIState>()((set, get) => ({
         sourceDirectory,
       )
       if (!project?.path) {
-        throw new Error("Project is not registered in OpenChamber")
+        throw new Error("Project is not registered in Magio")
       }
 
       const [branchNameModule, configModule, trustModule, createModule] = await Promise.all([
         import("@/lib/git/branchNameGenerator"),
-        import("@/lib/openchamberConfig"),
+        import("@/lib/magioConfig"),
         import("@/lib/sharedTrustConfirmation"),
         import("@/lib/worktrees/worktreeCreate"),
       ])

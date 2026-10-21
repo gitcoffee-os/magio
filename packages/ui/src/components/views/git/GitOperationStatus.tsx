@@ -33,7 +33,7 @@ export function GitOperationStatus({ entry, onRefresh, onCancel, className }: {
     || operation.state === 'outcome-unknown'));
   return (
     <section
-      className={cn('min-w-0 shrink-0 rounded-lg oc-tile p-3 typography-meta', className)}
+      className={cn('min-w-0 shrink-0 rounded-lg mg-tile p-3 typography-meta', className)}
       aria-live="polite"
       aria-busy={entry.checking}
       aria-label={t('gitView.operation.title')}
@@ -70,7 +70,7 @@ export function GitOperationStatus({ entry, onRefresh, onCancel, className }: {
                   {item.endpoint ? <> · <code>{item.endpoint.displayUrl}</code></> : null}
                 </p>
               ))}
-              {/* The ID is what the person looks for outside OpenChamber when nobody knows the outcome. */}
+              {/* The ID is what the person looks for outside Magio when nobody knows the outcome. */}
               {unavailable ? <code className="block break-all typography-micro text-muted-foreground">{operation.operationId}</code> : null}
             </div>
           );

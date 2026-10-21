@@ -82,7 +82,7 @@ const connectIntegrationKey = async (request: IntegrationKeyRequest): Promise<vo
 };
 
 const ADD_PROVIDER_ID = '__add_provider__';
-/** Not an OpenCode provider id: the page for OpenChamber's own classification providers (Jev). */
+/** Not an OpenCode provider id: the page for Magio's own classification providers (Jev). */
 const CLASSIFICATION_PAGE_ID = '__classification__';
 
 interface ProviderSourceInfo {
@@ -150,7 +150,7 @@ export const ProvidersPage: React.FC = () => {
   const [catalog, setCatalog] = React.useState<IntegrationCatalog | null>(() => peekIntegrationCatalog());
   const [integrationsLoadFailed, setIntegrationsLoadFailed] = React.useState(false);
   const integrations = catalog?.integrations ?? null;
-  // Null until read, and where the runtime has no OpenChamber server (VS Code).
+  // Null until read, and where the runtime has no Magio server (VS Code).
   const [disabledProviders, setDisabledProviders] = React.useState<string[] | null>(null);
   React.useEffect(() => {
     let active = true;
@@ -325,7 +325,7 @@ export const ProvidersPage: React.FC = () => {
 
     const loadSources = async () => {
       try {
-        // OpenChamber-only metadata endpoint: the SDK exposes provider data but
+        // Magio-only metadata endpoint: the SDK exposes provider data but
         // not local auth/source-file provenance used by this settings UI.
         const query = settingsDirectory ? `?directory=${encodeURIComponent(settingsDirectory)}` : '';
         const response = await runtimeFetch(`/api/provider/${encodeURIComponent(selectedProviderId)}/source${query}`, {
@@ -893,7 +893,7 @@ export const ProvidersPage: React.FC = () => {
           <div
             className={cn(
               'space-y-4',
-              providerConnections.length > 0 && 'oc-tile rounded-xl p-4',
+              providerConnections.length > 0 && 'mg-tile rounded-xl p-4',
             )}
           >
             {showApiKeyAuth ? (
@@ -1019,7 +1019,7 @@ export const ProvidersPage: React.FC = () => {
                         ) : (
                           <>
                         {tokenSummary ? (
-                          <span className="typography-micro text-muted-foreground flex-shrink-0 oc-tile-inset px-1.5 py-0.5 rounded">
+                          <span className="typography-micro text-muted-foreground flex-shrink-0 mg-tile-inset px-1.5 py-0.5 rounded">
                             {tokenSummary}
                           </span>
                         ) : null}
@@ -1028,7 +1028,7 @@ export const ProvidersPage: React.FC = () => {
                             {capabilityIcons.map(({ key, icon: iconName, label }) => (
                               <span
                                 key={key}
-                                className="flex h-5 w-5 rounded items-center justify-center text-muted-foreground oc-tile-inset"
+                                className="flex h-5 w-5 rounded items-center justify-center text-muted-foreground mg-tile-inset"
                                 title={label}
                                 aria-label={label}
                               >

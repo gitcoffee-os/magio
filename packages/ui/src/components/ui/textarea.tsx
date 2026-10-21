@@ -215,8 +215,8 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
           ? { height: `${effectiveResizedHeight}px`, minHeight: 'fit-content' }
           : undefined}
         className={cn(
-          "oc-surface-elevated group/textarea relative flex w-full flex-col rounded-[var(--radius-xl)] bg-surface-elevated pb-2.5",
-          "oc-raised oc-field",
+          "mg-surface-elevated group/textarea relative flex w-full flex-col rounded-[var(--radius-xl)] bg-surface-elevated pb-2.5",
+          "mg-raised mg-field",
           "hover:[&:not(:focus-within)]:[background-image:linear-gradient(var(--interactive-hover),var(--interactive-hover))]",
           // Scoped to the textarea, not any disabled descendant: an endSlot
           // control that disables itself (an add button with an empty field)

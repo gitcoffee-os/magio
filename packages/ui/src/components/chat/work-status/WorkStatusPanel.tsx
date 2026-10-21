@@ -240,10 +240,10 @@ export const WorkStatusPanel: React.FC<Props> = ({ sessionId, directory, visible
         // so the settings button stays discoverable — going transparent made the
         // only recovery path unreachable.
         'motion-reduce:transition-none',
-        // Beside the chat: the layout panels' ring (`oc-panel-edge`, shared
+        // Beside the chat: the layout panels' ring (`mg-panel-edge`, shared
         // with the context panel card). Over the chat it is a dropdown and
         // takes the dropdown's full edge (`data-edge-floating`).
-        'oc-panel-edge rounded-xl',
+        'mg-panel-edge rounded-xl',
         // Takes the docked panels' lifted page colour (design-system.css).
         !overlay && 'bg-background',
       )}
@@ -277,7 +277,7 @@ export const WorkStatusPanel: React.FC<Props> = ({ sessionId, directory, visible
           the shadow's blur and paints a grey band past the card's edge. */}
       <DockedPanelSurfaceContext.Provider value={!overlay}>
       <div
-        className={cn('flex min-h-0 flex-1 flex-col', overlay && 'oc-glass-panel')}
+        className={cn('flex min-h-0 flex-1 flex-col', overlay && 'mg-glass-panel')}
         style={overlay ? {
           opacity: interactive ? 1 : 0,
           transitionProperty: 'opacity',
@@ -304,7 +304,7 @@ export const WorkStatusPanel: React.FC<Props> = ({ sessionId, directory, visible
         size={24}
         // Sections returning null leave no DOM node, so this reserves room for
         // settings in the first rendered heading, regardless of saved order.
-        className="oc-hide-scrollbar min-h-0 flex-1 overflow-y-auto overflow-x-hidden p-2 [&>section:first-child>[data-work-status-heading]]:pe-7"
+        className="mg-hide-scrollbar min-h-0 flex-1 overflow-y-auto overflow-x-hidden p-2 [&>section:first-child>[data-work-status-heading]]:pe-7"
       >
         <WorkStatusPrimaryGroup
           sessionId={sessionId}

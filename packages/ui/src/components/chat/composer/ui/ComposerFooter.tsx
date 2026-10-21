@@ -176,7 +176,7 @@ function ComposerFooterView(props: ComposerFooterProps) {
             }}
             data-chat-input-footer="true"
             // On the path from the composer box to the desktop dictation
-            // overlay (see the .oc-dictation-overlay rule in design-system.css).
+            // overlay (see the .mg-dictation-overlay rule in design-system.css).
             data-dictation-chain={isMobile ? undefined : 'true'}
         >
             {isMobile ? (

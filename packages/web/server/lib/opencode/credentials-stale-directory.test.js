@@ -115,7 +115,7 @@ describe('credential read through the lifecycle default directory', () => {
   let credentialReads;
 
   beforeEach(async () => {
-    root = await fsp.mkdtemp(path.join(os.tmpdir(), 'oc-cred-'));
+    root = await fsp.mkdtemp(path.join(os.tmpdir(), 'mg-cred-'));
     stale = path.join(root, 'last-used');
     await fsp.mkdir(stale);
     credentialFails = false;

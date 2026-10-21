@@ -81,7 +81,7 @@ export const buildStoreZip = (files) => {
 
 describe('extractZipBuffer', () => {
   test('extracts files and rejects traversal', async () => {
-    const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'oc-zip-'));
+    const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'mg-zip-'));
     const ok = await extractZipBuffer(buildStoreZip([
       { name: 'package.json', data: '{"ok":true}' },
       { name: 'panel/index.html', data: '<html></html>' },
@@ -100,7 +100,7 @@ describe('extractZipBuffer', () => {
   });
 
   test('unwraps a single root folder', async () => {
-    const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'oc-zip-'));
+    const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'mg-zip-'));
     await fs.mkdir(path.join(dir, 'panel-root', 'panel'), { recursive: true });
     await fs.writeFile(path.join(dir, 'panel-root', 'package.json'), '{}');
     expect(await unwrapGuestRoot(dir)).toBe(path.join(dir, 'panel-root'));

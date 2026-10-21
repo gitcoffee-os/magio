@@ -8,7 +8,7 @@ const { convertVsCodeTheme, registerTheme } = require('./convert-vscode-theme.cj
 const { importVSCodeTheme } = require('../packages/ui/src/lib/theme/vscode/import.ts');
 
 test('CLI conversion shares the browser palette and stores compact registry entries', () => {
-  const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'oc-vscode-cli-'));
+  const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'mg-vscode-cli-'));
   try {
     const source = '{ // JSONC\n "name": "Sample Dark", "colors": { "editor.background": "#101820", "editor.foreground": "#eeeeee", }, "tokenColors": [{ "scope": "keyword", "settings": { "foreground": "#aa88ff" } }] }';
     const filename = path.join(directory, 'sample.jsonc');

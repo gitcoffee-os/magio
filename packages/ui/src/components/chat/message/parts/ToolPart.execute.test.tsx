@@ -55,7 +55,7 @@ const part: ToolPartData = {
     output: '{"count":3}',
     metadata: {
       truncated: true,
-      outputPath: '/tmp/oc-script-output.json',
+      outputPath: '/tmp/mg-script-output.json',
       toolCalls: [
         { tool: 'linear.list_issues', status: 'completed', input: { teamId: 'OPE' } },
         { tool: 'linear.list_issues', status: 'error', input: { teamId: 'OPE' } },
@@ -118,7 +118,7 @@ test('a Code Mode call shows its script, the tools it called, and the truncation
     // The row is named "Script", not "execute", and carries the braces icon.
     expect(container.textContent).toContain('Script');
     expect(container.textContent).not.toContain('execute');
-    expect(container.querySelector('use[href="#oc-braces"]')).not.toBeNull();
+    expect(container.querySelector('use[href="#mg-braces"]')).not.toBeNull();
 
     // The description names the called tools, deduplicated and counted.
     expect(container.textContent).toContain('linear.list_issues \u00d72, linear.get_workspace');
@@ -127,7 +127,7 @@ test('a Code Mode call shows its script, the tools it called, and the truncation
     expect(container.textContent).toContain('Tool calls');
     expect(container.textContent).toContain('{"teamId":"OPE"}');
     expect(container.textContent).toContain('Output was truncated');
-    expect(container.textContent).toContain('/tmp/oc-script-output.json');
+    expect(container.textContent).toContain('/tmp/mg-script-output.json');
   } finally {
     await act(async () => { root.unmount(); });
     await happyWindow.happyDOM.abort();

@@ -933,17 +933,17 @@ function SessionGroupSectionBase(props: SessionGroupSectionProps): React.ReactNo
   const hasSecondHeaderAction = hasWorktreeDeleteAction || Boolean(group.space);
   const hasThirdHeaderAction = Boolean(group.space);
   // Permanent actions take room; hover-revealed ones cross-fade over the
-  // header's right end (`oc-actions-mask`), so nothing moves. The reserve is
+  // header's right end (`mg-actions-mask`), so nothing moves. The reserve is
   // how far they reach in past the 8px right padding: one 24px button 2px
   // from the edge, the next ones 26px apart.
   const groupHeaderRightPadding = alwaysShowActions
     ? (hasThirdHeaderAction ? 'pe-20' : hasSecondHeaderAction ? 'pe-14' : 'pe-7')
     : cn('pe-2', hasThirdHeaderAction
-        ? '[--oc-actions-reserve:68px]'
+        ? '[--mg-actions-reserve:68px]'
         : hasSecondHeaderAction
-        ? '[--oc-actions-reserve:44px]'
-        : '[--oc-actions-reserve:18px]');
-  const headerActionsMaskClass = alwaysShowActions ? undefined : 'group-hover/gh:oc-actions-mask group-has-[:focus-visible]/gh:oc-actions-mask';
+        ? '[--mg-actions-reserve:44px]'
+        : '[--mg-actions-reserve:18px]');
+  const headerActionsMaskClass = alwaysShowActions ? undefined : 'group-hover/gh:mg-actions-mask group-has-[:focus-visible]/gh:mg-actions-mask';
   const headerCoveredFadeClass = alwaysShowActions ? undefined : 'transition-opacity group-hover/gh:opacity-0 group-has-[:focus-visible]/gh:opacity-0';
   // An empty group keeps the chevron's place, so its label stays in line.
   const headerChevron = isEmpty
@@ -1128,14 +1128,14 @@ function SessionGroupSectionBase(props: SessionGroupSectionProps): React.ReactNo
   />;
 
   if (hideGroupLabel) {
-    return renderBody ? <><div className="oc-group"><div className={cn('oc-group-body', groupBodyPaddingClass)}>{body}</div></div>{folderDeleteDialog}</> : null;
+    return renderBody ? <><div className="mg-group"><div className={cn('mg-group-body', groupBodyPaddingClass)}>{body}</div></div>{folderDeleteDialog}</> : null;
   }
 
   return (
-    <><div className={cn('oc-group', worktreeRemoving && 'opacity-60')} aria-busy={worktreeRemoving || undefined}>
+    <><div className={cn('mg-group', worktreeRemoving && 'opacity-60')} aria-busy={worktreeRemoving || undefined}>
       {/* No hover fill: only session rows take one, so a pointer moving
           down the sidebar tells sessions from their containers. */}
-      <div className={cn('oc-ref-tint-scope group/gh relative flex items-start justify-between gap-1 py-1 min-w-0 rounded-md', 'cursor-pointer')}>
+      <div className={cn('mg-ref-tint-scope group/gh relative flex items-start justify-between gap-1 py-1 min-w-0 rounded-md', 'cursor-pointer')}>
       <Tooltip disabled={groupPrSummary ? !groupPrStatusLabel : !primaryGroupIssue}>
       <TooltipTrigger asChild closeDelay={SIDEBAR_REF_TOOLTIP_CLOSE_DELAY_MS}>
       <div
@@ -1187,7 +1187,7 @@ function SessionGroupSectionBase(props: SessionGroupSectionProps): React.ReactNo
                     </span>
                   ) : (
                     <Icon name={group.space ? 'box-3' : 'git-branch'}
-                      className={cn('h-3 w-3 shrink-0', groupPrColor ? 'oc-ref-tint' : 'text-muted-foreground')}
+                      className={cn('h-3 w-3 shrink-0', groupPrColor ? 'mg-ref-tint' : 'text-muted-foreground')}
                       style={groupPrColor ? refTintStyle(groupPrColor) : undefined}
                       aria-label={group.space ? t('sessions.sidebar.group.space') : undefined}
                     />
@@ -1205,7 +1205,7 @@ function SessionGroupSectionBase(props: SessionGroupSectionProps): React.ReactNo
                     // drag handle, so it keeps its pointer and keys to itself.
                     <button
                       type="button"
-                      className={cn('ms-auto flex-shrink-0 rounded text-[0.72rem] font-medium leading-none hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-default disabled:no-underline', groupPrColor && 'oc-ref-tint', headerCoveredFadeClass)}
+                      className={cn('ms-auto flex-shrink-0 rounded text-[0.72rem] font-medium leading-none hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-default disabled:no-underline', groupPrColor && 'mg-ref-tint', headerCoveredFadeClass)}
                       style={groupPrColor ? refTintStyle(groupPrColor) : undefined}
                       disabled={!groupPrSummary.url}
                       aria-label={groupPrLabel}
@@ -1225,7 +1225,7 @@ function SessionGroupSectionBase(props: SessionGroupSectionProps): React.ReactNo
                       type="button"
                       className={cn(
                         'ms-auto inline-flex flex-shrink-0 items-center gap-1 rounded text-[0.72rem] font-medium leading-none hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
-                        primaryGroupIssue.color ? 'oc-ref-tint' : 'text-muted-foreground',
+                        primaryGroupIssue.color ? 'mg-ref-tint' : 'text-muted-foreground',
                         headerCoveredFadeClass,
                       )}
                       style={primaryGroupIssue.color ? refTintStyle(primaryGroupIssue.color) : undefined}
@@ -1367,7 +1367,7 @@ function SessionGroupSectionBase(props: SessionGroupSectionProps): React.ReactNo
           Its 12px icon sits under the header's slot icon and its text starts at 26px, where the
           header label and the group's other sub-rows start. */}
       {group.space ? <SpaceGroupStatus spaceId={group.space.id} className="pb-1 ps-2" /> : null}
-      {!isCollapsed && renderBody ? <div className={cn('oc-group-body', groupBodyPaddingClass)}>{body}</div> : null}
+      {!isCollapsed && renderBody ? <div className={cn('mg-group-body', groupBodyPaddingClass)}>{body}</div> : null}
     </div>{folderDeleteDialog}</>
   );
 }

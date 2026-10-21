@@ -2,12 +2,12 @@
 import http from "node:http";
 import { deflateSync } from "node:zlib";
 // packages/sdk/src/scrollbar-style.ts
-var GUEST_SCROLLING_ATTRIBUTE = "data-oc-scrolling";
+var GUEST_SCROLLING_ATTRIBUTE = "data-mg-scrolling";
 var GUEST_SCROLLBAR_CSS = `
 :root {
   /* Quiet at rest like the app's own thumbs; hover gives a clear grab target. */
-  --oc-scrollbar-thumb: color-mix(in srgb, var(--oc-muted, currentColor) 18%, transparent);
-  --oc-scrollbar-thumb-hover: color-mix(in srgb, var(--oc-muted, currentColor) 36%, transparent);
+  --mg-scrollbar-thumb: color-mix(in srgb, var(--mg-muted, currentColor) 18%, transparent);
+  --mg-scrollbar-thumb-hover: color-mix(in srgb, var(--mg-muted, currentColor) 36%, transparent);
   scrollbar-gutter: stable;
 }
 * {
@@ -15,7 +15,7 @@ var GUEST_SCROLLBAR_CSS = `
   scrollbar-color: transparent transparent;
 }
 :hover, [${GUEST_SCROLLING_ATTRIBUTE}] {
-  scrollbar-color: var(--oc-scrollbar-thumb) transparent;
+  scrollbar-color: var(--mg-scrollbar-thumb) transparent;
 }
 /* Chromium's standard scrollbar properties otherwise override its pseudo-elements. */
 @supports selector(::-webkit-scrollbar) {
@@ -28,8 +28,8 @@ var GUEST_SCROLLBAR_CSS = `
     min-width: 24px;
     min-height: 24px;
   }
-  :hover::-webkit-scrollbar-thumb, [${GUEST_SCROLLING_ATTRIBUTE}]::-webkit-scrollbar-thumb { background: var(--oc-scrollbar-thumb); }
-  ::-webkit-scrollbar-thumb:hover { background: var(--oc-scrollbar-thumb-hover); }
+  :hover::-webkit-scrollbar-thumb, [${GUEST_SCROLLING_ATTRIBUTE}]::-webkit-scrollbar-thumb { background: var(--mg-scrollbar-thumb); }
+  ::-webkit-scrollbar-thumb:hover { background: var(--mg-scrollbar-thumb-hover); }
   ::-webkit-scrollbar-corner { background: transparent; }
   ::-webkit-scrollbar-button { display: none; width: 0; height: 0; }
 }
@@ -40,22 +40,22 @@ var GUEST_SCROLLBAR_CSS = `
 `;
 function installGuestScrollbarActivity(doc) {
   const root = doc.documentElement;
-  if (root.hasAttribute("data-oc-scrollbar-activity"))
+  if (root.hasAttribute("data-mg-scrollbar-activity"))
     return;
-  root.setAttribute("data-oc-scrollbar-activity", "");
+  root.setAttribute("data-mg-scrollbar-activity", "");
   const timers = new WeakMap;
   doc.addEventListener("scroll", (event) => {
     const target = event.target === doc ? root : event.target;
     if (!(target instanceof Element))
       return;
-    if (!target.hasAttribute("data-oc-scrolling"))
-      target.setAttribute("data-oc-scrolling", "");
+    if (!target.hasAttribute("data-mg-scrolling"))
+      target.setAttribute("data-mg-scrolling", "");
     const pending = timers.get(target);
     if (pending !== undefined)
       clearTimeout(pending);
     timers.set(target, setTimeout(() => {
       timers.delete(target);
-      target.removeAttribute("data-oc-scrolling");
+      target.removeAttribute("data-mg-scrolling");
     }, 1000));
   }, { capture: true, passive: true });
 }
@@ -269,10 +269,10 @@ var readSurfaceResizeRequest = (body) => {
   return { width: Math.round(width), height: Math.round(height) };
 };
 // packages/sdk/examples/browser-provider-stub/service/main.ts
-var port = Number(process.env.OPENCHAMBER_SERVICE_PORT);
-var token = process.env.OPENCHAMBER_SERVICE_TOKEN ?? "";
+var port = Number(process.env.MAGIO_SERVICE_PORT);
+var token = process.env.MAGIO_SERVICE_TOKEN ?? "";
 if (!port || !token) {
-  console.error("OPENCHAMBER_SERVICE_PORT and OPENCHAMBER_SERVICE_TOKEN are required");
+  console.error("MAGIO_SERVICE_PORT and MAGIO_SERVICE_TOKEN are required");
   process.exit(1);
 }
 var VIEWPORTS = {

@@ -21,7 +21,7 @@ export type TabsHandle = Handle<TabsProps>;
 export const mountTabs = (root: Element, initial: TabsProps): TabsHandle => {
   ensureStyle(UI_CSS);
   let props = initial;
-  const track = el('div', 'oc-sdk oc-sdk-tabs');
+  const track = el('div', 'mg-sdk mg-sdk-tabs');
   track.setAttribute('role', 'tablist');
   root.append(track);
 
@@ -29,7 +29,7 @@ export const mountTabs = (root: Element, initial: TabsProps): TabsHandle => {
     clearNode(track);
     track.dataset.track = props.trackBackground ? 'true' : 'false';
     for (const item of props.items) {
-      const tab = button('oc-sdk-tab');
+      const tab = button('mg-sdk-tab');
       tab.setAttribute('role', 'tab');
       const active = item.id === props.activeId;
       tab.setAttribute('aria-selected', active ? 'true' : 'false');
@@ -39,7 +39,7 @@ export const mountTabs = (root: Element, initial: TabsProps): TabsHandle => {
       label.textContent = item.label;
       tab.append(label);
       if (item.count !== undefined) {
-        const count = el('span', 'oc-sdk-tab-count');
+        const count = el('span', 'mg-sdk-tab-count');
         count.textContent = String(item.count);
         tab.append(count);
       }

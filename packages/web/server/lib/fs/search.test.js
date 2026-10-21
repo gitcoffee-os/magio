@@ -18,7 +18,7 @@ const neverSpawn = () => {
 
 describe('filesystem search', () => {
   it('reaches an exact deep match after weak shallow subsequence matches', async () => {
-    const root = await fs.mkdtemp(path.join(os.tmpdir(), 'oc-fs-search-'));
+    const root = await fs.mkdtemp(path.join(os.tmpdir(), 'mg-fs-search-'));
     try {
       const shallow = path.join(root, 'a_shallow');
       const deep = path.join(root, 'z_deep', 'nested');
@@ -47,7 +47,7 @@ describe('filesystem search', () => {
   });
 
   it('stops an empty query at the limit', async () => {
-    const root = await fs.mkdtemp(path.join(os.tmpdir(), 'oc-fs-search-'));
+    const root = await fs.mkdtemp(path.join(os.tmpdir(), 'mg-fs-search-'));
     try {
       for (let index = 1; index <= 5; index += 1) {
         await fs.writeFile(path.join(root, `file_${index}.txt`), '');
@@ -67,12 +67,12 @@ describe('filesystem search', () => {
   });
 
   it('kills a stuck git check-ignore instead of hanging the search', async () => {
-    const root = await fs.mkdtemp(path.join(os.tmpdir(), 'oc-fs-search-'));
-    const previousTimeout = process.env.OPENCHAMBER_GIT_CHECK_IGNORE_TIMEOUT_MS;
+    const root = await fs.mkdtemp(path.join(os.tmpdir(), 'mg-fs-search-'));
+    const previousTimeout = process.env.MAGIO_GIT_CHECK_IGNORE_TIMEOUT_MS;
     let guard;
     try {
       await fs.writeFile(path.join(root, 'visible.txt'), '');
-      process.env.OPENCHAMBER_GIT_CHECK_IGNORE_TIMEOUT_MS = '50';
+      process.env.MAGIO_GIT_CHECK_IGNORE_TIMEOUT_MS = '50';
 
       const kills = [];
       const neverCloses = () => {
@@ -98,9 +98,9 @@ describe('filesystem search', () => {
     } finally {
       clearTimeout(guard);
       if (previousTimeout === undefined) {
-        delete process.env.OPENCHAMBER_GIT_CHECK_IGNORE_TIMEOUT_MS;
+        delete process.env.MAGIO_GIT_CHECK_IGNORE_TIMEOUT_MS;
       } else {
-        process.env.OPENCHAMBER_GIT_CHECK_IGNORE_TIMEOUT_MS = previousTimeout;
+        process.env.MAGIO_GIT_CHECK_IGNORE_TIMEOUT_MS = previousTimeout;
       }
       await fs.rm(root, { recursive: true, force: true });
     }

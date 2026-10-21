@@ -783,7 +783,7 @@ export const MessageFilesDisplay = memo(({ files, onShowPopup, compact = false, 
                     void openExternalUrl(file.url || '');
                   }}
                   className={cn(
-                    "flex items-center gap-2 p-2 rounded-lg oc-tile oc-tile-hover text-start",
+                    "flex items-center gap-2 p-2 rounded-lg mg-tile mg-tile-hover text-start",
                     compact ? "text-xs" : "text-sm"
                   )}
                 >
@@ -822,7 +822,7 @@ export const MessageFilesDisplay = memo(({ files, onShowPopup, compact = false, 
                     }
                   }}
                   className={cn(
-                    "flex items-center gap-2 p-2 rounded-lg oc-tile oc-tile-hover text-start cursor-pointer",
+                    "flex items-center gap-2 p-2 rounded-lg mg-tile mg-tile-hover text-start cursor-pointer",
                     compact ? "text-xs" : "text-sm"
                   )}
                 >
@@ -850,7 +850,7 @@ export const MessageFilesDisplay = memo(({ files, onShowPopup, compact = false, 
                   showFilePopup(file, fileName);
                 }}
                 className={cn(
-                  "flex items-center gap-2 p-2 rounded-lg oc-tile oc-tile-hover text-start",
+                  "flex items-center gap-2 p-2 rounded-lg mg-tile mg-tile-hover text-start",
                   compact ? "text-xs" : "text-sm"
                 )}
               >

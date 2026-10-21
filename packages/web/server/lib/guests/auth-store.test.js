@@ -14,15 +14,15 @@ import {
 
 describe('guestAuthPersistPath', () => {
   test('joins the instance data dir and refuses a relative path', () => {
-    const dataDir = path.join(os.tmpdir(), 'oc-guest-auth-a');
+    const dataDir = path.join(os.tmpdir(), 'mg-guest-auth-a');
     expect(guestAuthPersistPath(dataDir)).toBe(path.join(dataDir, 'guest-auth.json'));
-    expect(() => guestAuthPersistPath('relative')).toThrow('absolute OpenChamber data dir');
+    expect(() => guestAuthPersistPath('relative')).toThrow('absolute Magio data dir');
   });
 });
 
 describe('guest auth store', () => {
   test('round-trips tokens and writes 0o600', async () => {
-    const dir = await fs.promises.mkdtemp(path.join(os.tmpdir(), 'oc-guest-auth-'));
+    const dir = await fs.promises.mkdtemp(path.join(os.tmpdir(), 'mg-guest-auth-'));
     const file = guestAuthPersistPath(dir);
     expect(await readGuestAuthStore(file)).toEqual({ guests: {} });
     await patchGuestAuth('clickup', {
@@ -48,7 +48,7 @@ describe('guest auth store', () => {
   });
 
   test('forgets a guest entirely when its package is removed', async () => {
-    const dir = await fs.promises.mkdtemp(path.join(os.tmpdir(), 'oc-guest-auth-'));
+    const dir = await fs.promises.mkdtemp(path.join(os.tmpdir(), 'mg-guest-auth-'));
     const file = guestAuthPersistPath(dir);
     try {
       await patchGuestAuth('clickup', { clientId: 'app', clientSecret: 'secret', accessToken: 'token' }, file);
@@ -62,7 +62,7 @@ describe('guest auth store', () => {
   });
 
   test('treats a blank file as an empty store', async () => {
-    const dir = await fs.promises.mkdtemp(path.join(os.tmpdir(), 'oc-guest-auth-'));
+    const dir = await fs.promises.mkdtemp(path.join(os.tmpdir(), 'mg-guest-auth-'));
     const file = guestAuthPersistPath(dir);
     await fs.promises.writeFile(file, '', 'utf8');
     expect(await readGuestAuthStore(file)).toEqual({ guests: {} });
@@ -72,7 +72,7 @@ describe('guest auth store', () => {
   });
 
   test('refuses a corrupt store', async () => {
-    const dir = await fs.promises.mkdtemp(path.join(os.tmpdir(), 'oc-guest-auth-'));
+    const dir = await fs.promises.mkdtemp(path.join(os.tmpdir(), 'mg-guest-auth-'));
     const file = guestAuthPersistPath(dir);
     await fs.promises.writeFile(file, '{"guests":[]}', 'utf8');
     try {
@@ -94,7 +94,7 @@ describe('guest auth store', () => {
 
 describe('concurrent auth changes', () => {
   test('two patches at once both land', async () => {
-    const dir = await fs.promises.mkdtemp(path.join(os.tmpdir(), 'oc-guest-auth-'));
+    const dir = await fs.promises.mkdtemp(path.join(os.tmpdir(), 'mg-guest-auth-'));
     const file = guestAuthPersistPath(dir);
     try {
       await Promise.all([

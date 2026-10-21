@@ -1,4 +1,4 @@
-import type { NotificationPayload, NotificationsAPI } from '@openchamber/ui/lib/api/types';
+import type { NotificationPayload, NotificationsAPI } from '@magio/ui/lib/api/types';
 import { sendBridgeMessage } from './bridge';
 
 // The extension host shows notifications: Chromium never displays a

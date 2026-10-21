@@ -1,6 +1,6 @@
 /**
  * The measured width of the persistent titlebar control cluster
- * (`TitlebarLeftControls`), published as `--oc-titlebar-controls-width` onto
+ * (`TitlebarLeftControls`), published as `--mg-titlebar-controls-width` onto
  * the elements that reserve room for it: the sidebar's top strip and the
  * header's spacer.
  *
@@ -12,7 +12,7 @@
  * them instead. A reader that mounts later gets the current value at once.
  */
 
-const PROPERTY = '--oc-titlebar-controls-width';
+const PROPERTY = '--mg-titlebar-controls-width';
 
 const readers = new Set<HTMLElement>();
 let published: string | null = null;
@@ -29,7 +29,7 @@ export const publishTitlebarControlsWidth = (px: number): void => {
   readers.forEach(apply);
 };
 
-/** Callback ref for an element whose styles read `--oc-titlebar-controls-width`. */
+/** Callback ref for an element whose styles read `--mg-titlebar-controls-width`. */
 export const titlebarControlsWidthReaderRef = (node: HTMLElement | null): (() => void) | undefined => {
   if (!node) return undefined;
   readers.add(node);

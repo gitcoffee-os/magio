@@ -2,8 +2,8 @@ import { buildLocalUrl } from './cli-network.js';
 import { readDesktopLocalClientTokenFromSettings, readDesktopLocalPortFromSettings } from './cli-paths.js';
 import { getInstanceFilePath, readInstanceOptions } from './cli-process.js';
 
-const UI_SESSION_COOKIE_NAME = 'oc_ui_session';
-// The server folds the request port into the cookie name (oc_ui_session_<port>)
+const UI_SESSION_COOKIE_NAME = 'mg_ui_session';
+// The server folds the request port into the cookie name (mg_ui_session_<port>)
 // so LAN instances on different ports don't share one jar (issue #2377). Accept
 // both the bare name and any per-port variant when extracting.
 const UI_SESSION_COOKIE_PATTERN = new RegExp(`(?:^|,\\s*)(${UI_SESSION_COOKIE_NAME}(?:_\\d+)?=[^;]+)`);
@@ -208,7 +208,7 @@ async function fetchTunnelProvidersFromPort(port, fetchImpl = globalThis.fetch) 
     return null;
   }
   try {
-    const response = await fetchImpl(buildLocalUrl(port, '/api/openchamber/tunnel/providers'));
+    const response = await fetchImpl(buildLocalUrl(port, '/api/magio/tunnel/providers'));
     if (!response.ok) return null;
     const body = await response.json().catch(() => null);
     if (!body || !Array.isArray(body.providers)) return null;

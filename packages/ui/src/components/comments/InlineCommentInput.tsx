@@ -172,8 +172,8 @@ export function InlineCommentInput({
   return (
     <div
       className={cn(
-        'w-full max-w-[min(100%,calc(var(--oc-context-panel-width,100vw)-var(--oc-editor-gutter-width,0px)))] font-sans',
-        !floating && 'oc-inline-comment-band px-3 py-2',
+        'w-full max-w-[min(100%,calc(var(--mg-context-panel-width,100vw)-var(--mg-editor-gutter-width,0px)))] font-sans',
+        !floating && 'mg-inline-comment-band px-3 py-2',
         className
       )}
       style={{
@@ -188,8 +188,8 @@ export function InlineCommentInput({
         className={cn(
           'relative flex items-end gap-2 py-1 pe-1 text-foreground',
           floating
-            ? 'oc-glass-popover oc-glass-floating rounded-3xl ps-4'
-            : 'oc-raised oc-field rounded-lg bg-[var(--surface-elevated)] ps-3',
+            ? 'mg-glass-popover mg-glass-floating rounded-3xl ps-4'
+            : 'mg-raised mg-field rounded-lg bg-[var(--surface-elevated)] ps-3',
         )}
       >
         {snippetPicker.picker}

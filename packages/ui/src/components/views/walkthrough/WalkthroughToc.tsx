@@ -68,7 +68,7 @@ const TocStop = ({
                 ? 'bg-interactive-selection-foreground/20'
                 : isVisited
                   ? 'bg-status-success/15 text-status-success'
-                  : 'oc-tile-inset text-muted-foreground'
+                  : 'mg-tile-inset text-muted-foreground'
             )}
           >
             {isVisited && !isActive ? <Icon name="check" className="size-2.5" /> : stopView.position}

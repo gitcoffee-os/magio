@@ -1,6 +1,6 @@
 {
-  "appId": "com.openchamber.app",
-  "appName": "OpenChamber",
+  "appId": "com.magio.app",
+  "appName": "Magio",
   "webDir": "dist",
   "server": {
     "androidScheme": "https"

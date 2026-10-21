@@ -1,5 +1,5 @@
 // The dispatcher: a thin layer in front of the host's routes that forwards a request addressed
-// to a space to the OpenChamber server inside that space, over the place's `connect` channel.
+// to a space to the Magio server inside that space, over the place's `connect` channel.
 //
 // The client addresses the space. A request goes to a space when it names a directory under
 // `/spaces/<id>` in its query or its directory header, or when its path starts with
@@ -72,7 +72,7 @@ const HOST_ONLY_ROUTES = Object.freeze([
   '/api/system',
   '/api/push',
   '/api/notifications',
-  '/api/openchamber/tunnel',
+  '/api/magio/tunnel',
 ]);
 
 // Route families refused across the boundary: they would move something between the host and
@@ -135,7 +135,7 @@ const FORWARDED_RESPONSE_HEADERS = new Set([
 ]);
 
 // Query parameters that carry the user's credentials on browser-owned URLs.
-const DROPPED_QUERY_PARAMETERS = ['oc_url_token', 'oc_client_token'];
+const DROPPED_QUERY_PARAMETERS = ['mg_url_token', 'mg_client_token'];
 
 // Content types a browser would render as a page, with the space's script in it, under the
 // app's origin. A response from a space with one of these is served as plain text instead.

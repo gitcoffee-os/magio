@@ -6,10 +6,10 @@ import { getSessionMetadata, type SessionMetadataRecord } from '@/lib/sessionRev
  * link in `sessionReviewMetadata`:
  *
  * - The parent (the session `/btw` was typed into) carries
- *   `openchamber.btwSessionID` pointing at its active btw fork. The panel is
+ *   `magio.btwSessionID` pointing at its active btw fork. The panel is
  *   derived from this link, so it appears only in the parent session and
  *   survives reloads.
- * - The fork itself is marked `openchamber.kind = 'btw'` with
+ * - The fork itself is marked `magio.kind = 'btw'` with
  *   `originalSessionID` (its parent) and `btwBoundaryMessageID` — the id of
  *   the last message cloned from the parent. The panel locates this marker
  *   in the chronologically ordered transcript and renders what follows it.
@@ -24,8 +24,8 @@ type BtwMetadata = {
   btwPromoted?: boolean;
 };
 
-const getOpenChamberMetadata = (metadata: SessionMetadataRecord): BtwMetadata => {
-  const value = metadata.openchamber;
+const getMagioMetadata = (metadata: SessionMetadataRecord): BtwMetadata => {
+  const value = metadata.magio;
   if (!value || typeof value !== 'object' || Array.isArray(value)) return {};
   // SAFETY: session metadata is persisted, externally writable data; this is
   // its parsing boundary. `BtwMetadata` only declares optional fields and
@@ -38,7 +38,7 @@ const nonEmpty = (value: string | undefined): string | null =>
 
 /** The parent's link to its active btw fork, or null. */
 export const getBtwSessionID = (session: Session | null | undefined): string | null =>
-  nonEmpty(getOpenChamberMetadata(getSessionMetadata(session)).btwSessionID);
+  nonEmpty(getMagioMetadata(getSessionMetadata(session)).btwSessionID);
 
 /**
  * The session was once a btw fork and was promoted to a normal session.
@@ -50,16 +50,16 @@ export const getBtwSessionID = (session: Session | null | undefined): string | n
  * that is no longer a side conversation.
  */
 export const wasPromotedBtwSession = (session: Session | null | undefined): boolean =>
-  getOpenChamberMetadata(getSessionMetadata(session)).btwPromoted === true;
+  getMagioMetadata(getSessionMetadata(session)).btwPromoted === true;
 
 export const isBtwSession = (session: Session | null | undefined): boolean =>
-  getOpenChamberMetadata(getSessionMetadata(session)).kind === 'btw'
+  getMagioMetadata(getSessionMetadata(session)).kind === 'btw'
   && Boolean(getBtwOriginalSessionID(session));
 
 /** The fork's back-pointer to the session `/btw` was typed into. */
 export const getBtwOriginalSessionID = (session: Session | null | undefined): string | null => {
-  const openchamber = getOpenChamberMetadata(getSessionMetadata(session));
-  return openchamber.kind === 'btw' ? nonEmpty(openchamber.originalSessionID) : null;
+  const magio = getMagioMetadata(getSessionMetadata(session));
+  return magio.kind === 'btw' ? nonEmpty(magio.originalSessionID) : null;
 };
 
 /**
@@ -67,8 +67,8 @@ export const getBtwOriginalSessionID = (session: Session | null | undefined): st
  * the fork inherited nothing (empty parent) and every message is its own.
  */
 export const getBtwBoundaryMessageID = (session: Session | null | undefined): string | null => {
-  const openchamber = getOpenChamberMetadata(getSessionMetadata(session));
-  return openchamber.kind === 'btw' ? nonEmpty(openchamber.btwBoundaryMessageID) : null;
+  const magio = getMagioMetadata(getSessionMetadata(session));
+  return magio.kind === 'btw' ? nonEmpty(magio.btwBoundaryMessageID) : null;
 };
 
 export const withBtwSessionLink = (
@@ -76,8 +76,8 @@ export const withBtwSessionLink = (
   btwSessionID: string,
 ): SessionMetadataRecord => ({
   ...metadata,
-  openchamber: {
-    ...getOpenChamberMetadata(metadata),
+  magio: {
+    ...getMagioMetadata(metadata),
     btwSessionID,
   },
 });
@@ -85,16 +85,16 @@ export const withBtwSessionLink = (
 /**
  * Mark the fork as a btw session. The fork clones the parent's metadata
  * wholesale (including review links or a stale `btwSessionID`), so the
- * inherited `openchamber` object is replaced, not merged.
+ * inherited `magio` object is replaced, not merged.
  */
 export const withBtwSessionMarker = (
   metadata: SessionMetadataRecord,
   originalSessionID: string,
   boundaryMessageID: string | null,
 ): SessionMetadataRecord => {
-  const openchamber: BtwMetadata = { kind: 'btw', originalSessionID };
-  if (boundaryMessageID) openchamber.btwBoundaryMessageID = boundaryMessageID;
-  return { ...metadata, openchamber };
+  const magio: BtwMetadata = { kind: 'btw', originalSessionID };
+  if (boundaryMessageID) magio.btwBoundaryMessageID = boundaryMessageID;
+  return { ...metadata, magio };
 };
 
 /**
@@ -105,14 +105,14 @@ export const withBtwSessionMarker = (
  * remain distinguishable from one that was never a side conversation.
  */
 export const withoutBtwSessionMarker = (metadata: SessionMetadataRecord): SessionMetadataRecord => {
-  const openchamber = getOpenChamberMetadata(metadata);
-  if (openchamber.kind !== 'btw') return metadata;
-  const rest: BtwMetadata = { ...openchamber };
+  const magio = getMagioMetadata(metadata);
+  if (magio.kind !== 'btw') return metadata;
+  const rest: BtwMetadata = { ...magio };
   delete rest.kind;
   delete rest.originalSessionID;
   delete rest.btwBoundaryMessageID;
   rest.btwPromoted = true;
-  return { ...metadata, openchamber: rest };
+  return { ...metadata, magio: rest };
 };
 
 /** Unlink the parent, but only if it still points at this fork. */
@@ -120,15 +120,15 @@ export const withoutBtwSessionLink = (
   metadata: SessionMetadataRecord,
   btwSessionID: string,
 ): SessionMetadataRecord => {
-  const openchamber = getOpenChamberMetadata(metadata);
-  if (openchamber.btwSessionID !== btwSessionID) return metadata;
-  const rest: BtwMetadata = { ...openchamber };
+  const magio = getMagioMetadata(metadata);
+  if (magio.btwSessionID !== btwSessionID) return metadata;
+  const rest: BtwMetadata = { ...magio };
   delete rest.btwSessionID;
   const next: SessionMetadataRecord = { ...metadata };
   if (Object.keys(rest).length > 0) {
-    next.openchamber = rest;
+    next.magio = rest;
   } else {
-    delete next.openchamber;
+    delete next.magio;
   }
   return next;
 };

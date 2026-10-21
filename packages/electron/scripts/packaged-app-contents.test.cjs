@@ -5,7 +5,7 @@ const path = require('node:path');
 const { test } = require('node:test');
 const { readAsarFiles, findPackagedAppContentProblems } = require('./packaged-app-contents.cjs');
 
-const web = 'node_modules/@openchamber/web';
+const web = 'node_modules/@magio/web';
 const helpers = [
   `${web}/server/lib/git/credential-helper.js`,
   `${web}/server/lib/git/ssh-wrapper.js`,
@@ -64,7 +64,7 @@ test('a missing server entry or a packed git helper is reported', () => {
 });
 
 test('reads nested files and the unpacked flag from an asar header', () => {
-  const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'oc-asar-'));
+  const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'mg-asar-'));
   try {
     const asarPath = writeAsar(directory, {
       files: {

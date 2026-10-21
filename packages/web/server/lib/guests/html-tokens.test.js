@@ -28,7 +28,7 @@ describe('listRelativeGuestScriptHrefs', () => {
 describe('resolveGuestHtmlRelativePath', () => {
   test('resolves against the entry file and blocks escape', () => {
     expect(resolveGuestHtmlRelativePath('panel/index.html', './main.js')).toBe('panel/main.js');
-    expect(resolveGuestHtmlRelativePath('panel/index.html', 'main.js?oc_url_token=x')).toBe('panel/main.js');
+    expect(resolveGuestHtmlRelativePath('panel/index.html', 'main.js?mg_url_token=x')).toBe('panel/main.js');
     expect(resolveGuestHtmlRelativePath('panel/index.html', '../secret.js')).toBe('secret.js');
     expect(resolveGuestHtmlRelativePath('panel/index.html', '../../outside.js')).toBeNull();
     expect(resolveGuestHtmlRelativePath('index.html', './panel/main.js')).toBe('panel/main.js');
@@ -38,7 +38,7 @@ describe('resolveGuestHtmlRelativePath', () => {
 describe('injectGuestAssetTokens', () => {
   test('adds the token to a relative script src', () => {
     expect(injectGuestAssetTokens('<script src="./main.js"></script>', 'tok/en'))
-      .toBe('<script src="./main.js?oc_url_token=tok%2Fen"></script>');
+      .toBe('<script src="./main.js?mg_url_token=tok%2Fen"></script>');
   });
 
   test('leaves absolute and data urls alone', () => {
@@ -47,7 +47,7 @@ describe('injectGuestAssetTokens', () => {
   });
 
   test('does not duplicate an existing token', () => {
-    expect(injectGuestAssetTokens('<script src="./main.js?oc_url_token=old"></script>', 'new'))
-      .toBe('<script src="./main.js?oc_url_token=old"></script>');
+    expect(injectGuestAssetTokens('<script src="./main.js?mg_url_token=old"></script>', 'new'))
+      .toBe('<script src="./main.js?mg_url_token=old"></script>');
   });
 });

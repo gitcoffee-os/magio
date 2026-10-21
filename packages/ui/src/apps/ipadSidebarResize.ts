@@ -41,7 +41,7 @@ export function useIpadSidebarResize(
     aside.style.width = `${nextWidth}px`;
     aside.style.minWidth = `${nextWidth}px`;
     aside.style.maxWidth = `${nextWidth}px`;
-    aside.style.setProperty('--oc-ipad-sidebar-width', `${nextWidth}px`);
+    aside.style.setProperty('--mg-ipad-sidebar-width', `${nextWidth}px`);
   }, []);
 
   const handlePointerDown = React.useCallback((event: React.PointerEvent) => {

@@ -2,7 +2,7 @@ import type { Metadata, Session } from '@/lib/opencode/model';
 
 export type SessionMetadataRecord = Metadata;
 
-type OpenChamberMetadata = {
+type MagioMetadata = {
   kind?: 'review';
   originalSessionID?: string;
   reviewSessionID?: string;
@@ -15,32 +15,32 @@ export const getSessionMetadata = (session: Session | null | undefined): Session
   session?.metadata ?? {}
 );
 
-const getOpenChamberMetadata = (metadata: SessionMetadataRecord): OpenChamberMetadata => {
-  const value = metadata.openchamber;
-  return isRecord(value) ? value as OpenChamberMetadata : {};
+const getMagioMetadata = (metadata: SessionMetadataRecord): MagioMetadata => {
+  const value = metadata.magio;
+  return isRecord(value) ? value as MagioMetadata : {};
 };
 
 export const getReviewSessionID = (session: Session | null | undefined): string | null => {
-  const value = getOpenChamberMetadata(getSessionMetadata(session)).reviewSessionID;
+  const value = getMagioMetadata(getSessionMetadata(session)).reviewSessionID;
   return typeof value === 'string' && value.trim().length > 0 ? value : null;
 };
 
 export const getOriginalSessionID = (session: Session | null | undefined): string | null => {
-  const value = getOpenChamberMetadata(getSessionMetadata(session)).originalSessionID;
+  const value = getMagioMetadata(getSessionMetadata(session)).originalSessionID;
   return typeof value === 'string' && value.trim().length > 0 ? value : null;
 };
 
 export const isReviewSession = (session: Session | null | undefined): boolean =>
-  getOpenChamberMetadata(getSessionMetadata(session)).kind === 'review' && Boolean(getOriginalSessionID(session));
+  getMagioMetadata(getSessionMetadata(session)).kind === 'review' && Boolean(getOriginalSessionID(session));
 
 export const withReviewSessionLink = (
   metadata: SessionMetadataRecord,
   reviewSessionID: string,
 ): SessionMetadataRecord => {
-  const current = getOpenChamberMetadata(metadata);
+  const current = getMagioMetadata(metadata);
   return {
     ...metadata,
-    openchamber: {
+    magio: {
       ...current,
       reviewSessionID,
     },
@@ -51,10 +51,10 @@ export const withReviewSessionMarker = (
   metadata: SessionMetadataRecord,
   originalSessionID: string,
 ): SessionMetadataRecord => {
-  const current = getOpenChamberMetadata(metadata);
+  const current = getMagioMetadata(metadata);
   return {
     ...metadata,
-    openchamber: {
+    magio: {
       ...current,
       kind: 'review' as const,
       originalSessionID,
@@ -66,16 +66,16 @@ export const withoutReviewSessionLink = (
   metadata: SessionMetadataRecord,
   reviewSessionID: string,
 ): SessionMetadataRecord => {
-  const current = getOpenChamberMetadata(metadata);
+  const current = getMagioMetadata(metadata);
   if (current.reviewSessionID !== reviewSessionID) return metadata;
 
-  const restOpenChamber = { ...current };
-  delete restOpenChamber.reviewSessionID;
+  const restMagio = { ...current };
+  delete restMagio.reviewSessionID;
   const next: SessionMetadataRecord = { ...metadata };
-  if (Object.keys(restOpenChamber).length > 0) {
-    next.openchamber = restOpenChamber;
+  if (Object.keys(restMagio).length > 0) {
+    next.magio = restMagio;
   } else {
-    delete next.openchamber;
+    delete next.magio;
   }
   return next;
 };

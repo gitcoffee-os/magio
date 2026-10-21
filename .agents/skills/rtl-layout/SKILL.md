@@ -1,6 +1,6 @@
 ---
 name: rtl-layout
-description: Use when creating or modifying OpenChamber UI layout, horizontal positioning, offsets or scroll math, resize or drag handles, arrow-key navigation, directional icons, or slide animations.
+description: Use when creating or modifying Magio UI layout, horizontal positioning, offsets or scroll math, resize or drag handles, arrow-key navigation, directional icons, or slide animations.
 ---
 
 # RTL Layout
@@ -13,13 +13,13 @@ Every layout change works in both directions. The test: English stays pixel-iden
 
 Write sides as start and end of the line: `ms-`/`me-`, `ps-`/`pe-`, `inset-s-`/`inset-e-`, `text-start`/`text-end`, `rounded-s`/`rounded-e`/`rounded-ss`, `border-s`/`border-e`; in CSS and inline styles `margin-inline-start`, `padding-inline-start`, `inset-inline-start`. Flex and grid already follow `dir`, so DOM order stays semantic.
 
-What CSS cannot express flips with the `rtl:` variant: `translate-x-*` (`data-[checked]:translate-x-4 rtl:data-[checked]:-translate-x-4`), `bg-gradient-to-r rtl:bg-gradient-to-l`, `origin-top-left rtl:origin-top-right`, and inline transforms built from a sign. A fade toward the end of a line uses `linear-gradient(var(--oc-to-inline-end), …)`.
+What CSS cannot express flips with the `rtl:` variant: `translate-x-*` (`data-[checked]:translate-x-4 rtl:data-[checked]:-translate-x-4`), `bg-gradient-to-r rtl:bg-gradient-to-l`, `origin-top-left rtl:origin-top-right`, and inline transforms built from a sign. A fade toward the end of a line uses `linear-gradient(var(--mg-to-inline-end), …)`.
 
 ## Physical on purpose
 
-Some sides belong to the screen, not the line. The lint rule `openchamber/no-physical-sides` (`tools/oxlint/openchamber`, enabled in `oxlint.config.ts`) flags physical classes in `packages/ui` class lists, so a deliberate one carries `// oxlint-disable-next-line openchamber/no-physical-sides -- <why it is physical>`:
+Some sides belong to the screen, not the line. The lint rule `magio/no-physical-sides` (`tools/oxlint/magio`, enabled in `oxlint.config.ts`) flags physical classes in `packages/ui` class lists, so a deliberate one carries `// oxlint-disable-next-line magio/no-physical-sides -- <why it is physical>`:
 
-- **OS window controls.** macOS traffic lights stay top left in every language; frameless Windows/Linux controls stay on the side the user picked. The titlebar publishes `--oc-titlebar-start-inset` and maps controls through `getInlineStartSide(direction)` (see `Header.tsx`, `TitlebarLeftControls.tsx`).
+- **OS window controls.** macOS traffic lights stay top left in every language; frameless Windows/Linux controls stay on the side the user picked. The titlebar publishes `--mg-titlebar-start-inset` and maps controls through `getInlineStartSide(direction)` (see `Header.tsx`, `TitlebarLeftControls.tsx`).
 - **Geometry from measurement.** An element moved by `offsetLeft`, `getBoundingClientRect().left` or `clientX` anchors with `left-0`, because the numbers are physical (the active-tab pill in `sortable-tabs-strip.tsx`).
 - **Content that reads left to right:** code, diffs, terminal output and its key strip, file paths and path fields, URLs, IDs, charts along a time axis. The container gets `dir="ltr"`, so its own logical classes resolve as physical inside it.
 - **Keyboard keys and labels** that name a physical key ("close tabs to the left" means the screen's left).
@@ -34,7 +34,7 @@ Some sides belong to the screen, not the line. The lint rule `openchamber/no-phy
 
 ## Mixed-direction text
 
-User content (session titles, run names, file names in lists) gets `dir="auto"` so it shows its own start when truncated. Text whose direction differs from the UI aligns with the interface through `oc-ui-start-align`, so it lines up with the rows around it. Values made of numbers and units ("~41 tok/s", "6.6K ↑ · 242 ↓") also take `dir="auto"`. Markdown already resolves direction per block; see `components/chat/message/parts/DOCUMENTATION.md` before touching it.
+User content (session titles, run names, file names in lists) gets `dir="auto"` so it shows its own start when truncated. Text whose direction differs from the UI aligns with the interface through `mg-ui-start-align`, so it lines up with the rows around it. Values made of numbers and units ("~41 tok/s", "6.6K ↑ · 242 ↓") also take `dir="auto"`. Markdown already resolves direction per block; see `components/chat/message/parts/DOCUMENTATION.md` before touching it.
 
 ## Icons
 
@@ -43,5 +43,5 @@ User content (session titles, run names, file names in lists) gets `dir="auto"` 
 ## Verify
 
 1. Take English screenshots of the affected screens before the change and after it; they match pixel for pixel.
-2. Switch to Arabic (`localStorage['openchamber.i18n.v1'] = '{"locale":"ar"}'`) and check the same screens, then drag, scroll and use the arrow keys on whatever changed.
+2. Switch to Arabic (`localStorage['magio.i18n.v1'] = '{"locale":"ar"}'`) and check the same screens, then drag, scroll and use the arrow keys on whatever changed.
 3. For phone layouts, check the drawer and swipe direction at a 390px touch viewport.

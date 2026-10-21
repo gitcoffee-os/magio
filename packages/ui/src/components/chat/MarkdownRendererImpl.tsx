@@ -152,9 +152,9 @@ export interface MarkdownRendererProps {
   enableFileReferences?: boolean;
 }
 
-const BLOCK_PATH_TOKEN_ATTR = 'data-openchamber-block-path-token';
+const BLOCK_PATH_TOKEN_ATTR = 'data-magio-block-path-token';
 const BLOCK_PATH_TOKEN_SELECTOR = `[${BLOCK_PATH_TOKEN_ATTR}]`;
-const CODE_BLOCK_PATH_SCANNED_ATTR = 'data-openchamber-block-paths-scanned';
+const CODE_BLOCK_PATH_SCANNED_ATTR = 'data-magio-block-paths-scanned';
 // Matches `path[:line[:col]]` or `path:start-end` inside shell/grep-style
 // output. The regex is defined in `./fileReferenceParser`; the inline-code
 // pipeline reads full text content rather than using this regex.
@@ -306,7 +306,7 @@ const findBlockCodePathTokens = (container: HTMLElement): Array<{ codeBlock: HTM
 };
 
 // Wraps confirmed tokens of one code block in spans carrying
-// `data-openchamber-block-path-token`, which later passes treat like inline
+// `data-magio-block-path-token`, which later passes treat like inline
 // code references, and marks the block scanned. A token whose text moved
 // since the scan stays text.
 const wrapBlockCodePathTokens = (
@@ -400,9 +400,9 @@ const useFileReferenceInteractions = ({
     const fileReferencesEnabled = enabled && !isMobileSurfaceRuntime();
 
     const clearFileLinkAttributes = (candidate: HTMLElement) => {
-      candidate.removeAttribute('data-openchamber-file-link');
-      candidate.removeAttribute('data-openchamber-file-ref');
-      candidate.removeAttribute('data-openchamber-file-path');
+      candidate.removeAttribute('data-magio-file-link');
+      candidate.removeAttribute('data-magio-file-ref');
+      candidate.removeAttribute('data-magio-file-path');
       if (candidate.getAttribute('title') === 'Open file') {
         candidate.removeAttribute('title');
       }
@@ -421,14 +421,14 @@ const useFileReferenceInteractions = ({
     };
 
     const openFileReference = async (sourceElement: HTMLElement, options?: { external: boolean }) => {
-      const raw = sourceElement.getAttribute('data-openchamber-file-ref') || extractPathCandidateFromElement(sourceElement);
+      const raw = sourceElement.getAttribute('data-magio-file-ref') || extractPathCandidateFromElement(sourceElement);
       const parsedReference = getResolvedReference(raw, effectiveDirectory);
       if (!parsedReference) {
         return;
       }
       // Annotation stored where the file really is, which differs from the
       // written path when a bare name was found elsewhere in the workspace.
-      const storedPath = sourceElement.getAttribute('data-openchamber-file-path');
+      const storedPath = sourceElement.getAttribute('data-magio-file-path');
       const resolved = storedPath ? { ...parsedReference, resolvedPath: storedPath } : parsedReference;
 
       // Cmd/Ctrl-click hands the file to the OS, which opens it with the app
@@ -520,9 +520,9 @@ const useFileReferenceInteractions = ({
     };
 
     const markFileLink = (candidate: HTMLElement, raw: string, targetPath: string) => {
-      setAttributeIfChanged(candidate, 'data-openchamber-file-link', 'true');
-      setAttributeIfChanged(candidate, 'data-openchamber-file-ref', raw);
-      setAttributeIfChanged(candidate, 'data-openchamber-file-path', targetPath);
+      setAttributeIfChanged(candidate, 'data-magio-file-link', 'true');
+      setAttributeIfChanged(candidate, 'data-magio-file-ref', raw);
+      setAttributeIfChanged(candidate, 'data-magio-file-path', targetPath);
       setAttributeIfChanged(candidate, 'title', 'Open file');
       if (candidate.tagName.toLowerCase() !== 'a') {
         setAttributeIfChanged(candidate, 'role', 'button');
@@ -609,7 +609,7 @@ const useFileReferenceInteractions = ({
       }
 
       const target = event.target;
-      if (!(target instanceof HTMLElement) || target.getAttribute('data-openchamber-file-link') !== 'true') {
+      if (!(target instanceof HTMLElement) || target.getAttribute('data-magio-file-link') !== 'true') {
         return;
       }
 
@@ -819,7 +819,7 @@ const markLastMarkdownBlock = (target: HTMLElement): void => {
   }
 };
 
-const BLOCK_ENTER_CLASS = 'oc-md-block-enter';
+const BLOCK_ENTER_CLASS = 'mg-md-block-enter';
 
 /**
  * Drops the entrance animation streamed blocks carry. Settled blocks now keep
@@ -828,7 +828,7 @@ const BLOCK_ENTER_CLASS = 'oc-md-block-enter';
 const clearBlockEnterAnimation = (target: HTMLElement): void => {
   for (const element of Array.from(target.querySelectorAll<HTMLElement>(`.${BLOCK_ENTER_CLASS}`))) {
     element.classList.remove(BLOCK_ENTER_CLASS);
-    element.style.removeProperty('--oc-md-enter-delay');
+    element.style.removeProperty('--mg-md-enter-delay');
   }
 };
 
@@ -841,7 +841,7 @@ const clearPatchedBlockEnterAnimation = (block: HTMLElement): void => {
   for (const child of Array.from(block.children)) {
     if (!(child instanceof HTMLElement) || !child.classList.contains(BLOCK_ENTER_CLASS)) continue;
     child.classList.remove(BLOCK_ENTER_CLASS);
-    child.style.removeProperty('--oc-md-enter-delay');
+    child.style.removeProperty('--mg-md-enter-delay');
     if (!child.getAttribute('style')) child.removeAttribute('style');
   }
 };
@@ -1300,9 +1300,9 @@ const useMorphdomMarkdown = ({
           const delayMs = Math.min(enteredThisPass, 4) * 55;
           enteredThisPass += 1;
           for (const child of Array.from(temp.children)) {
-            child.classList.add('oc-md-block-enter');
+            child.classList.add('mg-md-block-enter');
             if (delayMs > 0 && child instanceof HTMLElement) {
-              child.style.setProperty('--oc-md-enter-delay', `${delayMs}ms`);
+              child.style.setProperty('--mg-md-enter-delay', `${delayMs}ms`);
             }
           }
         }

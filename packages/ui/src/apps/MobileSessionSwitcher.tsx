@@ -52,7 +52,7 @@ const SwitcherRow: React.FC<{
       style={{ touchAction: 'manipulation' }}
     >
       <span className="flex min-w-0 flex-1 flex-col">
-        <span dir="auto" className={cn('block truncate oc-ui-start-align typography-ui-label', active ? 'text-primary' : 'text-foreground')}>
+        <span dir="auto" className={cn('block truncate mg-ui-start-align typography-ui-label', active ? 'text-primary' : 'text-foreground')}>
           {getSessionTitle(session, t('sessions.sidebar.session.untitled'))}
         </span>
         {meta ? (
@@ -183,19 +183,19 @@ export const MobileSessionSwitcher: React.FC<{
   if (!shouldRender) return null;
 
   return (
-    <div ref={wrapperRef} className="fixed inset-x-0 bottom-0 top-[calc(var(--oc-safe-area-top,0px)+var(--oc-header-height,56px))] z-20 pointer-events-none">
+    <div ref={wrapperRef} className="fixed inset-x-0 bottom-0 top-[calc(var(--mg-safe-area-top,0px)+var(--mg-header-height,56px))] z-20 pointer-events-none">
       <div
         ref={panelRef}
         role="dialog"
         aria-label={t('sessions.switcher.openAria')}
         className={cn(
-          'oc-surface-elevated flex flex-col overflow-hidden rounded-[20px] border border-border/70 bg-surface-elevated p-2 shadow-[0_12px_32px_rgb(0_0_0_/_0.2)] will-change-transform',
+          'mg-surface-elevated flex flex-col overflow-hidden rounded-[20px] border border-border/70 bg-surface-elevated p-2 shadow-[0_12px_32px_rgb(0_0_0_/_0.2)] will-change-transform',
           isPopover ? 'absolute origin-top-left' : 'mx-3 mt-2',
           isExiting ? 'pointer-events-none' : 'pointer-events-auto',
         )}
         style={{
           animation: `${isExiting ? 'session-switcher-out' : 'session-switcher-in'} ${isExiting ? 140 : 170}ms cubic-bezier(0.32, 0.72, 0, 1) forwards`,
-          maxHeight: 'min(72dvh, calc(100dvh - var(--oc-safe-area-top, 0px) - var(--oc-header-height, 56px) - 1rem))',
+          maxHeight: 'min(72dvh, calc(100dvh - var(--mg-safe-area-top, 0px) - var(--mg-header-height, 56px) - 1rem))',
           ...(isPopover
             ? {
                 top: 8,
@@ -205,7 +205,7 @@ export const MobileSessionSwitcher: React.FC<{
             : null),
         }}
       >
-        <div className="oc-hide-scrollbar min-h-0 flex-1 space-y-0.5 overflow-y-auto overscroll-contain">
+        <div className="mg-hide-scrollbar min-h-0 flex-1 space-y-0.5 overflow-y-auto overscroll-contain">
           {items.length === 0 ? (
             <p className="px-3 py-6 text-center typography-small text-muted-foreground">
               {t('sessions.switcher.empty')}

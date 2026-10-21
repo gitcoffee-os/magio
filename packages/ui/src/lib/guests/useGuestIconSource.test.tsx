@@ -51,7 +51,7 @@ describe('guest icon loading', () => {
       if (String(input).includes('/auth/url-token')) return Response.json({ token: 'fixture-url-token', expiresAt: Date.now() + 60_000 });
       requests.push(String(input));
       expect(new Headers(init?.headers).get('Authorization')).toBe('Bearer fixture-client');
-      expect(String(input)).not.toContain('oc_url_token');
+      expect(String(input)).not.toContain('mg_url_token');
       return reply(String(input));
     });
     const create = spyOn(URL, 'createObjectURL').mockImplementation(() => `blob:fixture-${++created}`);
@@ -81,10 +81,10 @@ describe('guest icon loading', () => {
   });
 
   test('loads on first mount without a URL token and ignores expired URL tokens', async () => {
-    await render('/api/guests/demo/icon.svg?oc_url_token=expired');
+    await render('/api/guests/demo/icon.svg?mg_url_token=expired');
     expect(icon).toBe('blob:fixture-1');
     expect(requests).toEqual(['https://first.example/api/guests/demo/icon.svg']);
-    await render('/api/guests/demo/icon.svg?oc_url_token=replaced');
+    await render('/api/guests/demo/icon.svg?mg_url_token=replaced');
     expect(icon).toBe('blob:fixture-1');
     expect(requests).toHaveLength(1);
     expect(revoked).toHaveLength(0);

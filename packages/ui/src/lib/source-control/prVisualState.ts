@@ -28,7 +28,7 @@ export const prVisualStateOf = (pr: PrVisualInput): PrVisualState => {
 };
 
 /**
- * Inline style for an element with the `oc-ref-tint` class: the state colour
+ * Inline style for an element with the `mg-ref-tint` class: the state colour
  * a PR or issue reference rests muted from and shows in full on hover.
  */
-export const refTintStyle = (color: string): CSSProperties & { '--oc-ref-tint': string } => ({ '--oc-ref-tint': color });
+export const refTintStyle = (color: string): CSSProperties & { '--mg-ref-tint': string } => ({ '--mg-ref-tint': color });

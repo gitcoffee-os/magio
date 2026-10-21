@@ -49,7 +49,7 @@ export const mountPopoverAnchor = (element: HTMLElement, options: PopoverAnchorO
     clearTimer();
     activeId = null;
     removeActiveListeners();
-    element.removeAttribute('data-oc-popover-open');
+    element.removeAttribute('data-mg-popover-open');
     if (ownsExpanded) element.setAttribute('aria-expanded', 'false');
     if (id) void options.host.closePopover(id, reason).catch(() => undefined);
     if (restoreFocus) {
@@ -79,7 +79,7 @@ export const mountPopoverAnchor = (element: HTMLElement, options: PopoverAnchorO
     if (disposed || activeId || !element.isConnected) return;
     const rect = element.getBoundingClientRect();
     if (rect.width <= 0 || rect.height <= 0) return;
-    const id = `oc-popover-${++nextPopoverAnchorId}`;
+    const id = `mg-popover-${++nextPopoverAnchorId}`;
     let data: JsonValue;
     try {
       data = options.getData();
@@ -87,7 +87,7 @@ export const mountPopoverAnchor = (element: HTMLElement, options: PopoverAnchorO
       return;
     }
     activeId = id;
-    element.setAttribute('data-oc-popover-open', 'true');
+    element.setAttribute('data-mg-popover-open', 'true');
     if (ownsExpanded) element.setAttribute('aria-expanded', 'true');
     watchActive();
     void options.host.openPopover({
@@ -142,7 +142,7 @@ export const mountPopoverAnchor = (element: HTMLElement, options: PopoverAnchorO
     activeId = null;
     clearTimer();
     removeActiveListeners();
-    element.removeAttribute('data-oc-popover-open');
+    element.removeAttribute('data-mg-popover-open');
     if (ownsExpanded) element.setAttribute('aria-expanded', 'false');
     if (event.reason === 'escape') {
       ignoreNextFocus = true;
@@ -169,7 +169,7 @@ export const mountPopoverAnchor = (element: HTMLElement, options: PopoverAnchorO
     clearTimer();
     close();
     unsubscribe();
-    element.removeAttribute('data-oc-popover-open');
+    element.removeAttribute('data-mg-popover-open');
     if (previousExpanded === null) element.removeAttribute('aria-expanded');
     if (previousPopup === null) element.removeAttribute('aria-haspopup');
     else element.setAttribute('aria-haspopup', previousPopup);

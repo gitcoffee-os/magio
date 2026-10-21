@@ -19,7 +19,7 @@ const tarball = (name, content) => {
 };
 
 beforeAll(() => {
-  directory = fs.mkdtempSync(path.join(os.tmpdir(), 'openchamber-tools-test-'));
+  directory = fs.mkdtempSync(path.join(os.tmpdir(), 'magio-tools-test-'));
 });
 
 afterAll(() => {
@@ -50,10 +50,10 @@ describe('createRegistryToolsSource', () => {
     expect(source.description).toBe('web 1.24.2, opencode 1.18.31');
     expect(source.files).toEqual([]);
     expect(JSON.parse(source.packageJson)).toEqual({
-      name: 'openchamber-space-tools',
+      name: 'magio-space-tools',
       private: true,
       // bun and pnpm ride along at exact versions, the runtimes setup commands reach for.
-      dependencies: { '@openchamber/web': '1.24.2', '@opencode/cli': '1.18.31', '@opencode/plugin': '1.18.31', bun: '1.4.3', pnpm: '12.11.2' },
+      dependencies: { '@magio/web': '1.24.2', '@opencode/cli': '1.18.31', '@opencode/plugin': '1.18.31', bun: '1.4.3', pnpm: '12.11.2' },
     });
   });
 
@@ -73,21 +73,21 @@ describe('createPackedToolsSource', () => {
 
     expect(source.description).toBe('development build');
     expect(source.files).toEqual([
-      { name: 'openchamber-web.tgz', bytes: Buffer.from('web bytes') },
-      { name: 'openchamber-sdk.tgz', bytes: Buffer.from('sdk bytes') },
+      { name: 'magio-web.tgz', bytes: Buffer.from('web bytes') },
+      { name: 'magio-sdk.tgz', bytes: Buffer.from('sdk bytes') },
     ]);
     expect(JSON.parse(source.packageJson)).toEqual({
-      name: 'openchamber-space-tools',
+      name: 'magio-space-tools',
       private: true,
       dependencies: {
-        '@openchamber/web': 'file:/tmp/openchamber-fill/openchamber-web.tgz',
-        '@openchamber/sdk': 'file:/tmp/openchamber-fill/openchamber-sdk.tgz',
+        '@magio/web': 'file:/tmp/magio-fill/magio-web.tgz',
+        '@magio/sdk': 'file:/tmp/magio-fill/magio-sdk.tgz',
         '@opencode/cli': '1.18.31',
         '@opencode/plugin': '1.18.31',
         bun: '1.4.3',
         pnpm: '12.11.2',
       },
-      overrides: { '@openchamber/sdk': '$@openchamber/sdk' },
+      overrides: { '@magio/sdk': '$@magio/sdk' },
     });
   });
 

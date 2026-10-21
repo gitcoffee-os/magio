@@ -3,7 +3,7 @@ import type { I18nKey } from '@/lib/i18n';
 import { guestNeedsApproval } from '@/lib/guests/capabilities';
 import type { InstalledGuest } from '@/lib/guests/types';
 
-/** An OpenChamber extension the team publishes and the Integrations page offers to install. */
+/** An Magio extension the team publishes and the Integrations page offers to install. */
 export interface CatalogExtensionDefinition {
   /** The extension's `panel.id`, which is its id once installed. */
   guestId: string;
@@ -22,8 +22,8 @@ export type CatalogExtensionLogo =
 
 export const EXCALIDRAW_EXTENSION: CatalogExtensionDefinition = {
   guestId: 'excalidraw',
-  gitUrl: 'https://github.com/openchamber/openchamber-excalidraw',
-  homepage: 'https://github.com/openchamber/openchamber-excalidraw',
+  gitUrl: 'https://github.com/gitcoffee-os/magio-excalidraw',
+  homepage: 'https://github.com/gitcoffee-os/magio-excalidraw',
   nameKey: 'settings.integrations.extensionCatalog.excalidraw.name',
   descriptionKey: 'settings.integrations.extensionCatalog.excalidraw.description',
   logo: { kind: 'file-type', fileName: 'drawing.excalidraw' },
@@ -31,8 +31,8 @@ export const EXCALIDRAW_EXTENSION: CatalogExtensionDefinition = {
 
 export const RESOURCE_MONITOR_EXTENSION: CatalogExtensionDefinition = {
   guestId: 'resource-monitor',
-  gitUrl: 'https://github.com/openchamber/openchamber-resource-monitor',
-  homepage: 'https://github.com/openchamber/openchamber-resource-monitor',
+  gitUrl: 'https://github.com/gitcoffee-os/magio-resource-monitor',
+  homepage: 'https://github.com/gitcoffee-os/magio-resource-monitor',
   nameKey: 'settings.integrations.extensionCatalog.resourceMonitor.name',
   descriptionKey: 'settings.integrations.extensionCatalog.resourceMonitor.description',
   logo: { kind: 'icon', name: 'pulse' },

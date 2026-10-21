@@ -15,7 +15,7 @@ import {
 import { selectProvidersForDirectory, useConfigStore } from '@/stores/useConfigStore';
 import { modelVariantNames } from '@/lib/modelVariants';
 import { isPrimaryMode } from '@/components/chat/mobileControlsUtils';
-import { updateSharedProjectSetup, type ProjectRef } from '@/lib/openchamberConfig';
+import { updateSharedProjectSetup, type ProjectRef } from '@/lib/magioConfig';
 import { ensureSharedSetupTrusted, resetSharedSetupTrust } from '@/lib/sharedTrustConfirmation';
 import { useI18n } from '@/lib/i18n';
 import { cn } from '@/lib/utils';
@@ -175,7 +175,7 @@ const TeamFileSection: React.FC<{ projectRef: ProjectRef; setupState: ProjectSet
               className={cn(
                 'flex max-w-[40rem] items-center gap-3 rounded-lg p-3',
                 setup.trust.trusted
-                  ? 'oc-tile'
+                  ? 'mg-tile'
                   : 'bg-[var(--status-warning)]/10',
               )}
             >

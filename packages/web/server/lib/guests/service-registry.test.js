@@ -79,7 +79,7 @@ const crashHost = async ({ recordedToken = TOKEN, serviceToken = TOKEN } = {}) =
 };
 
 beforeEach(async () => {
-  dir = await fs.mkdtemp(path.join(os.tmpdir(), 'oc-guest-registry-'));
+  dir = await fs.mkdtemp(path.join(os.tmpdir(), 'mg-guest-registry-'));
 });
 
 afterEach(async () => {

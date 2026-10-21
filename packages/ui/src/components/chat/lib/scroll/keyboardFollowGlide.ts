@@ -18,10 +18,10 @@
  * the settle snap then only clamps scrollTop to the value it already has.
  *
  * Event contract:
- *  - `oc:composer-morph` (mobileComposerMorph): `hold` at the swap with the
+ *  - `mg:composer-morph` (mobileComposerMorph): `hold` at the swap with the
  *    tail inset's delta; `glide` when the morph runs without a keyboard;
  *    `release` when such a morph ends.
- *  - `oc:keyboard-anim` / `oc:keyboard-settled` (useNativeMobileChrome):
+ *  - `mg:keyboard-anim` / `mg:keyboard-settled` (useNativeMobileChrome):
  *    start the glide for a keyboard leg and release the hold when it lands.
  */
 
@@ -124,7 +124,7 @@ export function createKeyboardFollowGlide(options: KeyboardFollowGlideOptions): 
     };
 
     const handleMorph = (event: Event) => {
-        // SAFETY: oc:composer-morph is dispatched only by mobileComposerMorph
+        // SAFETY: mg:composer-morph is dispatched only by mobileComposerMorph
         // as a CustomEvent carrying ComposerMorphEventDetail.
         const detail = (event as CustomEvent<ComposerMorphEventDetail>).detail;
         if (detail.phase === 'hold') {
@@ -138,13 +138,13 @@ export function createKeyboardFollowGlide(options: KeyboardFollowGlideOptions): 
         release();
     };
     const handleKeyboardAnim = (event: Event) => {
-        // SAFETY: oc:keyboard-anim is dispatched only by useNativeMobileChrome
+        // SAFETY: mg:keyboard-anim is dispatched only by useNativeMobileChrome
         // as a CustomEvent carrying phase, slide and durationMs.
         const detail = (event as CustomEvent<KeyboardAnimEventDetail>).detail;
         glide(detail.phase, detail.slide, detail.durationMs);
     };
     const handleKeyboardSettled = (event: Event) => {
-        // SAFETY: oc:keyboard-settled is dispatched only by useNativeMobileChrome
+        // SAFETY: mg:keyboard-settled is dispatched only by useNativeMobileChrome
         // as a CustomEvent carrying `open`.
         const detail = (event as CustomEvent<KeyboardSettledEventDetail>).detail;
         if (lastDirection === null) return;
@@ -152,18 +152,18 @@ export function createKeyboardFollowGlide(options: KeyboardFollowGlideOptions): 
         release();
     };
 
-    window.addEventListener('oc:composer-morph', handleMorph);
-    window.addEventListener('oc:keyboard-anim', handleKeyboardAnim);
-    window.addEventListener('oc:keyboard-settled', handleKeyboardSettled);
+    window.addEventListener('mg:composer-morph', handleMorph);
+    window.addEventListener('mg:keyboard-anim', handleKeyboardAnim);
+    window.addEventListener('mg:keyboard-settled', handleKeyboardSettled);
 
     return {
         isHeld: () => held,
         dispose: () => {
             cancelFrame();
             held = false;
-            window.removeEventListener('oc:composer-morph', handleMorph);
-            window.removeEventListener('oc:keyboard-anim', handleKeyboardAnim);
-            window.removeEventListener('oc:keyboard-settled', handleKeyboardSettled);
+            window.removeEventListener('mg:composer-morph', handleMorph);
+            window.removeEventListener('mg:keyboard-anim', handleKeyboardAnim);
+            window.removeEventListener('mg:keyboard-settled', handleKeyboardSettled);
         },
     };
 }

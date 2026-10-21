@@ -10,7 +10,7 @@ describe('environment store', () => {
   let filePath;
 
   beforeEach(() => {
-    directory = fs.mkdtempSync(path.join(os.tmpdir(), 'oc-environment-'));
+    directory = fs.mkdtempSync(path.join(os.tmpdir(), 'mg-environment-'));
     filePath = path.join(directory, 'environment.json');
   });
 

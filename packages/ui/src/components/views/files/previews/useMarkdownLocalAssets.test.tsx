@@ -93,7 +93,7 @@ describe('useMarkdownLocalAssets', () => {
 
     expect(fetchCalls).toEqual(['/api/fs/raw?path=%2Frepo%2Fdocs%2Fshots%2Fa.png&directory=%2Frepo']);
     expect(image.getAttribute('src')).toBe('blob:1');
-    expect(image.getAttribute('data-oc-local-asset')).toBe('/repo/docs/shots/a.png');
+    expect(image.getAttribute('data-mg-local-asset')).toBe('/repo/docs/shots/a.png');
   });
 
   test('reads a target outside the workspace the way the editor does, and leaves absolute URLs alone', async () => {
@@ -123,7 +123,7 @@ describe('useMarkdownLocalAssets', () => {
       root.render(
         <Preview
           container={container}
-          filePath="/home/user/.config/openchamber/projects/p1/plans/123-plan-a.md"
+          filePath="/home/user/.config/magio/projects/p1/plans/123-plan-a.md"
           onOpenFile={() => {}}
           enabled
         />,
@@ -132,7 +132,7 @@ describe('useMarkdownLocalAssets', () => {
     await flush();
 
     expect(fetchCalls).toEqual([
-      '/api/fs/raw?path=%2Fhome%2Fuser%2F.config%2Fopenchamber%2Fprojects%2Fp1%2Fassets%2Fplan-a%2Fflow.png&allowOutsideWorkspace=true&directory=%2Frepo',
+      '/api/fs/raw?path=%2Fhome%2Fuser%2F.config%2Fmagio%2Fprojects%2Fp1%2Fassets%2Fplan-a%2Fflow.png&allowOutsideWorkspace=true&directory=%2Frepo',
       '/api/fs/raw?path=%2Ftmp%2Fabsolute.png&allowOutsideWorkspace=true&directory=%2Frepo',
     ]);
     expect(remote.getAttribute('src')).toBe('https://example.test/remote.png');
@@ -197,7 +197,7 @@ describe('useMarkdownLocalAssets', () => {
       root.render(<Preview container={container} filePath="/repo/README.md" onOpenFile={() => {}} enabled colorScheme="dark" />);
     });
     expect(source.getAttribute('media')).toBe('(min-width: 0px)');
-    expect(source.getAttribute('data-oc-media')).toBe('(prefers-color-scheme: dark)');
+    expect(source.getAttribute('data-mg-media')).toBe('(prefers-color-scheme: dark)');
   });
 
   test('does nothing while disabled', async () => {

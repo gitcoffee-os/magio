@@ -128,7 +128,7 @@ export const createSessionWarmingRuntime = ({
   const commit = () => {
     revision += 1;
     void persist();
-    broadcast({ type: 'openchamber:session-warming', properties: snapshot() });
+    broadcast({ type: 'magio:session-warming', properties: snapshot() });
   };
 
   const cancelTimer = (entry) => {

@@ -50,7 +50,7 @@ const isPortalledPopup = (element: Element): boolean => !document.getElementById
 const isOnStartEdge = (event: PointerEvent): boolean => {
   const fromStart = isRightToLeft(document.documentElement) ? window.innerWidth - event.clientX : event.clientX;
   if (fromStart > PEEK_EDGE_PX) return false;
-  const headerHeight = Number.parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--oc-header-height')) || 48;
+  const headerHeight = Number.parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--mg-header-height')) || 48;
   return event.clientY >= headerHeight;
 };
 

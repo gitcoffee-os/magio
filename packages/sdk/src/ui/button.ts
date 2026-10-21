@@ -18,7 +18,7 @@ export type ButtonHandle = Handle<ButtonProps>;
 
 const ring = (): HTMLSpanElement => {
   const spinner = document.createElement('span');
-  spinner.className = 'oc-sdk-spinner-ring';
+  spinner.className = 'mg-sdk-spinner-ring';
   spinner.setAttribute('aria-hidden', 'true');
   return spinner;
 };
@@ -26,7 +26,7 @@ const ring = (): HTMLSpanElement => {
 export const mountButton = (root: Element, initial: ButtonProps): ButtonHandle => {
   ensureStyle(UI_CSS);
   let props = initial;
-  const node = button('oc-sdk oc-sdk-btn');
+  const node = button('mg-sdk mg-sdk-btn');
   const spinner = ring();
   const label = document.createElement('span');
   node.append(label);

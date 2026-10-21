@@ -12,8 +12,8 @@ let openMenuCount = 0;
  * Base UI's menus never close on window blur, so a menu stayed open after the
  * user switched to another application. The title bar's native drag region
  * swallows pointer input before the page sees it, so a click there could not
- * dismiss the menu either; `oc-menu-open` turns the drag region off the same
- * way `oc-dialog-open` does for dialogs.
+ * dismiss the menu either; `mg-menu-open` turns the drag region off the same
+ * way `mg-dialog-open` does for dialogs.
  */
 export function useMenuWindowDismiss(open: boolean): React.RefObject<MenuActions | null> {
   const actionsRef = React.useRef<MenuActions | null>(null);
@@ -21,14 +21,14 @@ export function useMenuWindowDismiss(open: boolean): React.RefObject<MenuActions
   React.useEffect(() => {
     if (!open) return;
     openMenuCount += 1;
-    document.documentElement.classList.add("oc-menu-open");
+    document.documentElement.classList.add("mg-menu-open");
     const onBlur = () => actionsRef.current?.close();
     window.addEventListener("blur", onBlur);
     return () => {
       window.removeEventListener("blur", onBlur);
       openMenuCount = Math.max(0, openMenuCount - 1);
       if (openMenuCount === 0) {
-        document.documentElement.classList.remove("oc-menu-open");
+        document.documentElement.classList.remove("mg-menu-open");
       }
     };
   }, [open]);

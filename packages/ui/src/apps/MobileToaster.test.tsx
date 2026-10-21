@@ -17,7 +17,7 @@ describe('MobileToaster', () => {
   // The pan as the toast list inherits it from the nearest element that sets it.
   const visualViewportTop = () => {
     for (let element = toastList(); element; element = element.parentElement) {
-      const value = element.style.getPropertyValue('--oc-visual-viewport-offset-top');
+      const value = element.style.getPropertyValue('--mg-visual-viewport-offset-top');
       if (value) return value;
     }
     return '';
@@ -62,7 +62,7 @@ describe('MobileToaster', () => {
   });
 
   test('anchors phone toasts to the visible area below the notch', () => {
-    expect(toastList()?.style.getPropertyValue('--mobile-offset-top')).toBe('calc(var(--oc-safe-area-top, 0px) + var(--oc-visual-viewport-offset-top, 0px) + 16px)');
+    expect(toastList()?.style.getPropertyValue('--mobile-offset-top')).toBe('calc(var(--mg-safe-area-top, 0px) + var(--mg-visual-viewport-offset-top, 0px) + 16px)');
   });
 
   test('follows the visible area when the keyboard pans it down', async () => {

@@ -28,8 +28,8 @@ import type {
   LinearWorkflowState,
   LinearUserSummary,
   LinearWorkspaceSummary,
-} from '@openchamber/ui/lib/api/types';
-import { runtimeFetch } from '@openchamber/ui/lib/runtime-fetch';
+} from '@magio/ui/lib/api/types';
+import { runtimeFetch } from '@magio/ui/lib/runtime-fetch';
 
 
 type LinearJson = {

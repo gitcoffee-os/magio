@@ -37,7 +37,7 @@ export function createGlobalMessageStreamHub({
   // what upstream leaves unnumbered. The per-process prefix makes a cursor
   // from before a restart miss instead of matching an unrelated sequence
   // number, which reports `replayReset` and sends the client to repair.
-  const replayIdPrefix = `oc-${randomUUID().slice(0, 8)}-`;
+  const replayIdPrefix = `mg-${randomUUID().slice(0, 8)}-`;
   let replaySequence = 0;
 
   let controller = null;

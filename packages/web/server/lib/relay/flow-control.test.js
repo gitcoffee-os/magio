@@ -26,7 +26,7 @@ async function exercise({ clientFlow = true, hostFlow = true, batch = true, canc
   upstream.on('upgrade', (req, socket, head) => {
     // Mirror the real URL-token and loopback-origin gates for tunneled WS.
     const query = new URL(req.url, 'http://localhost');
-    if (query.searchParams.get('oc_url_token') !== 'fixture-url-token' || req.headers.origin !== `http://127.0.0.1:${upstream.address().port}`) {
+    if (query.searchParams.get('mg_url_token') !== 'fixture-url-token' || req.headers.origin !== `http://127.0.0.1:${upstream.address().port}`) {
       socket.end('HTTP/1.1 403 Forbidden\r\n\r\n');
       return;
     }
@@ -99,7 +99,7 @@ async function exercise({ clientFlow = true, hostFlow = true, batch = true, canc
     await waitFor(() => client.getStatus().state === 'connected');
     let stream;
     if (websocket) {
-      const socket = client.openWebSocket('/api/terminal/ws?oc_url_token=fixture-url-token');
+      const socket = client.openWebSocket('/api/terminal/ws?mg_url_token=fixture-url-token');
       stream = new Promise((resolve, reject) => {
         socket.onmessage = event => {
           const bytes = new Uint8Array(event.data);

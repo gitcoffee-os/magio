@@ -15,14 +15,14 @@ describe('attachment citation links', () => {
         const link = { filename: 'notes:v2.txt', iconId: 'txt', openable: true };
         const href = buildAttachmentHref(link);
 
-        expect(href.startsWith('#openchamber-attachment-open:')).toBe(true);
+        expect(href.startsWith('#magio-attachment-open:')).toBe(true);
         expect(parseAttachmentHref(href)).toEqual(link);
         expect(parseAttachmentHref(buildAttachmentHref({ ...link, openable: false }))?.openable).toBeUndefined();
     });
 
     test('rejects other links and malformed attachment links', () => {
-        expect(parseAttachmentHref('#openchamber-skill:review')).toBeNull();
-        expect(parseAttachmentHref('#openchamber-attachment:png')).toBeNull();
-        expect(parseAttachmentHref('#openchamber-attachment:png:%E0%A4%A')).toBeNull();
+        expect(parseAttachmentHref('#magio-skill:review')).toBeNull();
+        expect(parseAttachmentHref('#magio-attachment:png')).toBeNull();
+        expect(parseAttachmentHref('#magio-attachment:png:%E0%A4%A')).toBeNull();
     });
 });

@@ -60,13 +60,13 @@ describe('SessionActivityIndicator', () => {
     useSessionDisplayStore.setState({ animatedActivityIndicators: false });
 
     await renderIndicator({ state: 'running' });
-    expect(iconHref('running')).toBe('#oc-circle');
+    expect(iconHref('running')).toBe('#mg-circle');
     await renderIndicator({ state: 'subagent' });
-    expect(iconHref('subagent')).toBe('#oc-robot');
+    expect(iconHref('subagent')).toBe('#mg-robot');
     await renderIndicator({ state: 'shell' });
-    expect(iconHref('shell')).toBe('#oc-terminal');
+    expect(iconHref('shell')).toBe('#mg-terminal');
     await renderIndicator({ state: 'unread' });
-    expect(iconHref('unread')).toBe('#oc-checkbox-circle');
+    expect(iconHref('unread')).toBe('#mg-checkbox-circle');
     expect(host.querySelector('[data-session-activity-indicator]')?.classList).toContain('shrink-0');
     expect(host.querySelector('[data-spinner]')).toBeNull();
   });
@@ -95,7 +95,7 @@ describe('SessionActivityIndicator', () => {
       expect(host.querySelector(`[data-session-activity-indicator="${state}"] [data-spinner]`)).not.toBeNull();
     }
     await renderIndicator({ state: 'unread' });
-    expect(iconHref('unread')).toBe('#oc-checkbox-circle');
+    expect(iconHref('unread')).toBe('#mg-checkbox-circle');
     expect(host.querySelector('[data-spinner]')).toBeNull();
   });
 
@@ -106,6 +106,6 @@ describe('SessionActivityIndicator', () => {
     expect(host.querySelector('[data-spinner]')?.classList).toContain('text-status-info');
     await act(async () => useSessionDisplayStore.getState().setAnimatedActivityIndicators(false));
     expect(host.querySelector('[data-spinner]')).toBeNull();
-    expect(iconHref('running')).toBe('#oc-circle');
+    expect(iconHref('running')).toBe('#mg-circle');
   });
 });

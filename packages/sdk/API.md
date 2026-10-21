@@ -1,8 +1,8 @@
-# @openchamber/sdk — developer API reference
+# @magio/sdk — developer API reference
 
-What third-party guest authors import and call. Source of truth: `[packages/sdk/src](https://github.com/openchamber/openchamber/tree/main/packages/sdk/src)`. Longer guides live in the [product docs](https://github.com/openchamber/openchamber/tree/main/packages/docs/content/docs) (`sdk.mdx`, `sdk/host.mdx`, `sdk/ui.mdx`) and in `[GUEST_SERVICES.md](https://github.com/openchamber/openchamber/blob/main/packages/sdk/GUEST_SERVICES.md)` for local services.
+What third-party guest authors import and call. Source of truth: `[packages/sdk/src](https://github.com/gitcoffee-os/magio/tree/main/packages/sdk/src)`. Longer guides live in the [product docs](https://github.com/gitcoffee-os/magio/tree/main/packages/docs/content/docs) (`sdk.mdx`, `sdk/host.mdx`, `sdk/ui.mdx`) and in `[GUEST_SERVICES.md](https://github.com/gitcoffee-os/magio/blob/main/packages/sdk/GUEST_SERVICES.md)` for local services.
 
-**Package:** `@openchamber/sdk`  
+**Package:** `@magio/sdk`  
 **API version:** manifest `apiVersion: 1`, wire envelope `v: 1`  
 **Runtimes that load guests:** web and desktop. VS Code and mobile mark the catalog `unsupported`.
 
@@ -11,15 +11,15 @@ Two entrypoints:
 
 | Import                | Role                                                           |
 | --------------------- | -------------------------------------------------------------- |
-| `@openchamber/sdk`    | Manifest parse, iframe protocol, `connectHost`                 |
-| `@openchamber/sdk/ui` | Optional DOM drawing kit (buttons, fields, lists, popups) |
+| `@magio/sdk`    | Manifest parse, iframe protocol, `connectHost`                 |
+| `@magio/sdk/ui` | Optional DOM drawing kit (buttons, fields, lists, popups) |
 
 
 ---
 
 ## Ship checklist (install fails without these)
 
-`inspectGuestPackage` (Settings → Extensions install) checks the folder or zip **on disk**. Parse alone is not enough. No OpenChamber runtime compiles TypeScript: packaged desktop, `openchamber serve`, and the dev server all serve the built `.js` files as they sit in the package.
+`inspectGuestPackage` (Settings → Extensions install) checks the folder or zip **on disk**. Parse alone is not enough. No Magio runtime compiles TypeScript: packaged desktop, `magio serve`, and the dev server all serve the built `.js` files as they sit in the package.
 
 
 | Must exist                                                                       | When                                            | Failure code       |
@@ -40,18 +40,18 @@ Two entrypoints:
 Bundle with the SDK helper from the guest folder (`--node` targets Node for the service):
 
 ```bash
-bunx openchamber-guest-bundle panel/main.ts panel/main.js
-bunx openchamber-guest-bundle --node service/main.ts service/main.js
+bunx magio-guest-bundle panel/main.ts panel/main.js
+bunx magio-guest-bundle --node service/main.ts service/main.js
 ```
 
-Zip or folder for install should include at least: `package.json`, `panel/index.html`, `panel/main.js`, and any declared `icon.svg` / `service/main.js`. Skip `node_modules` and TypeScript sources. Zip and git installs land in `{dataDir}/extensions/{id}`. See also `[GUEST_SERVICES.md](https://github.com/openchamber/openchamber/blob/main/packages/sdk/GUEST_SERVICES.md)`.
+Zip or folder for install should include at least: `package.json`, `panel/index.html`, `panel/main.js`, and any declared `icon.svg` / `service/main.js`. Skip `node_modules` and TypeScript sources. Zip and git installs land in `{dataDir}/extensions/{id}`. See also `[GUEST_SERVICES.md](https://github.com/gitcoffee-os/magio/blob/main/packages/sdk/GUEST_SERVICES.md)`.
 
 ---
 
 ## 1. `connectHost` — iframe client
 
 ```ts
-import { connectHost, HostRequestError } from '@openchamber/sdk';
+import { connectHost, HostRequestError } from '@magio/sdk';
 
 const host = connectHost();
 ```
@@ -101,9 +101,9 @@ Each returns an unsubscribe function. State subscriptions replay the last known 
 
 `theme.tokens` includes `primaryText`, `successText`, `warningText`, `errorText`, and `infoText`. The host computes these for text on neutral surfaces and the UI kit's tinted controls. Keep using the base colors for fills and `primaryForeground` for text on a solid primary fill.
 
-`features` is optional and only advertises implemented host operations: `deviceStorage?: true`, `statusControls?: true`, `popovers?: true`, and `lateGenerateResults?: true`. Optional syntax tokens are `syntaxKeyword`, `syntaxString`, `syntaxNumber`, `syntaxFunction`, `syntaxType`, `syntaxComment`, `syntaxVariable`, and `syntaxOperator`. `applyHostReady` exposes each as `--oc-syntax-*` and the matching legacy `--syntax-*` name, and clears a missing token on a later snapshot. Use a semantic-token fallback in guest CSS when supporting older hosts.
+`features` is optional and only advertises implemented host operations: `deviceStorage?: true`, `statusControls?: true`, `popovers?: true`, and `lateGenerateResults?: true`. Optional syntax tokens are `syntaxKeyword`, `syntaxString`, `syntaxNumber`, `syntaxFunction`, `syntaxType`, `syntaxComment`, `syntaxVariable`, and `syntaxOperator`. `applyHostReady` exposes each as `--mg-syntax-*` and the matching legacy `--syntax-*` name, and clears a missing token on a later snapshot. Use a semantic-token fallback in guest CSS when supporting older hosts.
 
-`applyHostReady` exposes the computed colors as `--primary-text`, `--success-text`, `--warning-text`, `--error-text`, and `--info-text`, with matching `--oc-*-text` aliases. These are required theme fields. Apply each `onReady` snapshot to update them when the theme changes.
+`applyHostReady` exposes the computed colors as `--primary-text`, `--success-text`, `--warning-text`, `--error-text`, and `--info-text`, with matching `--mg-*-text` aliases. These are required theme fields. Apply each `onReady` snapshot to update them when the theme changes.
 
 `GuestItem` is `AttachIssueRequest | GuestMessageItem | GuestSessionItem`:
 
@@ -221,19 +221,19 @@ Projects contain `id`, `name`, `directory`. Worktrees contain `directory`, `name
 
 ### Running shells
 
-These methods need the `shells` capability. They expose the running shell commands in a scope — one session and its subagents, a registered project, or every session — and let the extension read their output and stop them. OpenChamber answers from its local store; no network read happens per request.
+These methods need the `shells` capability. They expose the running shell commands in a scope — one session and its subagents, a registered project, or every session — and let the extension read their output and stop them. Magio answers from its local store; no network read happens per request.
 
 | Method | Result |
 | --- | --- |
-| `onRunningShells(scope, listener)` | subscription: the running shell commands in scope — one session and its subagents (`{ kind: 'session', sessionId }`), a registered project (`{ kind: 'project', projectId }`), or every session (`{ kind: 'global' }`) — oldest first, with each command's `background` flag, plus the ones that ended since OpenChamber started watching |
+| `onRunningShells(scope, listener)` | subscription: the running shell commands in scope — one session and its subagents (`{ kind: 'session', sessionId }`), a registered project (`{ kind: 'project', projectId }`), or every session (`{ kind: 'global' }`) — oldest first, with each command's `background` flag, plus the ones that ended since Magio started watching |
 | `readShellOutput(shellId, { cursor?, tailBytes? })` | one page of a running or ended command's output; `tailBytes` is capped at 65536 |
 | `stopShell(shellId)` | sends the agent the stop note first, then removes the command |
 
 Await subscription registration to handle refusal, then retain its returned unsubscribe function. Each subscription sends an initial snapshot, then changes, and counts against the same 32-subscription limit as the workspace subscriptions. The snapshot is `{ kind: 'shells', scope, shells, ended }`, where `scope` echoes the subscription's scope; each shell is `{ id, sessionID, command, startedAt, background }`, at most 200, oldest first. `background` is `true` for a job the turn does not wait for, and `false` while the turn that ran it is blocked on it.
 
-`ended` holds the commands in scope that OpenChamber saw running and saw end, oldest end first, at most 200 with the newest kept. Each adds `status`, `endedAt`, and `exit` when the command exited with a code. `status` is `exited`, `timeout`, `killed` (a signal), `stopped` (by a user: Stop in the app, `stopShell`, or aborting the turn that waited on it), or `unknown` (the end fell into a reconnect and OpenChamber only saw the command gone). The list lives in memory: it starts empty when the app loads and resets on a runtime switch, so keep anything you show across reloads in extension storage.
+`ended` holds the commands in scope that Magio saw running and saw end, oldest end first, at most 200 with the newest kept. Each adds `status`, `endedAt`, and `exit` when the command exited with a code. `status` is `exited`, `timeout`, `killed` (a signal), `stopped` (by a user: Stop in the app, `stopShell`, or aborting the turn that waited on it), or `unknown` (the end fell into a reconnect and Magio only saw the command gone). The list lives in memory: it starts empty when the app loads and resets on a runtime switch, so keep anything you show across reloads in extension storage.
 
-`readShellOutput` returns `{ output, cursor, skipped }`; omit `cursor` to start `tailBytes` before the end, and `skipped` says earlier output was dropped. OpenCode keeps an ended command's output until it evicts the command (the latest 25 ended commands per directory); a stopped command's output is removed with it. A shell OpenChamber has not seen, a stopped one, and one whose output OpenCode no longer keeps are `NOT_FOUND`; `stopShell` on a shell that is not running is `NOT_FOUND` too. An unapproved `shells` capability is `NOT_GRANTED`.
+`readShellOutput` returns `{ output, cursor, skipped }`; omit `cursor` to start `tailBytes` before the end, and `skipped` says earlier output was dropped. OpenCode keeps an ended command's output until it evicts the command (the latest 25 ended commands per directory); a stopped command's output is removed with it. A shell Magio has not seen, a stopped one, and one whose output OpenCode no longer keeps are `NOT_FOUND`; `stopShell` on a shell that is not running is `NOT_FOUND` too. An unapproved `shells` capability is `NOT_GRANTED`.
 
 ### Extension storage
 
@@ -317,7 +317,7 @@ Only one extension popover is active per host document. Opening another retires 
 
 A `focus: true` request requires the source frame to have focus. Non-focusing previews are constrained to a visible anchor in the source frame; the host cannot verify pointer activity inside an opaque-origin guest document. The child can use `host.setHeight` to fit its content within the popover height limit; this resizes only that child and includes the host border. Scrolling an unrelated host panel does not dismiss the preview.
 
-Use `mountPopoverAnchor` from `@openchamber/sdk/ui` for DOM anchors. It measures the element, handles hover and keyboard opening, reports activity while the pointer crosses between frames, and retires the preview when the anchor scrolls away or is removed. Retain and call its `dispose()` when replacing rows. Low-level callers must perform those lifecycle steps themselves. The host can validate the source iframe and rectangle but cannot inspect an element inside its sandbox.
+Use `mountPopoverAnchor` from `@magio/sdk/ui` for DOM anchors. It measures the element, handles hover and keyboard opening, reports activity while the pointer crosses between frames, and retires the preview when the anchor scrolls away or is removed. Retain and call its `dispose()` when replacing rows. Low-level callers must perform those lifecycle steps themselves. The host can validate the source iframe and rectangle but cannot inspect an element inside its sandbox.
 
 ### 1.3 Error codes (`HostRequestError.code`)
 
@@ -382,14 +382,14 @@ Use `mountPopoverAnchor` from `@openchamber/sdk/ui` for DOM anchors. It measures
 
 ---
 
-## 2. `@openchamber/sdk/ui` — drawing kit
+## 2. `@magio/sdk/ui` — drawing kit
 
 DOM building blocks that use host tokens. They do **not** call the provider or `connectHost`. You compose the screen and wire callbacks yourself.
 
 Always call theme first:
 
 ```ts
-import { applyHostReady, mountList } from '@openchamber/sdk/ui';
+import { applyHostReady, mountList } from '@magio/sdk/ui';
 
 let mounted = false;
 host.onReady((ctx) => {
@@ -405,7 +405,7 @@ Every mount returns `{ update(partial), dispose() }`. `update` merges the fields
 Selection controls report a proposed value; the caller commits it with `update`. Use `activeId` for tabs, `value` for selects, and `checked` for checkboxes and switches. Text and search inputs display typing immediately, but call `update({ value })` too so later updates do not restore stale props. Button clicks do not change `variant`; use tabs for mode selection. Preserve input state across tab changes instead of remounting empty fields.
 
 ```ts
-import { mountTabs } from '@openchamber/sdk/ui';
+import { mountTabs } from '@magio/sdk/ui';
 
 let activeId = 'convert';
 const tabs = mountTabs(root, {
@@ -424,7 +424,7 @@ const tabs = mountTabs(root, {
 
 | Function                      | Role                                                      |
 | ----------------------------- | --------------------------------------------------------- |
-| `applyHostReady(ctx, root)`   | Writes theme tokens + `data-oc-surface` / `data-oc-theme` |
+| `applyHostReady(ctx, root)`   | Writes theme tokens + `data-mg-surface` / `data-mg-theme` |
 | `applyHostTheme(theme, root)` | Tokens only                                               |
 
 
@@ -465,9 +465,9 @@ const tabs = mountTabs(root, {
 
 ---
 
-## 3. Manifest and host-side parse (`@openchamber/sdk`)
+## 3. Manifest and host-side parse (`@magio/sdk`)
 
-Used by the OpenChamber host and by tools that validate packages. Guests rarely call these from the iframe.
+Used by the Magio host and by tools that validate packages. Guests rarely call these from the iframe.
 
 ### 3.1 Manifest block (inside `package.json`)
 
@@ -475,9 +475,9 @@ Used by the OpenChamber host and by tools that validate packages. Guests rarely 
 {
   "name": "@acme/hello-panel",
   "version": "1.0.0",
-  "openchamber": {
+  "magio": {
     "apiVersion": 1,
-    "engines": { "openchamber": ">=1.22.0" },
+    "engines": { "magio": ">=1.22.0" },
     "contributes": {
       "panel": {
         "id": "acme-hello",
@@ -506,7 +506,7 @@ Used by the OpenChamber host and by tools that validate packages. Guests rarely 
 | --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `version`             | Semver required on install (`1.0.0`)                                                                                                                                                 |
 | `apiVersion`          | Must be `1`                                                                                                                                                                          |
-| `engines.openchamber` | Optional. Only `1.22.0` or `>=1.22.0`. Older host → `host-too-old`                                                                                                                   |
+| `engines.magio` | Optional. Only `1.22.0` or `>=1.22.0`. Older host → `host-too-old`                                                                                                                   |
 | `panel.id`            | kebab-case                                                                                                                                                                           |
 | `panel.icon`          | Remixicon kebab name (`window`) **or** package `.svg` path. Remixicon needs no file. An `.svg` path must exist on disk or install fails (`invalid-manifest`). No URLs/absolute paths |
 | `panel.entry` | Optional visible-panel HTML path inside the package. No `..`, absolute path, or URL. Its scripts must be built. Omitting it removes the rail icon and visible views; `background.entry` can still run code. With neither entry, only `tools` plus package identity/version/engines are allowed. `hasGuestPage` means a visible panel, not background execution |
@@ -519,7 +519,7 @@ Used by the OpenChamber host and by tools that validate packages. Guests rarely 
 | `fileEditors`         | Optional, 1–8 editors: unique kebab-case `id`, `title` 1–60 chars, `match` 1–16 file-name patterns (no `/`, not only wildcards), `entry` package `.html` with built scripts, optional `content` `"text"` (default) or `"binary"` (`invalid-file-editors`). See File editors above |
 | `filesystem`          | Optional, 1–16 globs, each 1–256 chars, starting with `/` or `~/`; `**` spans folders, `*` / `?` stay in one segment; no `..`, empty segment, or backslash (`invalid-filesystem`). Declaring it adds the `filesystem` capability and the dialog lists the globs |
 | `integration`         | Optional. Exactly one of `oauth`, `token`, or `host` (`provider: "linear"` only)                                                                                                     |
-| `service`               | Optional. `entry` must be a built `.js` file on disk. `provides: ["browser"]` makes it the agent's browser when the user selects it; `surface: true` gives it a host-drawn live panel the user can take over (no `panel.entry` then). Neither needs a panel or background entry. See [GUEST_SERVICES.md](https://github.com/openchamber/openchamber/blob/main/packages/sdk/GUEST_SERVICES.md) |
+| `service`               | Optional. `entry` must be a built `.js` file on disk. `provides: ["browser"]` makes it the agent's browser when the user selects it; `surface: true` gives it a host-drawn live panel the user can take over (no `panel.entry` then). Neither needs a panel or background entry. See [GUEST_SERVICES.md](https://github.com/gitcoffee-os/magio/blob/main/packages/sdk/GUEST_SERVICES.md) |
 
 
 Extra keys are dropped, not forwarded.
@@ -529,18 +529,18 @@ Extra keys are dropped, not forwarded.
 
 | Export                                             | Role                                                      |
 | -------------------------------------------------- | --------------------------------------------------------- |
-| `parseManifest(document)` (`@openchamber/sdk/schemas`) | Typed document → success/failure (does not throw on junk) |
-| `parseManifestJson(json)` (`@openchamber/sdk/schemas`) | String → same result                                      |
+| `parseManifest(document)` (`@magio/sdk/schemas`) | Typed document → success/failure (does not throw on junk) |
+| `parseManifestJson(json)` (`@magio/sdk/schemas`) | String → same result                                      |
 | `resolveAttachMode(attach)`                        | Normalize to `'panel'                                     |
 | `resolveAttachEntry(contributes)`                  | Dialog page from the object form, or `null` when the dialog reuses `panel.entry` |
 | `hasGuestPage(contributes)` | `true` when `panel.entry` is set; background-only and tools-only packages return `false` |
 | `resolveIntegrationAuth` / `resolveIntegrationApi` | Auth kind and API origin                                  |
 | `toPublicIntegration` / `toPublicService`            | Catalog-safe public slices                                |
 | `isGuestPackageSvgIcon`                            | Whether icon is a package SVG path                        |
-| `compareOpenChamberVersions`                       | Semver compare                                            |
-| `hostMeetsOpenChamberEngine`                       | Host vs `engines.openchamber` floor                       |
-| `openChamberEngineMinimum`                         | Normalize `>=1.22.0` → floor string                       |
-| `parseOpenChamberVersion`                          | Parse `x.y.z`                                             |
+| `compareMagioVersions`                       | Semver compare                                            |
+| `hostMeetsMagioEngine`                       | Host vs `engines.magio` floor                       |
+| `magioEngineMinimum`                         | Normalize `>=1.22.0` → floor string                       |
+| `parseMagioVersion`                          | Parse `x.y.z`                                             |
 
 
 ### 3.3 Protocol helpers (host + guest tooling)
@@ -548,9 +548,9 @@ Extra keys are dropped, not forwarded.
 
 | Export                                                                                                            | Role                               |
 | ----------------------------------------------------------------------------------------------------------------- | ---------------------------------- |
-| `readHostMessage` (`@openchamber/sdk`)                                                                            | Guest-side read of a host push; no schema library |
-| `parseHostMessage` / `parseGuestMessage` (`@openchamber/sdk/schemas`)                                             | Host-side typed parse              |
-| `hostMessageSchema` / `guestMessageSchema` (`@openchamber/sdk/schemas`)                                           | Zod schemas for `postMessage` data |
+| `readHostMessage` (`@magio/sdk`)                                                                            | Guest-side read of a host push; no schema library |
+| `parseHostMessage` / `parseGuestMessage` (`@magio/sdk/schemas`)                                             | Host-side typed parse              |
+| `hostMessageSchema` / `guestMessageSchema` (`@magio/sdk/schemas`)                                           | Zod schemas for `postMessage` data |
 | `clampAttachRequest` / `clampStartSessionRequest` / `clampPromptRequest`                                          | Enforce field max lengths          |
 | `isGuestRequestPath` / `isGuestRequestResult` / `isStartSessionResult` / `isPromptResult` / `isServiceStatusResult` | Narrow result payloads             |
 | `isGuestAttachItem` / `isGuestMessageItem` / `isGuestSessionItem`                                                 | Narrow `ready.item`                |
@@ -558,7 +558,7 @@ Extra keys are dropped, not forwarded.
 | `isHostRequestErrorCode` / `resolveHostRequestErrorCode`                                                          | Error code validation              |
 
 
-Constants: `OPENCHAMBER_SDK_CHANNEL`, `OPENCHAMBER_SDK_API_VERSION`, `HOST_LINEAR_API_ORIGIN`, `GUEST_*_MAX`, `GUEST_REQUEST_TIMEOUT_MS`, `GUEST_ACTIONS_MAX`, `GUEST_COMMANDS_MAX`, `GUEST_COMMAND_NAME`, `GUEST_TOOLS_MAX`, `GUEST_TOOL_MATCH`, `GUEST_TOOL_OUTPUTS`, `HOST_REQUEST_ERROR_CODES`, `SERVICE_STATUS_VALUES`, `SESSION_LIFECYCLE_PHASES`, `START_SESSION_SENT`.
+Constants: `MAGIO_SDK_CHANNEL`, `MAGIO_SDK_API_VERSION`, `HOST_LINEAR_API_ORIGIN`, `GUEST_*_MAX`, `GUEST_REQUEST_TIMEOUT_MS`, `GUEST_ACTIONS_MAX`, `GUEST_COMMANDS_MAX`, `GUEST_COMMAND_NAME`, `GUEST_TOOLS_MAX`, `GUEST_TOOL_MATCH`, `GUEST_TOOL_OUTPUTS`, `HOST_REQUEST_ERROR_CODES`, `SERVICE_STATUS_VALUES`, `SESSION_LIFECYCLE_PHASES`, `START_SESSION_SENT`.
 
 Wire messages added for these: host → guest `resolve` (`{ id, payload: { command, args } }`), guest → host `resolve-result` (`{ id, payload: { item } | { error } }`, no `result` comes back) and `badge` (`{ count }`).
 
@@ -579,17 +579,17 @@ Panel → `serviceRequest` → host → `127.0.0.1:port` → service process →
 
 Manifest sketch: `service.entry` (path to **built** JS, e.g. `service/main.js`), `runtime: "host"`, `permissions.sockets` and/or `permissions.exec`. Install refuses with `missing-build` when that file is absent. Declaring a service adds `service` to the capabilities the user approves at install; until then `serviceRequest` is `NO_SERVICE`.
 
-A service with `provides: ["browser"]` answers the agent's `browser.*` actions at `POST /browser-control` instead of the desktop app's browser panel, once the user selects it in Settings → OpenChamber Tools. The host starts it on the first action and stops it when idle. Parse the body with `readBrowserProviderRequest`; request and answer types (`BrowserProviderRequest`, `BrowserProviderResult`, per-action `Browser*Parameters` / `Browser*Data`) and the limits (`BROWSER_PROVIDER_*`) are exported from `@openchamber/sdk`. Full contract in [GUEST_SERVICES.md](https://github.com/openchamber/openchamber/blob/main/packages/sdk/GUEST_SERVICES.md#browser-provider-provides-browser).
+A service with `provides: ["browser"]` answers the agent's `browser.*` actions at `POST /browser-control` instead of the desktop app's browser panel, once the user selects it in Settings → Magio Tools. The host starts it on the first action and stops it when idle. Parse the body with `readBrowserProviderRequest`; request and answer types (`BrowserProviderRequest`, `BrowserProviderResult`, per-action `Browser*Parameters` / `Browser*Data`) and the limits (`BROWSER_PROVIDER_*`) are exported from `@magio/sdk`. Full contract in [GUEST_SERVICES.md](https://github.com/gitcoffee-os/magio/blob/main/packages/sdk/GUEST_SERVICES.md#browser-provider-provides-browser).
 
-A service with `surface: true` shows a live picture in the extension's rail panel: the host pulls frames from `GET /surface/frame`, draws them, sends the user's input to `POST /surface/input`, and owns who is in control (nobody, the agent, the user). Paths, event types, and the `readSurface*` parsers are exported from `@openchamber/sdk`; contract in [GUEST_SERVICES.md](https://github.com/openchamber/openchamber/blob/main/packages/sdk/GUEST_SERVICES.md#shared-surface-surface-true).
+A service with `surface: true` shows a live picture in the extension's rail panel: the host pulls frames from `GET /surface/frame`, draws them, sends the user's input to `POST /surface/input`, and owns who is in control (nobody, the agent, the user). Paths, event types, and the `readSurface*` parsers are exported from `@magio/sdk`; contract in [GUEST_SERVICES.md](https://github.com/gitcoffee-os/magio/blob/main/packages/sdk/GUEST_SERVICES.md#shared-surface-surface-true).
 
 Bundle the service with the Node target:
 
 ```bash
-bunx openchamber-guest-bundle --node service/main.ts service/main.js
+bunx magio-guest-bundle --node service/main.ts service/main.js
 ```
 
-Full contract (env vars, `/health`, grants, socket overrides): `[GUEST_SERVICES.md](https://github.com/openchamber/openchamber/blob/main/packages/sdk/GUEST_SERVICES.md)`.
+Full contract (env vars, `/health`, grants, socket overrides): `[GUEST_SERVICES.md](https://github.com/gitcoffee-os/magio/blob/main/packages/sdk/GUEST_SERVICES.md)`.
 
 ---
 
@@ -612,11 +612,11 @@ Do not go around the guest contract through `RuntimeAPIs`.
 
 ## 6. Minimal panel sketch
 
-Mount once and keep the handles. `onReady` can repeat when the session or theme changes. Field listeners replay their current values too; compare relevant fields before fetching data again. For a complete request example with stale-response handling, see [the extension example](https://docs.openchamber.dev/sdk/example/).
+Mount once and keep the handles. `onReady` can repeat when the session or theme changes. Field listeners replay their current values too; compare relevant fields before fetching data again. For a complete request example with stale-response handling, see [the extension example](https://docs.magio.exmay.com/sdk/example/).
 
 ```ts
-import { connectHost } from '@openchamber/sdk';
-import { applyHostReady, mountList, mountEmpty } from '@openchamber/sdk/ui';
+import { connectHost } from '@magio/sdk';
+import { applyHostReady, mountList, mountEmpty } from '@magio/sdk/ui';
 
 const host = connectHost();
 const root = document.querySelector('#root')!;
@@ -659,8 +659,8 @@ host.onReady((ctx) => {
 
 | File                                                                                                                                                                                                                                                                                                                      | Audience                          |
 | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------- |
-| [README.md](https://github.com/openchamber/openchamber/blob/main/packages/sdk/README.md)                                                                                                                                                                                                                                   | Package overview and first hole   |
-| [DOCUMENTATION.md](https://github.com/openchamber/openchamber/blob/main/packages/sdk/DOCUMENTATION.md)                                                                                                                                                                                                                     | Agent / maintainer invariants     |
-| [GUEST_SERVICES.md](https://github.com/openchamber/openchamber/blob/main/packages/sdk/GUEST_SERVICES.md)                                                                                                                                                                                                                       | Local service contract              |
-| [src/ui/DOCUMENTATION.md](https://github.com/openchamber/openchamber/blob/main/packages/sdk/src/ui/DOCUMENTATION.md)                                                                                                                                                                                                       | UI kit invariants                 |
-| [sdk.mdx](https://github.com/openchamber/openchamber/blob/main/packages/docs/content/docs/sdk.mdx) / [sdk/host.mdx](https://github.com/openchamber/openchamber/blob/main/packages/docs/content/docs/sdk/host.mdx) / [sdk/ui.mdx](https://github.com/openchamber/openchamber/blob/main/packages/docs/content/docs/sdk/ui.mdx) | Author-facing website pages       |
+| [README.md](https://github.com/gitcoffee-os/magio/blob/main/packages/sdk/README.md)                                                                                                                                                                                                                                   | Package overview and first hole   |
+| [DOCUMENTATION.md](https://github.com/gitcoffee-os/magio/blob/main/packages/sdk/DOCUMENTATION.md)                                                                                                                                                                                                                     | Agent / maintainer invariants     |
+| [GUEST_SERVICES.md](https://github.com/gitcoffee-os/magio/blob/main/packages/sdk/GUEST_SERVICES.md)                                                                                                                                                                                                                       | Local service contract              |
+| [src/ui/DOCUMENTATION.md](https://github.com/gitcoffee-os/magio/blob/main/packages/sdk/src/ui/DOCUMENTATION.md)                                                                                                                                                                                                       | UI kit invariants                 |
+| [sdk.mdx](https://github.com/gitcoffee-os/magio/blob/main/packages/docs/content/docs/sdk.mdx) / [sdk/host.mdx](https://github.com/gitcoffee-os/magio/blob/main/packages/docs/content/docs/sdk/host.mdx) / [sdk/ui.mdx](https://github.com/gitcoffee-os/magio/blob/main/packages/docs/content/docs/sdk/ui.mdx) | Author-facing website pages       |

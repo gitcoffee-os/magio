@@ -9,7 +9,7 @@ compatibility: opencode
 
 The changelog is written once per release, by the maintainer, as one story. `changelog/` stays untouched by every other task; a fix or a merged PR lands without a changelog line. Proceed only when the current message asks to update the changelog.
 
-Write `changelog/unreleased.md` and nothing else. Generation is not your job: `oc-dev create-release` turns the file into `changelog/<version>.md` with the date and renders `packages/vscode/CHANGELOG.md` and `changelog/index.json` from it. `CHANGELOG.md` at the root is a legacy copy for older installs. Never run the generator or touch any of these files. `bun run changelog:check` only validates the shape of what you wrote and writes nothing; `changelog/README.md` describes the format.
+Write `changelog/unreleased.md` and nothing else. Generation is not your job: `mg-dev create-release` turns the file into `changelog/<version>.md` with the date and renders `packages/vscode/CHANGELOG.md` and `changelog/index.json` from it. `CHANGELOG.md` at the root is a legacy copy for older installs. Never run the generator or touch any of these files. `bun run changelog:check` only validates the shape of what you wrote and writes nothing; `changelog/README.md` describes the format.
 
 `unreleased.md` opens with a `title:` front matter line (see The title) and holds two sections:
 
@@ -63,7 +63,7 @@ Every release carries a one-line `title:` in its front matter. The website lists
 - **Never a category alone** (`Fixes`, `Stability`, `Improvements`, `Polish`) and **never a bare area** (`Git`, `Chat`): the title has to teach the reader something.
 - Two headliners at most, joined with `and`, and only when the release really has two.
 
-`oc-dev create-release` refuses a release without a title. In `unreleased.md` it sits at the top:
+`mg-dev create-release` refuses a release without a title. In `unreleased.md` it sits at the top:
 
 ```markdown
 ---
@@ -121,11 +121,11 @@ Gathering is complete when every user-visible or SDK change has evidence, a know
 
 ## VS Code section
 
-An entry belongs here only when the extension actually mounts the surface: trace from `packages/vscode/webview/main.tsx` → `VSCodeApp` → `VSCodeLayout`, which mounts a subset of the shared UI, and read the surface map in `packages/vscode/src/DOCUMENTATION.md`. Server-side changes have no entry here; the extension runs no OpenChamber server. Prefixes drop the `VS Code:` part. Bullets are written separately from the App section rather than tagged, so reachability is a decision made per bullet. When reachability is uncertain, leave the entry out; a false entry becomes a bug report.
+An entry belongs here only when the extension actually mounts the surface: trace from `packages/vscode/webview/main.tsx` → `VSCodeApp` → `VSCodeLayout`, which mounts a subset of the shared UI, and read the surface map in `packages/vscode/src/DOCUMENTATION.md`. Server-side changes have no entry here; the extension runs no Magio server. Prefixes drop the `VS Code:` part. Bullets are written separately from the App section rather than tagged, so reachability is a decision made per bullet. When reachability is uncertain, leave the entry out; a false entry becomes a bug report.
 
 ## Credit
 
-End the bullet with `(thanks to @username)` using the GitHub login from the PR or commit. `yulia-ivashko` is credited like any contributor; her commits carry the author name `𝖎𝖚𝖑𝖎𝖎𝖆` or `Iuliia Ivashko` with the email `yulia.ivashko@gmail.com`, and both are her. The maintainer `btriapitsyn` gets no credit line: his work is the project's own and goes in like any other OpenChamber change. In a shared credit, drop only his login.
+End the bullet with `(thanks to @username)` using the GitHub login from the PR or commit. `yulia-ivashko` is credited like any contributor; her commits carry the author name `𝖎𝖚𝖑𝖎𝖎𝖆` or `Iuliia Ivashko` with the email `yulia.ivashko@gmail.com`, and both are her. The maintainer `btriapitsyn` gets no credit line: his work is the project's own and goes in like any other Magio change. In a shared credit, drop only his login.
 
 ## Done when
 

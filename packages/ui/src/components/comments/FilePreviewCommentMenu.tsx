@@ -220,7 +220,7 @@ export function FilePreviewCommentMenu({ containerRef, filePath, fileContent }: 
         {highlightRects.map((rect, index) => (
           <div
             key={index}
-            className="oc-chat-comment-rect absolute"
+            className="mg-chat-comment-rect absolute"
             style={{ left: rect.left, top: rect.top, width: rect.width, height: rect.height }}
           />
         ))}
@@ -249,7 +249,7 @@ export function FilePreviewCommentMenu({ containerRef, filePath, fileContent }: 
   // z-50 overlay and would cover a separate body-level highlight.
   if (isMobile) {
     return createPortal(
-      <div className="oc-keyboard-inset-surface pointer-events-none fixed inset-x-0 bottom-0 z-50">
+      <div className="mg-keyboard-inset-surface pointer-events-none fixed inset-x-0 bottom-0 z-50">
         {highlightOverlay}
         <div
           ref={menuRef}
@@ -260,7 +260,7 @@ export function FilePreviewCommentMenu({ containerRef, filePath, fileContent }: 
             <div
               className={cn(
                 'mx-auto w-fit',
-                'oc-glass-popover oc-glass-floating rounded-full',
+                'mg-glass-popover mg-glass-floating rounded-full',
                 'p-1',
               )}
             >
@@ -308,7 +308,7 @@ export function FilePreviewCommentMenu({ containerRef, filePath, fileContent }: 
         <div
           className={cn(
             'flex items-center whitespace-nowrap',
-            'oc-glass-popover oc-glass-floating rounded-full',
+            'mg-glass-popover mg-glass-floating rounded-full',
             'p-1',
           )}
         >

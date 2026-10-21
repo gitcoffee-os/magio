@@ -1,6 +1,6 @@
 /**
  * What the project page edits in a project's setup, and how each edit maps
- * onto the two files behind it: the team's `.openchamber/project.json` in the
+ * onto the two files behind it: the team's `.magio/project.json` in the
  * repo (`shared`) and the user's own config (`personal`).
  *
  * The page shows one list per kind with every entry marked by where it lives,
@@ -12,10 +12,10 @@
 
 import type { IconName } from '@/components/icon/icons';
 import type {
-  OpenChamberProjectAction,
+  MagioProjectAction,
   ProjectSetup,
   ProjectSetupSource,
-} from '@/lib/openchamberConfig';
+} from '@/lib/magioConfig';
 import { PROJECT_ACTION_ICON_MAP } from '@/lib/projectActions';
 
 const ACTION_ICONS_BY_KEY: Readonly<Record<string, IconName>> = PROJECT_ACTION_ICON_MAP;
@@ -23,7 +23,7 @@ const ACTION_ICONS_BY_KEY: Readonly<Record<string, IconName>> = PROJECT_ACTION_I
 /** An action without an icon, or with one this build does not know, shows the play icon. */
 export const projectActionIconName = (icon: string | null | undefined): IconName => ACTION_ICONS_BY_KEY[icon || 'play'] ?? 'play';
 
-export type ProjectActionPlatform = NonNullable<OpenChamberProjectAction['platforms']>[number];
+export type ProjectActionPlatform = NonNullable<MagioProjectAction['platforms']>[number];
 
 /** Operating system names, shown as they are in every language. */
 export const PROJECT_ACTION_PLATFORMS: Array<{ value: ProjectActionPlatform; label: string }> = [
@@ -33,7 +33,7 @@ export const PROJECT_ACTION_PLATFORMS: Array<{ value: ProjectActionPlatform; lab
 ];
 
 export type ProjectActionEntry = {
-  action: OpenChamberProjectAction;
+  action: MagioProjectAction;
   source: ProjectSetupSource;
   /** A team action the user hid from their own run menu. */
   hidden: boolean;
@@ -58,27 +58,27 @@ export const listProjectActions = (setup: ProjectSetup): ProjectActionEntry[] =>
 export const canWriteShared = (setup: ProjectSetup): boolean => setup.shared.status !== 'invalid';
 
 export type ProjectSetupWriters = {
-  personalActions: (actions: OpenChamberProjectAction[]) => Promise<boolean>;
-  sharedActions: (actions: OpenChamberProjectAction[]) => Promise<boolean>;
+  personalActions: (actions: MagioProjectAction[]) => Promise<boolean>;
+  sharedActions: (actions: MagioProjectAction[]) => Promise<boolean>;
   hiddenSharedActionIds: (ids: string[]) => Promise<boolean>;
   personalCommands: (commands: string[]) => Promise<boolean>;
   sharedCommands: (commands: string[]) => Promise<boolean>;
 };
 
-const withoutSource = (action: OpenChamberProjectAction): OpenChamberProjectAction => {
+const withoutSource = (action: MagioProjectAction): MagioProjectAction => {
   const copy = { ...action };
   delete copy.source;
   return copy;
 };
 
-const upsert = (actions: OpenChamberProjectAction[], action: OpenChamberProjectAction): OpenChamberProjectAction[] => {
+const upsert = (actions: MagioProjectAction[], action: MagioProjectAction): MagioProjectAction[] => {
   const clean = withoutSource(action);
   return actions.some((entry) => entry.id === clean.id)
     ? actions.map((entry) => (entry.id === clean.id ? clean : entry))
     : [...actions, clean];
 };
 
-const removeAction = (actions: OpenChamberProjectAction[], id: string): OpenChamberProjectAction[] => (
+const removeAction = (actions: MagioProjectAction[], id: string): MagioProjectAction[] => (
   actions.filter((entry) => entry.id !== id)
 );
 
@@ -89,7 +89,7 @@ const removeAction = (actions: OpenChamberProjectAction[], id: string): OpenCham
 export const saveProjectAction = async (
   setup: ProjectSetup,
   write: ProjectSetupWriters,
-  action: OpenChamberProjectAction,
+  action: MagioProjectAction,
   from: ProjectSetupSource | null,
   to: ProjectSetupSource,
 ): Promise<boolean> => {

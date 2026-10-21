@@ -23,9 +23,9 @@ const ICON_BUTTON_CLASS =
  * Rendered exactly once as an absolutely-positioned overlay above both the
  * sidebar and the header, so the buttons never migrate / re-mount between the
  * two while the sidebar animates open or closed — the panels slide *underneath*
- * a fixed control cluster instead. Its height tracks `--oc-header-height` and
- * its start padding clears the OS window controls via `--oc-titlebar-start-inset`.
- * The cluster's measured width is published as `--oc-titlebar-controls-width`
+ * a fixed control cluster instead. Its height tracks `--mg-header-height` and
+ * its start padding clears the OS window controls via `--mg-titlebar-start-inset`.
+ * The cluster's measured width is published as `--mg-titlebar-controls-width`
  * onto the elements that reserve room for it (`titlebarControlsWidth.ts`), so
  * the header can reserve matching space when the sidebar is collapsed.
  */
@@ -92,15 +92,15 @@ export const TitlebarLeftControls: React.FC = () => {
     <div
       className="app-region-no-drag absolute inset-s-0 top-0 z-30 flex select-none items-center pe-2"
       style={{
-        height: 'var(--oc-header-height, 3rem)',
-        paddingInlineStart: 'var(--oc-titlebar-start-inset, 0.75rem)',
+        height: 'var(--mg-header-height, 3rem)',
+        paddingInlineStart: 'var(--mg-titlebar-start-inset, 0.75rem)',
         // The overlay floats above the sidebar rather than inside it, so it is
         // sized by its own content: the icon buttons and the "New session" label
         // are rem-sized and grow with Interface Font Size, while the sidebar and
         // the macOS window-controls clearance are fixed pixels. Left uncapped the
         // cluster runs past the sidebar edge and paints over the chat pane, so
         // cap it here and let the label truncate.
-        maxWidth: isSidebarOpen ? 'var(--oc-left-sidebar-width, 100%)' : undefined,
+        maxWidth: isSidebarOpen ? 'var(--mg-left-sidebar-width, 100%)' : undefined,
       }}
     >
       <div ref={clusterRef} className="flex min-w-0 items-center gap-2">

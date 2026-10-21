@@ -1,42 +1,42 @@
-# Managed OpenChamber Agent Tool
+# Managed Magio Agent Tool
 
 ## Purpose
 
-This module exposes OpenChamber to agents as typed OpenCode custom tools. There
+This module exposes Magio to agents as typed OpenCode custom tools. There
 are two, because controlling sessions and driving a page are separate intents
 the user can want independently:
 
-- `openchamber` — projects, sessions, worktrees, and showing a file to the
+- `magio` — projects, sessions, worktrees, and showing a file to the
   user (`file.open`). Enabled while the persisted `agentControlToolEnabled`
   setting is not `false`.
-- `openchamber_schedule` — the `schedule.*` actions of the same control
+- `magio_schedule` — the `schedule.*` actions of the same control
   service, for scheduled tasks. Enabled while `agentScheduleToolEnabled` is not
-  `false`. It used to be part of `openchamber`; reading settings sets it to
+  `false`. It used to be part of `magio`; reading settings sets it to
   `false` once for someone who had switched the control tool off
   (`settings-runtime.js`), so the split hands nobody a tool they turned off.
   Like the control tool, a stale plugin is not refused: the CLI runs the same
   actions, so the service cannot tell an agent call from a CLI one.
-- `openchamber_web` — looking at and interacting with the page in OpenChamber's
+- `magio_web` — looking at and interacting with the page in Magio's
   browser panel. Enabled while `agentWebToolEnabled` is not `false`.
-- `openchamber_notify` — `notify.send`, a notification to the user through
+- `magio_notify` — `notify.send`, a notification to the user through
   `lib/notifications/emit-route.js` (same limits and rate window as
   `POST /api/notifications/emit`). Off by default: enabled only while
   `agentNotifyToolEnabled` is `true`, and the control service refuses the
   action when the setting is off, so a stale plugin cannot keep paging.
-- `openchamber_knowledge` — the project's Notes, Todos and Plans, the items of
+- `magio_knowledge` — the project's Notes, Todos and Plans, the items of
   the Project knowledge panel (`knowledge.list`, `save`, `delete`, `show`,
   with `kind` naming note, todo or plan; plans are files, so list and save
   give their path and the agent reads and edits them with its own file tools;
   dispatched by
-  `../openchamber-control/project-knowledge.js` into
+  `../magio-control/project-knowledge.js` into
   `../project-context/runtime.js`). On by default: enabled while
   `agentKnowledgeToolEnabled` is not `false`, and the control service refuses
   these actions when it is, so a stale plugin cannot keep writing. Writes are
   attributed to the session OpenCode reported, never to a payload field.
-- `openchamber_render` — `render.page`, a self-contained HTML page (`html`,
+- `magio_render` — `render.page`, a self-contained HTML page (`html`,
   `title`) the chat draws inline above the agent's answer, such as a chart or
   table. The page travels in the call's input, which OpenCode stores and
-  syncs, so the server keeps no copy: `../openchamber-control/render-page.js`
+  syncs, so the server keeps no copy: `../magio-control/render-page.js`
   only checks the input (`html` at most 200,000 characters so the callback
   body stays under its 1 MB limit, `title` at most 120) and the setting.
   On by default: enabled while `agentRenderToolEnabled` is not `false`, and the
@@ -58,7 +58,7 @@ the user can want independently:
   With `awaitAnswer` the call waits for the user's answer on the page. The
   plugin sends the call id (`context.id`) with the callback so the server can
   find the waiting call when the chat answers it, and copies the answer into
-  the call's metadata (`metadata.openchamber.answer`), so every client shows
+  the call's metadata (`metadata.magio.answer`), so every client shows
   the page as answered. The waiting callback sends Bun's `timeout: false`,
   since Bun's fetch otherwise ends a request with no response after about six
   minutes. While the call waits, OpenCode holds any chat message
@@ -67,15 +67,15 @@ the user can want independently:
   waiting call, which returns `{ answered: false, reason: "chat" }`, and the
   agent reads the message next.
 
-Both default to on, are toggled in Settings → General → OpenChamber Tools, and take
-effect in the running OpenCode within a couple of seconds — OpenChamber rewrites
+Both default to on, are toggled in Settings → General → Magio Tools, and take
+effect in the running OpenCode within a couple of seconds — Magio rewrites
 the managed config file OpenCode watches (see
 `lib/opencode/managed-config-file.js`). Installs where the user's own
 environment sets `OPENCODE_CONFIG` fall back to `OPENCODE_CONFIG_CONTENT` and
 still need a restart for a toggle. Each tool carries only its own actions and
 only the parameters those actions use, so turning one off removes its inputs
 from the schema rather than leaving them visible. The plugin is injected only
-when OpenChamber launches and owns the OpenCode process, and not at all when
+when Magio launches and owns the OpenCode process, and not at all when
 both settings are `false`.
 
 - Every tool is registered with `options: { codemode: false }`, so it is a
@@ -84,7 +84,7 @@ both settings are `false`.
   size-limited catalog; with a few large MCP servers ours dropped out of it and
   agents concluded the tool did not exist. `agentToolsCodeMode: true` (the
   "Run through Code Mode" checkbox in the same section, off by default) flips
-  all of them to `codemode: true`, except `openchamber_render`: the chat draws
+  all of them to `codemode: true`, except `magio_render`: the chat draws
   a page from that tool's own call (its input and stored result), and inside
   an `execute` script the call is only an entry in `execute`'s list, so the
   page never showed.
@@ -97,7 +97,7 @@ both settings are `false`.
   inputs and unknown fields (a stale `wait` or `timeout`) through to the
   adapter.
 
-### Why scheduling is its own tool and not part of `openchamber`
+### Why scheduling is its own tool and not part of `magio`
 
 Scheduling is a separate intent from running sessions, and its ten inputs
 (`taskId`, `name`, `daily` ... `disabled`) rode in the control tool's schema on
@@ -116,7 +116,7 @@ all tools are on, and the flattened calls already work through
 
 ## Runtime flow
 
-1. The OpenChamber HTTP listener binds and publishes its authoritative port.
+1. The Magio HTTP listener binds and publishes its authoritative port.
 2. `materializePlugin()` writes the plugin under
    `<instance-dir>/agent-tool/` and returns its directory; the managed
    config layer lists that directory in `<instance-dir>/opencode.managed.json` and
@@ -130,11 +130,11 @@ all tools are on, and the flattened calls already work through
    points at loopback, except when the listener is bound to one concrete
    address (`--host <ip>`): that socket does not answer on loopback, so the URL
    uses the bound address instead.
-4. The plugin calls `POST /api/openchamber/agent-tool` with its typed input and
-   the session id OpenCode gives the tool; OpenChamber resolves the session's
+4. The plugin calls `POST /api/magio/agent-tool` with its typed input and
+   the session id OpenCode gives the tool; Magio resolves the session's
    directory on its own side.
 5. The route delegates the fixed action allowlist directly to the shared
-   OpenChamber control service. The CLI uses the same service through its
+   Magio control service. The CLI uses the same service through its
    authenticated HTTP adapter, so Goal Mode ordering, CLI wait behavior,
    result delivery, partial-failure reporting, and scheduled-task contracts
    have one owner.
@@ -202,7 +202,7 @@ default and when to set it. Field names and JSON types carry the rest.
   answer for itself, `session.*` when the user asks for a separate session
   they will follow and talk to.
 - The tool exposes only agent-relevant actions
-  (`OPENCHAMBER_AGENT_TOOL_ACTIONS`): `schedule.status` stays CLI-only because
+  (`MAGIO_AGENT_TOOL_ACTIONS`): `schedule.status` stays CLI-only because
   `schedule.list` already returns scheduler status, and enable/disable are one
   `schedule.toggle` action driven by the `disabled` boolean.
 - The tool description frames intent: created sessions and scheduled tasks are
@@ -220,7 +220,7 @@ default and when to set it. Field names and JSON types carry the rest.
   (`../git/DOCUMENTATION.md`, *Worktree creation from a GitHub pull request*);
   everything else about the request is resolved on the server.
 - `session.moveToWorktree` moves the calling session (or `sessionId`) into a
-  new worktree of its repository (`../openchamber-sessions/worktree-move.js`).
+  new worktree of its repository (`../magio-sessions/worktree-move.js`).
   `worktree` is required there and `startRef` defaults to the repository's
   default branch; `existingBranch` checks out a branch that already exists
   instead, local or remote (`origin/feature`), and cannot be combined with
@@ -319,7 +319,7 @@ error state.
 
 - Web and Desktop managed OpenCode: injected automatically.
 - External OpenCode selected with `OPENCODE_HOST` or skip-start: not injected,
-  because OpenChamber does not control that process environment.
+  because Magio does not control that process environment.
 - VS Code: not injected; the extension owns a separate OpenCode lifecycle.
 - Hosted and Capacitor mobile clients use the server's managed OpenCode tool
   when connected to such a server; no tool runs in the client runtime.
@@ -327,7 +327,7 @@ error state.
 ## The calling tool is part of the request
 
 Each generated tool sends its own name with every callback. Models routinely
-drop the namespace their tool's name appears to supply — `openchamber_memory`
+drop the namespace their tool's name appears to supply — `magio_memory`
 asked for `memory.read` gets called as `read` — and resolving the bare name
 inside the calling tool's action set makes that unambiguous even where it is not
 globally (`delete` belongs to both schedule and memory).

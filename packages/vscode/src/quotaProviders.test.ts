@@ -7,9 +7,9 @@ import type { CredentialEntry } from '@opencode/client';
 
 import { configureOpenCodeCredentials } from './opencodeAuth';
 
-const previousQuotaDataDirectory = process.env.OPENCHAMBER_DATA_DIR;
-const temporaryQuotaDataDirectory = fs.mkdtempSync(path.join(os.tmpdir(), 'openchamber-vscode-quota-'));
-process.env.OPENCHAMBER_DATA_DIR = temporaryQuotaDataDirectory;
+const previousQuotaDataDirectory = process.env.MAGIO_DATA_DIR;
+const temporaryQuotaDataDirectory = fs.mkdtempSync(path.join(os.tmpdir(), 'magio-vscode-quota-'));
+process.env.MAGIO_DATA_DIR = temporaryQuotaDataDirectory;
 // Credentials come from the running OpenCode; serve a fixed list so the
 // providers treat themselves as configured and go straight to fetch.
 const key = (integrationID: string): CredentialEntry => ({ id: `cred_${integrationID}`, integrationID, label: 'default', active: true, value: { type: 'key', key: 'test-token' } });
@@ -59,8 +59,8 @@ import { activateQuotaGiftReset, fetchClinePassQuota, fetchHyperQuota, fetchKilo
 type MockResponseInit = { ok?: boolean; status?: number };
 
 after(() => {
-  if (previousQuotaDataDirectory === undefined) delete process.env.OPENCHAMBER_DATA_DIR;
-  else process.env.OPENCHAMBER_DATA_DIR = previousQuotaDataDirectory;
+  if (previousQuotaDataDirectory === undefined) delete process.env.MAGIO_DATA_DIR;
+  else process.env.MAGIO_DATA_DIR = previousQuotaDataDirectory;
   fs.rmSync(temporaryQuotaDataDirectory, { recursive: true, force: true });
 });
 
@@ -137,7 +137,7 @@ describe('OpenCode Go quota provider (VS Code parity)', () => {
 
     assert.equal(result.ok, true);
     assert.equal((request?.headers as Record<string, string> | undefined)?.Authorization, 'Bearer test-token');
-    assert.equal((request?.headers as Record<string, string> | undefined)?.['x-opencode-session'], 'openchamber-usage');
+    assert.equal((request?.headers as Record<string, string> | undefined)?.['x-opencode-session'], 'magio-usage');
     assert.equal(result.usage!.windows['5h']!.usedPercent, 25);
     assert.throws(() => fs.statSync(legacyPath));
   });

@@ -1,9 +1,9 @@
 {
-  description = "OpenChamber — web UI for OpenCode sessions";
+  description = "Magio — web UI for OpenCode sessions";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
-    # OpenCode CLI, pinned to the tag matching OpenChamber's OpenCode 2.x
+    # OpenCode CLI, pinned to the tag matching Magio's OpenCode 2.x
     # requirement. Keep in sync with packages/electron/package.json
     # (opencodeCli.version) and the @opencode/client pin. Bump all together.
     opencode.url = "github:anomalyco/opencode/v2.0.32";
@@ -25,7 +25,7 @@
     in
     {
       overlays.default = final: _prev: {
-        openchamber = self.packages.${final.system}.openchamber;
+        magio = self.packages.${final.system}.magio;
       };
 
       packages = nixpkgs.lib.genAttrs systems (
@@ -69,37 +69,37 @@
               });
         in
         (rec {
-          openchamber = pkgs.callPackage ./nix/package.nix {
+          magio = pkgs.callPackage ./nix/package.nix {
             inherit self version;
             opencodeCli = opencode-cli;
           };
-          openchamber-desktop = pkgs.callPackage ./nix/gui.nix {
+          magio-desktop = pkgs.callPackage ./nix/gui.nix {
             inherit self version;
             opencodeCli = opencode-cli;
-            src = openchamber.passthru.src;
-            openchamberCore = openchamber.passthru.core;
+            src = magio.passthru.src;
+            magioCore = magio.passthru.core;
             # Same major as packages/electron devDependencies ("electron":
             # "^43.7.0"); bump both together, like nixpkgs' element-desktop does.
             electron = pkgs.electron_43;
           };
-          gui = openchamber-desktop;
-          default = openchamber;
+          gui = magio-desktop;
+          default = magio;
         })
         // {
-          # The pinned OpenCode CLI that OpenChamber bundles, exposed on its
+          # The pinned OpenCode CLI that Magio bundles, exposed on its
           # own so hosts can use the same 2.x build as the system opencode.
           opencode-cli = opencode-cli;
         }
       );
 
       apps = nixpkgs.lib.genAttrs systems (system: rec {
-        openchamber = {
+        magio = {
           type = "app";
-          program = "${self.packages.${system}.openchamber}/bin/openchamber";
+          program = "${self.packages.${system}.magio}/bin/magio";
         };
         gui = {
           type = "app";
-          program = "${self.packages.${system}.openchamber-desktop}/bin/openchamber-desktop";
+          program = "${self.packages.${system}.magio-desktop}/bin/magio-desktop";
         };
         update-hashes = {
           type = "app";
@@ -111,7 +111,7 @@
             )
             + "/bin/update-hashes";
         };
-        default = openchamber;
+        default = magio;
       });
 
       formatter = nixpkgs.lib.genAttrs systems (
@@ -137,8 +137,8 @@
       );
 
       nixosModules = {
-        openchamber = import ./nix/module.nix self;
-        default = self.nixosModules.openchamber;
+        magio = import ./nix/module.nix self;
+        default = self.nixosModules.magio;
       };
     };
 }

@@ -6,7 +6,7 @@ import path from 'node:path';
 
 // The accounts file path is resolved when the module loads, so point it at a
 // scratch directory before importing the providers.
-const configDir = fs.mkdtempSync(path.join(os.tmpdir(), 'oc-vscode-antigravity-'));
+const configDir = fs.mkdtempSync(path.join(os.tmpdir(), 'mg-vscode-antigravity-'));
 process.env.OPENCODE_CONFIG_DIR = configDir;
 fs.writeFileSync(path.join(configDir, 'antigravity-accounts.json'), JSON.stringify({
   accounts: [{ refreshToken: 'test-refresh', projectId: 'test-project', email: 'test@example.com' }],

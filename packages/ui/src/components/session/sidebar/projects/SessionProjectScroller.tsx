@@ -503,7 +503,7 @@ function SessionProjectScrollerComponent({ model, view, actions }: Props): React
       <ScrollableOverlay
         // Sticky zone headers replace the top shadow.
         ref={setScrollContainer} useScrollShadow hideTopScrollShadow scrollShadowSize={40}
-        outerClassName="flex-1 min-h-0" className="oc-sidebar-scroller pb-1 ps-2.5 pe-2 [overflow-anchor:none]"
+        outerClassName="flex-1 min-h-0" className="mg-sidebar-scroller pb-1 ps-2.5 pe-2 [overflow-anchor:none]"
       >
         <DndContext sensors={sensors} collisionDetection={closestCenter} onDragStart={(event) => {
           const activeId = String(event.active.id);

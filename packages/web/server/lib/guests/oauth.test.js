@@ -64,7 +64,7 @@ describe('toPublicGuestAuth', () => {
 
 describe('startGuestAuthorization', () => {
   test('builds a PKCE authorize URL after a client id is saved', async () => {
-    const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'oc-guest-oauth-'));
+    const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'mg-guest-oauth-'));
     const persistPath = guestAuthPersistPath(dir);
     await patchGuestAuth('clickup', { clientId: 'app-id', clientSecret: 'app-secret', clientTarget: credentialTarget(clickupGuest.integration) }, persistPath);
     const started = await startGuestAuthorization({
@@ -82,7 +82,7 @@ describe('startGuestAuthorization', () => {
   });
 
   test('refuses start without a client id', async () => {
-    const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'oc-guest-oauth-'));
+    const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'mg-guest-oauth-'));
     const persistPath = guestAuthPersistPath(dir);
     try {
       await startGuestAuthorization({
@@ -100,7 +100,7 @@ describe('startGuestAuthorization', () => {
 
 describe('consumeGuestAuthorization', () => {
   test('stores tokens from the token endpoint and never returns them', async () => {
-    const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'oc-guest-oauth-'));
+    const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'mg-guest-oauth-'));
     const persistPath = guestAuthPersistPath(dir);
     await patchGuestAuth('clickup', { clientId: 'app-id', clientSecret: 'app-secret', clientTarget: credentialTarget(clickupGuest.integration) }, persistPath);
     const started = await startGuestAuthorization({
@@ -146,7 +146,7 @@ describe('consumeGuestAuthorization', () => {
   });
 
   test('rejects a callback without state even when this guest has one pending exchange', async () => {
-    const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'oc-guest-oauth-'));
+    const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'mg-guest-oauth-'));
     const persistPath = guestAuthPersistPath(dir);
     await patchGuestAuth('clickup', { clientId: 'app-id', clientSecret: 'app-secret', clientTarget: credentialTarget(clickupGuest.integration) }, persistPath);
     await startGuestAuthorization({
@@ -185,7 +185,7 @@ describe('consumeGuestAuthorization', () => {
   });
 
   test('falls back to a JSON token body when form exchange fails', async () => {
-    const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'oc-guest-oauth-'));
+    const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'mg-guest-oauth-'));
     const persistPath = guestAuthPersistPath(dir);
     await patchGuestAuth('clickup', { clientId: 'app-id', clientSecret: 'app-secret', clientTarget: credentialTarget(clickupGuest.integration) }, persistPath);
     const started = await startGuestAuthorization({
@@ -235,7 +235,7 @@ describe('consumeGuestAuthorization', () => {
   });
 
   test('rejects an unknown state', async () => {
-    const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'oc-guest-oauth-'));
+    const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'mg-guest-oauth-'));
     const persistPath = guestAuthPersistPath(dir);
     try {
       await consumeGuestAuthorization({
@@ -276,7 +276,7 @@ describe('saveGuestAccessToken with a basic scheme', () => {
   };
 
   test('encodes username:token, probes with a Basic header, and stores only the pair', async () => {
-    const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'oc-guest-basic-'));
+    const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'mg-guest-basic-'));
     const persistPath = guestAuthPersistPath(dir);
     const originalFetch = globalThis.fetch;
     let seenAuthorization = '';
@@ -304,7 +304,7 @@ describe('saveGuestAccessToken with a basic scheme', () => {
   });
 
   test('refuses a basic integration without a username', async () => {
-    const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'oc-guest-basic-'));
+    const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'mg-guest-basic-'));
     const persistPath = guestAuthPersistPath(dir);
     try {
       await expect(saveGuestAccessToken({ guest: jiraGuest, persistPath, token: 'api-token' }))
@@ -315,7 +315,7 @@ describe('saveGuestAccessToken with a basic scheme', () => {
   });
 
   test('uses the username as the account label when the manifest declares no account probe', async () => {
-    const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'oc-guest-basic-'));
+    const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'mg-guest-basic-'));
     const persistPath = guestAuthPersistPath(dir);
     const guest = { ...jiraGuest, integration: { ...jiraGuest.integration, token: { apiOrigin: 'https://acme.atlassian.net', scheme: 'basic' } } };
     try {
@@ -329,7 +329,7 @@ describe('saveGuestAccessToken with a basic scheme', () => {
 
 describe('a package that changes its endpoints mid sign-in', () => {
   test('the callback refuses the exchange and nothing reaches the new endpoint', async () => {
-    const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'oc-guest-oauth-'));
+    const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'mg-guest-oauth-'));
     const persistPath = guestAuthPersistPath(dir);
     await patchGuestAuth('clickup', { clientId: 'app-id', clientSecret: 'app-secret', clientTarget: credentialTarget(clickupGuest.integration) }, persistPath);
     const started = await startGuestAuthorization({ guest: clickupGuest, persistPath, origin: 'http://127.0.0.1:4096' });
@@ -356,7 +356,7 @@ describe('a package that changes its endpoints mid sign-in', () => {
   });
 
   test('stored tokens record the target and stop counting once it moves', async () => {
-    const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'oc-guest-oauth-'));
+    const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'mg-guest-oauth-'));
     const persistPath = guestAuthPersistPath(dir);
     await patchGuestAuth('clickup', { clientId: 'app-id', clientSecret: 'app-secret', clientTarget: credentialTarget(clickupGuest.integration) }, persistPath);
     const started = await startGuestAuthorization({ guest: clickupGuest, persistPath, origin: 'http://127.0.0.1:4096' });
@@ -393,7 +393,7 @@ describe('client credentials after the package moved its endpoints', () => {
   };
 
   test('a new Connect refuses to reuse the old client id and secret', async () => {
-    const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'oc-guest-oauth-'));
+    const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'mg-guest-oauth-'));
     const persistPath = guestAuthPersistPath(dir);
     await patchGuestAuth('clickup', { clientId: 'app-id', clientSecret: 'app-secret', clientTarget: credentialTarget(clickupGuest.integration) }, persistPath);
     try {
@@ -407,7 +407,7 @@ describe('client credentials after the package moved its endpoints', () => {
   });
 
   test('a refresh that finished after a new Connect for other endpoints is dropped', async () => {
-    const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'oc-guest-oauth-'));
+    const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'mg-guest-oauth-'));
     const persistPath = guestAuthPersistPath(dir);
     await patchGuestAuth('clickup', {
       clientId: 'app-id',
@@ -455,7 +455,7 @@ describe('saveGuestOAuthClient', () => {
   };
 
   test('an empty secret keeps the stored one only for the same client and endpoints', async () => {
-    const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'oc-guest-oauth-'));
+    const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'mg-guest-oauth-'));
     const persistPath = guestAuthPersistPath(dir);
     try {
       await saveGuestOAuthClient({ guest: clickupGuest, persistPath, clientId: 'app-id', clientSecret: 'app-secret' });

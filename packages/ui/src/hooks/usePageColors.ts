@@ -8,7 +8,7 @@ import { mixColor } from '@/lib/theme/color';
  * work status card when it is not floating. Such a panel takes the sidebar's
  * colour instead of the chat's (halfway to it in light themes); CSS does that for everything
  * painted with `bg-background` or `var(--surface-background)` (the
- * `.oc-panel-edge` rule in design-system.css). Surfaces that take their
+ * `.mg-panel-edge` rule in design-system.css). Surfaces that take their
  * colour from the theme object instead (the terminal, extension frames) read
  * it through `usePageColors` so they match the panel they sit in.
  */

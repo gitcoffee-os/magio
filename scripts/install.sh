@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
-# OpenChamber Install Script
-# Usage: curl -fsSL https://raw.githubusercontent.com/btriapitsyn/openchamber/main/scripts/install.sh | bash
+# Magio Install Script
+# Usage: curl -fsSL https://raw.githubusercontent.com/gitcoffee-os/magio/main/scripts/install.sh | bash
 
 set -euo pipefail
 
-PACKAGE_NAME="@openchamber/web"
-BIN_NAME="openchamber"
+PACKAGE_NAME="@magio/web"
+BIN_NAME="magio"
 MIN_NODE_MAJOR=24
 MIN_NODE_MINOR=14
 MIN_NODE_VERSION="$MIN_NODE_MAJOR.$MIN_NODE_MINOR"
@@ -180,7 +180,7 @@ main() {
   echo ""
   echo "  ╭───────────────────────────────────╮"
   echo "  │                                   │"
-  echo "  │   OpenChamber Installer           │"
+  echo "  │   Magio Installer           │"
   echo "  │   Web interface for OpenCode      │"
   echo "  │                                   │"
   echo "  ╰───────────────────────────────────╯"
@@ -200,23 +200,23 @@ main() {
   fi
   success "Node.js v$NODE_VERSION found"
 
-  # If OpenChamber is already installed, hand off to its own updater instead
-  # of guessing a package manager. `openchamber update` detects which manager
+  # If Magio is already installed, hand off to its own updater instead
+  # of guessing a package manager. `magio update` detects which manager
   # actually owns the existing global install and reinstalls with that one —
   # reinstalling with a different manager here would orphan files and break PATH.
   if command_exists "$BIN_NAME"; then
-    info "OpenChamber is already installed — updating via 'openchamber update'..."
+    info "Magio is already installed — updating via 'magio update'..."
     echo ""
-    if openchamber update; then
+    if magio update; then
       echo ""
-      success "OpenChamber is up to date!"
+      success "Magio is up to date!"
       exit 0
     fi
     echo ""
     error "Update failed."
     echo ""
     echo "  Try running it manually:"
-    echo "    openchamber update"
+    echo "    magio update"
     echo ""
     exit 1
   fi
@@ -240,25 +240,22 @@ main() {
 
   # Install
   echo ""
-  info "Installing OpenChamber..."
+  info "Installing Magio..."
   echo "  Running: $INSTALL_CMD"
   echo ""
   
   if eval "$INSTALL_CMD"; then
     echo ""
-    # Wordmark (toilet "pagga", "Open"/"Chamber" stacked).
+    # Wordmark (toilet "pagga", "Magio").
     # Hardcoded so the user needs no extra tools.
     printf '%b' "$BLUE"
     cat <<'EOF'
-  ░█▀█░█▀█░█▀▀░█▀█
-  ░█░█░█▀▀░█▀▀░█░█
-  ░▀▀▀░▀░░░▀▀▀░▀░▀
-  ░█▀▀░█░█░█▀█░█▄█░█▀▄░█▀▀░█▀▄
-  ░█░░░█▀█░█▀█░█░█░█▀▄░█▀▀░█▀▄
-  ░▀▀▀░▀░▀░▀░▀░▀░▀░▀▀░░▀▀▀░▀░▀
+  ░█▄█░█▀█░█▀▀░▀█▀░█▀█
+  ░█░█░█▀█░█░█░░█░░█░█
+  ░▀░▀░▀░▀░▀▀▀░▀▀▀░▀▀▀
 EOF
     printf '%b\n' "$NC"
-    success "OpenChamber installed successfully!"
+    success "Magio installed successfully!"
     echo ""
 
     # Verify the binary is actually reachable. Global installs frequently
@@ -266,8 +263,8 @@ EOF
     # letting the user hit a confusing "command not found".
     if command_exists "$BIN_NAME"; then
       echo "  Get started:"
-      echo "    openchamber              # Start server on port 3000"
-      echo "    openchamber --help       # Show all options"
+      echo "    magio              # Start server on port 3000"
+      echo "    magio --help       # Show all options"
     else
       warn "'$BIN_NAME' was installed but isn't on your PATH yet."
       echo ""
@@ -283,7 +280,7 @@ EOF
         echo "    export PATH=\"$bin_dir:\$PATH\""
       else
         echo "  Add your package manager's global bin directory to PATH,"
-        echo "  then restart your terminal and run: openchamber"
+        echo "  then restart your terminal and run: magio"
       fi
     fi
     echo ""

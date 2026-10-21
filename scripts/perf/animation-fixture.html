@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="utf-8">
-<title>OpenChamber animation cost fixture</title>
+<title>Magio animation cost fixture</title>
 <style>
   body { margin: 0; background: #111; color: #eee; font: 12px ui-monospace, monospace; }
   .grid { display: flex; flex-wrap: wrap; gap: 8px; padding: 8px; }
@@ -16,33 +16,33 @@
     driven properties should cost a small constant; anything the compositor
     cannot handle recalculates style every frame.
   */
-  @keyframes oc-transform-rotate { to { transform: rotate(360deg); } }
-  @keyframes oc-transform-stepped { to { transform: rotate(360deg); } }
-  @keyframes oc-rotate-property { to { rotate: 360deg; } }
-  @keyframes oc-opacity { 0%, 100% { opacity: 0.2; } 50% { opacity: 1; } }
-  @keyframes oc-translate { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(6px); } }
-  @keyframes oc-scale { 0%, 100% { transform: scale(0.7); } 50% { transform: scale(1); } }
-  @keyframes oc-background-position { to { background-position: 200% 0; } }
-  @keyframes oc-border-color { 0%, 100% { border-color: #345; } 50% { border-color: #8ab; } }
-  @keyframes oc-box-shadow { 0%, 100% { box-shadow: 0 0 0 0 #8ab; } 50% { box-shadow: 0 0 8px 2px #8ab; } }
-  @keyframes oc-filter { 0%, 100% { filter: brightness(0.6); } 50% { filter: brightness(1.4); } }
-  @keyframes oc-width { 0%, 100% { width: 12px; } 50% { width: 24px; } }
+  @keyframes mg-transform-rotate { to { transform: rotate(360deg); } }
+  @keyframes mg-transform-stepped { to { transform: rotate(360deg); } }
+  @keyframes mg-rotate-property { to { rotate: 360deg; } }
+  @keyframes mg-opacity { 0%, 100% { opacity: 0.2; } 50% { opacity: 1; } }
+  @keyframes mg-translate { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(6px); } }
+  @keyframes mg-scale { 0%, 100% { transform: scale(0.7); } 50% { transform: scale(1); } }
+  @keyframes mg-background-position { to { background-position: 200% 0; } }
+  @keyframes mg-border-color { 0%, 100% { border-color: #345; } 50% { border-color: #8ab; } }
+  @keyframes mg-box-shadow { 0%, 100% { box-shadow: 0 0 0 0 #8ab; } 50% { box-shadow: 0 0 8px 2px #8ab; } }
+  @keyframes mg-filter { 0%, 100% { filter: brightness(0.6); } 50% { filter: brightness(1.4); } }
+  @keyframes mg-width { 0%, 100% { width: 12px; } 50% { width: 24px; } }
 
   .v-none svg { animation: none; }
-  .v-transform-rotate svg { animation: oc-transform-rotate 1s linear infinite; }
-  .v-transform-rotate-willchange svg { animation: oc-transform-rotate 1s linear infinite; will-change: transform; }
-  .v-transform-rotate-steps svg { animation: oc-transform-rotate 1s steps(12) infinite; }
-  .v-transform-stepped svg { animation: oc-transform-stepped 1.5s steps(30) infinite; }
-  .v-transform-rotate-wrapper .wrap { animation: oc-transform-rotate 1s linear infinite; }
-  .v-rotate-property svg { animation: oc-rotate-property 1s linear infinite; }
-  .v-opacity svg { animation: oc-opacity 1.2s ease-in-out infinite; }
-  .v-translate svg { animation: oc-translate 1.2s ease-in-out infinite; }
-  .v-scale svg { animation: oc-scale 1.2s ease-in-out infinite; }
-  .v-background-position .cell { background: linear-gradient(90deg, #223, #8ab, #223); background-size: 200% 100%; animation: oc-background-position 1.5s linear infinite; }
-  .v-border-color .cell { border: 2px solid #345; animation: oc-border-color 1.5s linear infinite; }
-  .v-box-shadow .cell { animation: oc-box-shadow 1.5s linear infinite; }
-  .v-filter svg { animation: oc-filter 1.5s linear infinite; }
-  .v-width svg { animation: oc-width 1.5s linear infinite; }
+  .v-transform-rotate svg { animation: mg-transform-rotate 1s linear infinite; }
+  .v-transform-rotate-willchange svg { animation: mg-transform-rotate 1s linear infinite; will-change: transform; }
+  .v-transform-rotate-steps svg { animation: mg-transform-rotate 1s steps(12) infinite; }
+  .v-transform-stepped svg { animation: mg-transform-stepped 1.5s steps(30) infinite; }
+  .v-transform-rotate-wrapper .wrap { animation: mg-transform-rotate 1s linear infinite; }
+  .v-rotate-property svg { animation: mg-rotate-property 1s linear infinite; }
+  .v-opacity svg { animation: mg-opacity 1.2s ease-in-out infinite; }
+  .v-translate svg { animation: mg-translate 1.2s ease-in-out infinite; }
+  .v-scale svg { animation: mg-scale 1.2s ease-in-out infinite; }
+  .v-background-position .cell { background: linear-gradient(90deg, #223, #8ab, #223); background-size: 200% 100%; animation: mg-background-position 1.5s linear infinite; }
+  .v-border-color .cell { border: 2px solid #345; animation: mg-border-color 1.5s linear infinite; }
+  .v-box-shadow .cell { animation: mg-box-shadow 1.5s linear infinite; }
+  .v-filter svg { animation: mg-filter 1.5s linear infinite; }
+  .v-width svg { animation: mg-width 1.5s linear infinite; }
 
   /*
     Context variants. The same composited animation can stop being composited
@@ -57,7 +57,7 @@
   .v-ctx-opacity .cell svg,
   .v-ctx-transformed-parent .cell svg,
   .v-ctx-sibling-translatez .cell svg,
-  .v-ctx-currentcolor .cell svg { animation: oc-transform-rotate 1s linear infinite; }
+  .v-ctx-currentcolor .cell svg { animation: mg-transform-rotate 1s linear infinite; }
 
   /* Mirrors the repository rule that gives every other button SVG a GPU hint. */
   .v-ctx-sibling-translatez button svg:not(.spin) { transform: translateZ(0); }
@@ -75,18 +75,18 @@
     Tailwind's animate-spin with these, so each piece is measured separately to
     find which one stops the rotation being composited.
   */
-  @keyframes oc-webkit-spin {
+  @keyframes mg-webkit-spin {
     0% { transform: translateZ(0) rotate(0deg); }
     100% { transform: translateZ(0) rotate(360deg); }
   }
-  .v-app-keyframes svg { animation: oc-webkit-spin 1s linear infinite; }
+  .v-app-keyframes svg { animation: mg-webkit-spin 1s linear infinite; }
   .v-app-fillbox svg {
-    animation: oc-transform-rotate 1s linear infinite;
+    animation: mg-transform-rotate 1s linear infinite;
     transform-box: fill-box;
     transform-origin: 50% 50%;
   }
   .v-app-full svg {
-    animation: oc-webkit-spin 1s linear infinite;
+    animation: mg-webkit-spin 1s linear infinite;
     will-change: transform;
     transform-box: fill-box;
     transform-origin: 50% 50%;
@@ -101,27 +101,27 @@
     per-second cost is paid for as long as the model is working. The remaining
     variants change one thing each to find which part makes it expensive.
   */
-  @keyframes oc-busy-pulse { 0%, 100% { opacity: 0.2; } 50% { opacity: 1; } }
+  @keyframes mg-busy-pulse { 0%, 100% { opacity: 0.2; } 50% { opacity: 1; } }
   .busy-dots { display: inline-flex; }
   .v-busy-dots-static .busy-dots span { opacity: 0.6; }
   .v-busy-dots .busy-dots span,
   .v-busy-dots-willchange .busy-dots span,
-  .v-busy-dots-single .busy-dots { animation: oc-busy-pulse 1.2s ease-in-out infinite; }
+  .v-busy-dots-single .busy-dots { animation: mg-busy-pulse 1.2s ease-in-out infinite; }
   .v-busy-dots-willchange .busy-dots span { will-change: opacity; }
-  .v-busy-dots-steps .busy-dots span { animation: oc-busy-pulse 1.2s steps(4, jump-none) infinite; }
+  .v-busy-dots-steps .busy-dots span { animation: mg-busy-pulse 1.2s steps(4, jump-none) infinite; }
   /*
     Three steps per half cycle make one step 200ms, the same as the stagger
     between dots, so all three dots change on the same frames: five distinct
     frames per second instead of one per dot per step.
   */
-  .v-busy-dots-steps-aligned .busy-dots span { animation: oc-busy-pulse 1.2s steps(3, jump-none) infinite; }
+  .v-busy-dots-steps-aligned .busy-dots span { animation: mg-busy-pulse 1.2s steps(3, jump-none) infinite; }
   /* Compare the status pill's old dots with one filtered provider-logo image. */
   .v-status-logo-dots .cell,
   .v-status-logo-pulse .cell { width: auto; height: 32px; display: flex; align-items: center; padding: 0 12px; border-radius: 9999px; background: #19191980; }
   .status-logo { width: 14px; height: 14px; margin-right: 6px; filter: brightness(0.9) contrast(1.1) invert(1); }
-  .v-status-logo-dots .busy-dots span { animation: oc-busy-pulse 1.2s steps(3, jump-none) infinite; }
-  @keyframes oc-status-logo { 0%, 100% { opacity: 0.6; } 50% { opacity: 1; } }
-  .v-status-logo-pulse .status-logo { animation: oc-status-logo 4s steps(10, jump-none) infinite; }
+  .v-status-logo-dots .busy-dots span { animation: mg-busy-pulse 1.2s steps(3, jump-none) infinite; }
+  @keyframes mg-status-logo { 0%, 100% { opacity: 0.6; } 50% { opacity: 1; } }
+  .v-status-logo-pulse .status-logo { animation: mg-status-logo 4s steps(10, jump-none) infinite; }
   @media (prefers-reduced-motion: reduce) {
     .v-status-logo-pulse .status-logo { animation: none; }
   }

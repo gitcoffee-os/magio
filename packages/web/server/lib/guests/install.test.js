@@ -23,9 +23,9 @@ const writeGuest = async (root, id) => {
   await fs.mkdir(path.join(root, 'panel'), { recursive: true });
   await fs.writeFile(path.join(root, 'panel', 'index.html'), '<html></html>');
   await fs.writeFile(path.join(root, 'package.json'), JSON.stringify({
-    name: `@openchamber/${id}`,
+    name: `@magio/${id}`,
     version: '1.0.0',
-    openchamber: {
+    magio: {
       apiVersion: 1,
       contributes: {
         panel: { id, name: id, icon: 'window', entry: 'panel/index.html' },
@@ -36,7 +36,7 @@ const writeGuest = async (root, id) => {
 
 describe('installGuestFromPath', () => {
   test('installs a folder extension and refuses a second copy', async () => {
-    const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'oc-ext-'));
+    const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'mg-ext-'));
     const persistPath = path.join(dir, 'extensions.json');
     const guestRoot = path.join(dir, 'clone');
     await writeGuest(guestRoot, 'clone-hello');
@@ -117,16 +117,16 @@ describe('installGuestFromPath', () => {
   });
 
   test('refuses a panel that has TypeScript but no built script', async () => {
-    const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'oc-ext-'));
+    const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'mg-ext-'));
     const persistPath = path.join(dir, 'extensions.json');
     const guestRoot = path.join(dir, 'source-only');
     await fs.mkdir(path.join(guestRoot, 'panel'), { recursive: true });
     await fs.writeFile(path.join(guestRoot, 'panel', 'index.html'), '<script src="./main.js"></script>');
     await fs.writeFile(path.join(guestRoot, 'panel', 'main.ts'), 'console.log(1)');
     await fs.writeFile(path.join(guestRoot, 'package.json'), JSON.stringify({
-      name: '@openchamber/source-only',
+      name: '@magio/source-only',
       version: '1.0.0',
-      openchamber: {
+      magio: {
         apiVersion: 1,
         contributes: {
           panel: { id: 'source-only', name: 'Source', icon: 'window', entry: 'panel/index.html' },
@@ -138,35 +138,35 @@ describe('installGuestFromPath', () => {
     await fs.rm(dir, { recursive: true, force: true });
   });
 
-  test('refuses engines.openchamber newer than the host', async () => {
-    const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'oc-ext-'));
+  test('refuses engines.magio newer than the host', async () => {
+    const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'mg-ext-'));
     const persistPath = path.join(dir, 'extensions.json');
     const guestRoot = path.join(dir, 'future');
     await fs.mkdir(path.join(guestRoot, 'panel'), { recursive: true });
     await fs.writeFile(path.join(guestRoot, 'panel', 'index.html'), '<html></html>');
     await fs.writeFile(path.join(guestRoot, 'package.json'), JSON.stringify({
-      name: '@openchamber/future',
+      name: '@magio/future',
       version: '1.0.0',
-      openchamber: {
+      magio: {
         apiVersion: 1,
-        engines: { openchamber: '>=9.9.9' },
+        engines: { magio: '>=9.9.9' },
         contributes: {
           panel: { id: 'future', name: 'Future', icon: 'window', entry: 'panel/index.html' },
         },
       },
     }));
 
-    const refused = await installGuestFromPath(guestRoot, persistPath, { openchamberVersion: '1.22.0' });
+    const refused = await installGuestFromPath(guestRoot, persistPath, { magioVersion: '1.22.0' });
     expect(refused).toEqual({ ok: false, code: 'host-too-old', required: '9.9.9' });
 
-    const allowed = await installGuestFromPath(guestRoot, persistPath, { openchamberVersion: '9.9.9' });
+    const allowed = await installGuestFromPath(guestRoot, persistPath, { magioVersion: '9.9.9' });
     expect(allowed.ok).toBe(true);
 
     await fs.rm(dir, { recursive: true, force: true });
   });
 
   test('keeps two instance catalogs apart', async () => {
-    const parent = await fs.mkdtemp(path.join(os.tmpdir(), 'oc-ext-'));
+    const parent = await fs.mkdtemp(path.join(os.tmpdir(), 'mg-ext-'));
     const persistA = path.join(parent, 'a', 'extensions.json');
     const persistB = path.join(parent, 'b', 'extensions.json');
     const guestRoot = path.join(parent, 'clone');
@@ -181,14 +181,14 @@ describe('installGuestFromPath', () => {
   });
 
   test('installs a zip and deletes the copy on uninstall', async () => {
-    const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'oc-ext-'));
+    const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'mg-ext-'));
     const persistPath = path.join(dir, 'extensions.json');
     const zipPath = path.join(dir, 'panel.zip');
     await fs.writeFile(zipPath, buildStoreZip([
       { name: 'package.json', data: JSON.stringify({
-        name: '@openchamber/zip-hello',
+        name: '@magio/zip-hello',
         version: '1.0.0',
-        openchamber: {
+        magio: {
           apiVersion: 1,
           contributes: {
             panel: { id: 'zip-hello', name: 'Zip', icon: 'window', entry: 'panel/index.html' },
@@ -219,7 +219,7 @@ describe('installGuestFromPath', () => {
 
 describe('installGuestFromUrl', () => {
   test('refuses a non-https url', async () => {
-    const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'oc-ext-'));
+    const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'mg-ext-'));
     const persistPath = path.join(dir, 'extensions.json');
     expect(await installGuestFromUrl('http://example.com/panel.git', persistPath)).toEqual({
       ok: false,
@@ -245,7 +245,7 @@ describe('installGuestFromUrl', () => {
 
 describe('installGuestFromGitSource', () => {
   test('clones a local repo and deletes the copy on uninstall', async () => {
-    const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'oc-ext-'));
+    const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'mg-ext-'));
     const persistPath = path.join(dir, 'extensions.json');
     const repo = path.join(dir, 'repo');
     await writeGuest(repo, 'git-hello');

@@ -63,8 +63,8 @@ const CountsProbe = ({ includeChild }: { includeChild: boolean }) => {
 
 const withProbe = async (includeChild: boolean, assert: () => Promise<void>) => {
   const dom = installHookTestDom()
-  const previousSurface = window.__OPENCHAMBER_SURFACE__
-  window.__OPENCHAMBER_SURFACE__ = 'desktop'
+  const previousSurface = window.__MAGIO_SURFACE__
+  window.__MAGIO_SURFACE__ = 'desktop'
   const homeInfo = spyOn(opencodeClient, 'getFilesystemHomeInfo').mockResolvedValue({ home: '/home' })
   const home = spyOn(opencodeClient, 'getFilesystemHome').mockResolvedValue('/home')
   const location = spyOn(opencodeClient, 'getLocation').mockResolvedValue({
@@ -91,7 +91,7 @@ const withProbe = async (includeChild: boolean, assert: () => Promise<void>) => 
     location.mockRestore()
     config.mockRestore()
     projects.mockRestore()
-    window.__OPENCHAMBER_SURFACE__ = previousSurface
+    window.__MAGIO_SURFACE__ = previousSurface
     dom.restore()
   }
 }

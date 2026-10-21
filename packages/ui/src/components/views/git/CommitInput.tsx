@@ -73,7 +73,7 @@ export const CommitInput: React.FC<CommitInputProps> = ({
       autoCapitalize={hasTouchInput ? 'sentences' : 'off'}
       spellCheck={isMobile || inputSpellcheckEnabled}
       className={cn(
-        'oc-raised oc-field w-full rounded-lg bg-surface-elevated px-3 py-2 typography-ui-label text-foreground placeholder:text-muted-foreground',
+        'mg-raised mg-field w-full rounded-lg bg-surface-elevated px-3 py-2 typography-ui-label text-foreground placeholder:text-muted-foreground',
         'resize-none outline-none',
         disabled && 'opacity-50'
       )}

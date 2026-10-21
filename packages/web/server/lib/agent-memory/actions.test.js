@@ -20,7 +20,7 @@ let actions;
 let runtime;
 
 beforeEach(async () => {
-  const rootDir = await fsPromises.mkdtemp(path.join(os.tmpdir(), 'oc-memory-actions-'));
+  const rootDir = await fsPromises.mkdtemp(path.join(os.tmpdir(), 'mg-memory-actions-'));
   runtime = createAgentMemoryRuntime({
     fsPromises,
     path,

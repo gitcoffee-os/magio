@@ -17,6 +17,6 @@ describe('UI kit styles', () => {
   test('the kit ships scrollbars, its sizes and the look', () => {
     expect(UI_CSS).toContain(GUEST_SCROLLBAR_CSS);
     expect(UI_CSS).toContain(GUEST_UI_LOOK_CSS);
-    expect(UI_CSS).toContain('.oc-sdk-btn { display: inline-flex;');
+    expect(UI_CSS).toContain('.mg-sdk-btn { display: inline-flex;');
   });
 });

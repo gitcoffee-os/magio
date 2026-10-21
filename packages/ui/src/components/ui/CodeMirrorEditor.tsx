@@ -181,7 +181,7 @@ class BlockWidget extends WidgetType {
     let div = this.containerMap.get(this.id);
     if (!div) {
       div = document.createElement('div');
-      div.className = 'oc-block-widget';
+      div.className = 'mg-block-widget';
       div.dataset.widgetId = this.id;
       this.containerMap.set(this.id, div);
     }
@@ -257,7 +257,7 @@ const createHighlightLinesExtension = (range?: { start: number; end: number }): 
       const builder = new RangeSetBuilder<Decoration>();
       for (let lineNo = start; lineNo <= end && lineNo <= view.state.doc.lines; lineNo += 1) {
         const line = view.state.doc.line(lineNo);
-        builder.add(line.from, line.from, Decoration.line({ class: 'oc-cm-selected-line' }));
+        builder.add(line.from, line.from, Decoration.line({ class: 'mg-cm-selected-line' }));
       }
       return builder.finish();
     }
@@ -357,7 +357,7 @@ export function CodeMirrorEditor({
         const next = `${gutterWidth}px`;
         if (gutterWidthRef.current === next) return;
         gutterWidthRef.current = next;
-        host.style.setProperty('--oc-editor-gutter-width', next);
+        host.style.setProperty('--mg-editor-gutter-width', next);
       },
     });
   }, []);
@@ -393,7 +393,7 @@ export function CodeMirrorEditor({
       if (typeof document === 'undefined') return null;
       const metaNonce = document.querySelector('meta[name="csp-nonce"]')?.getAttribute('content');
       if (metaNonce) return metaNonce;
-      const windowNonce = (window as Window & { __OPENCHAMBER_CSP_NONCE__?: string }).__OPENCHAMBER_CSP_NONCE__;
+      const windowNonce = (window as Window & { __MAGIO_CSP_NONCE__?: string }).__MAGIO_CSP_NONCE__;
       return typeof windowNonce === 'string' && windowNonce.length > 0 ? windowNonce : null;
     })();
 
@@ -604,7 +604,7 @@ export function CodeMirrorEditor({
         // Code reads left to right in every UI language; gutters stay on the left.
         dir="ltr"
         className={cn(
-          'oc-surface-code h-full w-full',
+          'mg-surface-code h-full w-full',
           '[&_.cm-editor]:h-full [&_.cm-editor]:w-full',
           '[&_.cm-scroller]:font-mono [&_.cm-scroller]:text-[var(--text-code)] [&_.cm-scroller]:leading-6',
           className,

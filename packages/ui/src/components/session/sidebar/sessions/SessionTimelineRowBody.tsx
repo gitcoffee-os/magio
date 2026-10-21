@@ -57,7 +57,7 @@ type Props = {
   metaPaddingClass?: string;
   hideMetaOnHoverClass: string;
   /** Sets how far hover-revealed actions reach into the title line
-      (`--oc-actions-reserve`). */
+      (`--mg-actions-reserve`). */
   actionsReserveClass?: string;
   /** Fades the title's tail away under hover-revealed actions. */
   actionsMaskClass?: string;
@@ -141,7 +141,7 @@ export const SessionTimelineRowBody: React.FC<Props> = ({
     <span className="typography-micro leading-none text-muted-foreground/50 tabular-nums">{timeSlot}</span>
   </span>;
   const titleLine = (
-    <div dir="auto" className={cn('oc-ui-start-align min-w-0 flex-1 truncate typography-ui-label font-normal', actionsMaskClass, titleClassName)}>{title}</div>
+    <div dir="auto" className={cn('mg-ui-start-align min-w-0 flex-1 truncate typography-ui-label font-normal', actionsMaskClass, titleClassName)}>{title}</div>
   );
   if (compact) {
     return <div className={cn('@container relative flex w-full min-w-0 items-center gap-1', actionsReserveClass)}>
@@ -157,11 +157,11 @@ export const SessionTimelineRowBody: React.FC<Props> = ({
       <div className={cn('@container relative flex h-5 w-full min-w-0 items-center gap-1', actionsReserveClass)}>
         {project ? <TimelineProjectIcon project={project} label={null} /> : null}
         {/* Starts past the 12px project icon and the 4px gap. */}
-        <span className={cn('min-w-0 flex-1 truncate typography-micro text-muted-foreground/85', project && '[--oc-actions-inset:16px]', actionsMaskClass)}>{projectLabel}</span>
+        <span className={cn('min-w-0 flex-1 truncate typography-micro text-muted-foreground/85', project && '[--mg-actions-inset:16px]', actionsMaskClass)}>{projectLabel}</span>
         {meta}
       </div>
       <div className="flex h-5 w-full min-w-0 items-center">
-        <div dir="auto" className={cn('oc-ui-start-align min-w-0 flex-1 truncate typography-ui-label font-normal', titleClassName)}>{title}</div>
+        <div dir="auto" className={cn('mg-ui-start-align min-w-0 flex-1 truncate typography-ui-label font-normal', titleClassName)}>{title}</div>
       </div>
     </> : (
       <div className={cn('@container relative flex h-5 w-full min-w-0 items-center gap-1', actionsReserveClass)}>

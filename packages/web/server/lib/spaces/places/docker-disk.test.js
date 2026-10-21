@@ -15,7 +15,7 @@ const OLDER_KEY = 'fedcba9876543210';
 const NOW = new Date('2026-09-30T08:00:00.000Z');
 const ID = 'a1b2c3d4e5f6';
 
-const toolsName = (owner, key) => `openchamber-tools-${owner}-${key}`;
+const toolsName = (owner, key) => `magio-tools-${owner}-${key}`;
 const toolsVolume = (owner, key) => ({
   kind: 'volume',
   name: toolsName(owner, key),
@@ -30,11 +30,11 @@ const oneShot = (key, { running }) => {
 const spaceLabels = (role) => buildSpaceLabels({ id: ID, role, owner: OWNER, project: hashProjectDirectory('/home/me/project'), name: 'Fix it', created: NOW.toISOString() });
 /** A stopped space of ours on the tools of `key`, with its two volumes. */
 const stoppedSpace = (key) => {
-  const name = `openchamber-space-${ID}-space`;
-  const work = `openchamber-space-${ID}-volume-work`;
-  const home = `openchamber-space-${ID}-volume-home`;
+  const name = `magio-space-${ID}-space`;
+  const work = `magio-space-${ID}-volume-work`;
+  const home = `magio-space-${ID}-volume-home`;
   return [
-    { kind: 'container', name, entry: hardenedContainerEntry({ name, labels: spaceLabels('space'), network: `openchamber-space-${ID}-network`, running: false, mounts: [{ volume: work, destination: `/spaces/${ID}` }, { volume: home, destination: '/home/space' }, { volume: toolsName(OWNER, key), destination: '/opt/openchamber-tools', readOnly: true }] }) },
+    { kind: 'container', name, entry: hardenedContainerEntry({ name, labels: spaceLabels('space'), network: `magio-space-${ID}-network`, running: false, mounts: [{ volume: work, destination: `/spaces/${ID}` }, { volume: home, destination: '/home/space' }, { volume: toolsName(OWNER, key), destination: '/opt/magio-tools', readOnly: true }] }) },
     { kind: 'volume', name: work, entry: { Name: work, Labels: spaceLabels('volume') } },
     { kind: 'volume', name: home, entry: { Name: home, Labels: spaceLabels('volume') } },
   ];
@@ -47,8 +47,8 @@ const SIZES = {
   [toolsName(OWNER, OLD_KEY)]: '440MB',
   [toolsName(OWNER, OLDER_KEY)]: '441MB',
   [toolsName(STRANGER, OLD_KEY)]: '439MB',
-  [`openchamber-space-${ID}-volume-work`]: '1.2GB',
-  [`openchamber-space-${ID}-volume-home`]: '300MB',
+  [`magio-space-${ID}-volume-work`]: '1.2GB',
+  [`magio-space-${ID}-volume-home`]: '300MB',
   'their-data': '5GB',
 };
 
@@ -176,7 +176,7 @@ describe('clean-up of the Docker place', () => {
     const RETIRED = RETIRED_SPACE_BASE_IMAGES[0];
     const RETIRED_BYTES = 1_600_000_000;
     // The gatekeeper of a space created before the bump, still on the image it was made from.
-    const oldGatekeeper = { kind: 'container', name: `openchamber-space-${ID}-gatekeeper`, entry: hardenedContainerEntry({ name: `openchamber-space-${ID}-gatekeeper`, labels: spaceLabels('gatekeeper'), network: `openchamber-space-${ID}-network`, mounts: [], running: false, image: RETIRED }) };
+    const oldGatekeeper = { kind: 'container', name: `magio-space-${ID}-gatekeeper`, entry: hardenedContainerEntry({ name: `magio-space-${ID}-gatekeeper`, labels: spaceLabels('gatekeeper'), network: `magio-space-${ID}-network`, mounts: [], running: false, image: RETIRED }) };
 
     it('is counted in what a clean-up frees and nowhere else, and removed without force', async () => {
       const fake = createFakeDocker({ imagePresent: false, retiredImages: [{ name: RETIRED, bytes: RETIRED_BYTES }], resources: [toolsVolume(OWNER, KEY)] });

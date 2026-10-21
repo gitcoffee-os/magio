@@ -180,7 +180,7 @@ export const VSCodeLayout: React.FC = () => {
   const openNewSessionDraft = useSessionUIStore((state) => state.openNewSessionDraft);
   const [connectionStatus, setConnectionStatus] = React.useState<'connecting' | 'connected' | 'error' | 'disconnected'>(
     () => (typeof window !== 'undefined'
-      ? (window as { __OPENCHAMBER_CONNECTION__?: { status?: string } }).__OPENCHAMBER_CONNECTION__?.status as
+      ? (window as { __MAGIO_CONNECTION__?: { status?: string } }).__MAGIO_CONNECTION__?.status as
         'connecting' | 'connected' | 'error' | 'disconnected' | undefined
       : 'connecting') || 'connecting'
   );
@@ -208,7 +208,7 @@ export const VSCodeLayout: React.FC = () => {
       return;
     }
 
-    void vscodeApi.executeCommand('openchamber.setActiveSession', currentSessionId, activeSessionTitle);
+    void vscodeApi.executeCommand('magio.setActiveSession', currentSessionId, activeSessionTitle);
   }, [activeSessionTitle, currentSessionId, runtimeApis.vscode]);
 
   React.useEffect(() => {
@@ -221,7 +221,7 @@ export const VSCodeLayout: React.FC = () => {
       return;
     }
 
-    void vscodeApi.executeCommand('openchamber.updateSessionEditorTitle', currentSessionId, activeSessionTitle);
+    void vscodeApi.executeCommand('magio.updateSessionEditorTitle', currentSessionId, activeSessionTitle);
   }, [activeSessionTitle, currentSessionId, runtimeApis.vscode, viewMode]);
 
   // If the active session disappears (e.g., deleted), go back to sessions list
@@ -358,7 +358,7 @@ export const VSCodeLayout: React.FC = () => {
     // before this component registered the event listener.
     const current =
       (typeof window !== 'undefined'
-        ? (window as { __OPENCHAMBER_CONNECTION__?: { status?: string } }).__OPENCHAMBER_CONNECTION__?.status
+        ? (window as { __MAGIO_CONNECTION__?: { status?: string } }).__MAGIO_CONNECTION__?.status
         : undefined) as 'connecting' | 'connected' | 'error' | 'disconnected' | undefined;
     if (current === 'connected' || current === 'connecting' || current === 'error' || current === 'disconnected') {
       setConnectionStatus(current);
@@ -371,8 +371,8 @@ export const VSCodeLayout: React.FC = () => {
         setConnectionStatus(status);
       }
     };
-    window.addEventListener('openchamber:connection-status', handler as EventListener);
-    return () => window.removeEventListener('openchamber:connection-status', handler as EventListener);
+    window.addEventListener('magio:connection-status', handler as EventListener);
+    return () => window.removeEventListener('magio:connection-status', handler as EventListener);
   }, []);
 
   // Listen for navigation events from VS Code extension title bar buttons
@@ -391,8 +391,8 @@ export const VSCodeLayout: React.FC = () => {
         setCurrentView('sessions');
       }
     };
-    window.addEventListener('openchamber:navigate', handler as EventListener);
-    return () => window.removeEventListener('openchamber:navigate', handler as EventListener);
+    window.addEventListener('magio:navigate', handler as EventListener);
+    return () => window.removeEventListener('magio:navigate', handler as EventListener);
   }, []);
 
   // Bootstrap config and sessions when connected
@@ -411,13 +411,13 @@ export const VSCodeLayout: React.FC = () => {
         const debugEnabled = (() => {
           if (typeof window === 'undefined') return false;
           try {
-            return window.localStorage.getItem('openchamber_stream_debug') === '1';
+            return window.localStorage.getItem('magio_stream_debug') === '1';
           } catch {
             return false;
           }
         })();
 
-        if (debugEnabled) console.log('[OpenChamber][VSCode][bootstrap] attempt', { configInitialized });
+        if (debugEnabled) console.log('[Magio][VSCode][bootstrap] attempt', { configInitialized });
         if (!configInitialized) {
           await initializeConfig();
         }
@@ -441,7 +441,7 @@ export const VSCodeLayout: React.FC = () => {
         if (!configState.isInitialized || !configState.isConnected || !configState.providersLoaded || !configState.agentsLoaded) {
           return;
         }
-        if (debugEnabled) console.log('[OpenChamber][VSCode][bootstrap] post-load', {
+        if (debugEnabled) console.log('[Magio][VSCode][bootstrap] post-load', {
           providers: configState.providers.length,
           agents: configState.agents.length,
         });
@@ -800,7 +800,7 @@ const VSCodeHeader: React.FC<VSCodeHeaderProps> = ({ title, showBack, onBack, on
             aria-label={t('sessions.switcher.openAria')}
             className="inline-flex min-w-0 max-w-full items-center rounded-md px-1 py-0.5 -my-0.5 text-start transition-colors hover:bg-interactive-hover/60 focus-visible:outline-none focus-visible:bg-interactive-hover/60"
           >
-            <span dir="auto" className="oc-ui-start-align text-sm font-medium truncate" title={title}>{title}</span>
+            <span dir="auto" className="mg-ui-start-align text-sm font-medium truncate" title={title}>{title}</span>
           </button>
         </SessionSwitcherDropdown>
       ) : (

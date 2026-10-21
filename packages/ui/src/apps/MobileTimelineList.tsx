@@ -137,7 +137,7 @@ const MobileTimelineRunRow: React.FC<{
             {time ? <span className="shrink-0 typography-micro text-muted-foreground tabular-nums">{time}</span> : null}
           </>;
           const titleText = (
-            <span dir="auto" className={cn('block min-w-0 flex-1 truncate oc-ui-start-align typography-ui-label', active ? 'text-primary' : 'text-foreground')}>
+            <span dir="auto" className={cn('block min-w-0 flex-1 truncate mg-ui-start-align typography-ui-label', active ? 'text-primary' : 'text-foreground')}>
               {run.title}
             </span>
           );
@@ -275,7 +275,7 @@ const MobileTimelineRow: React.FC<{
               />
             ) : (
               <span className="flex min-w-0 items-center gap-2">
-                <span dir="auto" className={cn('block min-w-0 flex-1 truncate oc-ui-start-align typography-ui-label', mobileSessionTitleClass({ active, unread: showUnreadDot, running: isStreaming, pending: pendingRequests }))}>
+                <span dir="auto" className={cn('block min-w-0 flex-1 truncate mg-ui-start-align typography-ui-label', mobileSessionTitleClass({ active, unread: showUnreadDot, running: isStreaming, pending: pendingRequests }))}>
                   {title}
                 </span>
                 {withProjectLine ? null : status}

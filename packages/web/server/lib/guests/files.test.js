@@ -3,7 +3,7 @@ import fs from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 
-import { GUEST_FILE_CONTENT_MAX, GUEST_FILE_LIST_MAX } from '@openchamber/sdk';
+import { GUEST_FILE_CONTENT_MAX, GUEST_FILE_LIST_MAX } from '@magio/sdk';
 
 import {
   expandHome,
@@ -67,7 +67,7 @@ describe('matchesFilesystemPattern', () => {
 
 describe('resolveGuestFilePath', () => {
   test('accepts a relative path inside the project and refuses .. anywhere', async () => {
-    const project = await makeTemp('oc-files-project-');
+    const project = await makeTemp('mg-files-project-');
     await fs.writeFile(path.join(project, 'README.md'), '# hi');
     const inside = await resolveGuestFilePath({ path: 'README.md', projectDirectory: project, patterns: [], homeDir: os.homedir() });
     expect(inside).toEqual({ ok: true, scope: 'project', absolute: path.join(project, 'README.md') });
@@ -85,8 +85,8 @@ describe('resolveGuestFilePath', () => {
   });
 
   test('refuses a symlink that escapes the project', async () => {
-    const project = await makeTemp('oc-files-project-');
-    const outside = await makeTemp('oc-files-outside-');
+    const project = await makeTemp('mg-files-project-');
+    const outside = await makeTemp('mg-files-outside-');
     await fs.writeFile(path.join(outside, 'secret.txt'), 'nope');
     await fs.symlink(outside, path.join(project, 'link'));
     const viaLink = await resolveGuestFilePath({ path: 'link/secret.txt', projectDirectory: project, patterns: [], homeDir: os.homedir() });
@@ -97,8 +97,8 @@ describe('resolveGuestFilePath', () => {
   });
 
   test('accepts an outside path only when a declared pattern covers its canonical form', async () => {
-    const home = await makeTemp('oc-files-home-');
-    const probe = await makeTemp('oc-files-probe-');
+    const home = await makeTemp('mg-files-home-');
+    const probe = await makeTemp('mg-files-probe-');
     await fs.mkdir(path.join(home, '.config', 'opencode'), { recursive: true });
     const declared = await resolveGuestFilePath({
       path: '~/.config/opencode/opencode.json',
@@ -116,9 +116,9 @@ describe('resolveGuestFilePath', () => {
   });
 
   test('matches through a symlinked pattern prefix and refuses a symlink out of the granted tree', async () => {
-    const real = await makeTemp('oc-files-real-');
-    const holder = await makeTemp('oc-files-holder-');
-    const outside = await makeTemp('oc-files-outside-');
+    const real = await makeTemp('mg-files-real-');
+    const holder = await makeTemp('mg-files-holder-');
+    const outside = await makeTemp('mg-files-outside-');
     const link = path.join(holder, 'link');
     await fs.symlink(real, link);
     // Pattern names the symlink; the candidate canonicalizes to the real dir.
@@ -133,8 +133,8 @@ describe('resolveGuestFilePath', () => {
 
 describe('runGuestFileOperation', () => {
   const base = async () => {
-    const project = await makeTemp('oc-files-project-');
-    const probe = await makeTemp('oc-files-probe-');
+    const project = await makeTemp('mg-files-project-');
+    const probe = await makeTemp('mg-files-probe-');
     return {
       project,
       probe,
@@ -235,7 +235,7 @@ describe('runGuestFileOperation', () => {
     });
     expect(await run({ op: 'list', path: 'a.txt' })).toMatchObject({ ok: false, code: 'BAD_PATH' });
     expect(await run({ op: 'list', path: 'nope' })).toMatchObject({ ok: false, code: 'NOT_FOUND' });
-    const many = await makeTemp('oc-files-many-');
+    const many = await makeTemp('mg-files-many-');
     await Promise.all(Array.from({ length: GUEST_FILE_LIST_MAX + 5 }, (_, index) => (
       fs.writeFile(path.join(many, `f${String(index).padStart(5, '0')}`), '')
     )));

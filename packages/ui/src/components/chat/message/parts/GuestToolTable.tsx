@@ -1,5 +1,5 @@
 import React from 'react';
-import type { JsonValue } from '@openchamber/sdk';
+import type { JsonValue } from '@magio/sdk';
 
 import { useI18n } from '@/lib/i18n';
 import { readPath, stringifyTemplateValue } from '@/lib/guests/tool-presentation';
@@ -30,7 +30,7 @@ export const GuestToolTable: React.FC<GuestToolTableProps> = ({ rows, columns })
 
     return (
         <div className="flex w-fit max-w-full flex-col gap-1">
-            <div className="oc-tile overflow-x-auto rounded-lg">
+            <div className="mg-tile overflow-x-auto rounded-lg">
                 <table className="w-max border-collapse text-sm">
                     <thead>
                         <tr className="border-b border-border/60">

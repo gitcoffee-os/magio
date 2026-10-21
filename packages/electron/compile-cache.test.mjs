@@ -80,7 +80,7 @@ describe('main process compile cache', () => {
   });
 
   it('flushes and removes caches of other Node versions after startup', async () => {
-    const userData = fs.mkdtempSync(path.join(os.tmpdir(), 'oc-compile-cache-'));
+    const userData = fs.mkdtempSync(path.join(os.tmpdir(), 'mg-compile-cache-'));
     try {
       const root = path.join(userData, COMPILE_CACHE_DIR_NAME);
       const active = path.join(root, 'v24.21.0-arm64-aaaa-501');
@@ -106,7 +106,7 @@ describe('main process compile cache', () => {
   });
 
   it('deletes nothing when Node reports the cache root itself', async () => {
-    const userData = fs.mkdtempSync(path.join(os.tmpdir(), 'oc-compile-cache-'));
+    const userData = fs.mkdtempSync(path.join(os.tmpdir(), 'mg-compile-cache-'));
     try {
       const root = path.join(userData, COMPILE_CACHE_DIR_NAME);
       const versionDir = path.join(root, 'v24.21.0-arm64-aaaa-501');
@@ -131,7 +131,7 @@ describe('main process compile cache', () => {
   });
 
   it('deletes nothing when the active directory is outside the known root', async () => {
-    const userData = fs.mkdtempSync(path.join(os.tmpdir(), 'oc-compile-cache-'));
+    const userData = fs.mkdtempSync(path.join(os.tmpdir(), 'mg-compile-cache-'));
     try {
       const root = path.join(userData, COMPILE_CACHE_DIR_NAME);
       const stale = path.join(root, 'v22.20.0-arm64-bbbb-501');

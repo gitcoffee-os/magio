@@ -16,10 +16,10 @@ import { resolveProjectContextId } from '@/lib/projectContextApi';
 import { cn } from '@/lib/utils';
 import { registerBrowserCloser, registerBrowserOpener, registerSleepingBrowserTab, setShownBrowserTab } from '@/lib/browser/controlClient';
 import { pickLiveBrowserTabs, touchRecentBrowserTab } from '@/lib/browser/liveTabs';
-import { subscribeOpenchamberEvents } from '@/lib/openchamberEvents';
+import { subscribemagioEvents } from '@/lib/magioEvents';
 import { useGuestsStore } from '@/lib/guests/store';
 import { guestHasSharedSurface, guestSurfaceDocking, type GuestSurfaceDocking } from '@/lib/guests/surfaces';
-import { GUEST_SURFACE_DOCK_SIZE_MIN } from '@openchamber/sdk';
+import { GUEST_SURFACE_DOCK_SIZE_MIN } from '@magio/sdk';
 import { isPluginContextPanelMode, pluginIdFromMode, type PluginContextPanelMode } from '@/lib/surfaces/modes';
 import {
   getZoneView,
@@ -122,7 +122,7 @@ const EditorTreeColumn: React.FC<{ visible: boolean; active: boolean; fill?: boo
       return;
     }
     column.style.width = `${nextWidth}px`;
-    column.style.setProperty('--oc-editor-tree-width', `${nextWidth}px`);
+    column.style.setProperty('--mg-editor-tree-width', `${nextWidth}px`);
   }, []);
 
   const handlePointerDown = (event: React.PointerEvent) => {
@@ -186,7 +186,7 @@ const EditorTreeColumn: React.FC<{ visible: boolean; active: boolean; fill?: boo
       style={{
         width: `${isResizing ? (liveWidthRef.current ?? appliedWidth) : appliedWidth}px`,
         maxWidth: fill ? '100%' : undefined,
-        ['--oc-editor-tree-width' as string]: `${isResizing ? (liveWidthRef.current ?? width) : width}px`,
+        ['--mg-editor-tree-width' as string]: `${isResizing ? (liveWidthRef.current ?? width) : width}px`,
         overflowX: 'clip',
         transitionProperty: isResizing ? 'none' : 'width',
         transitionDuration: '200ms',
@@ -220,7 +220,7 @@ const EditorTreeColumn: React.FC<{ visible: boolean; active: boolean; fill?: boo
           isResizing && 'pointer-events-none',
           !visible && 'pointer-events-none select-none opacity-0'
         )}
-        style={{ width: 'var(--oc-editor-tree-width)', maxWidth: fill ? '100%' : undefined }}
+        style={{ width: 'var(--mg-editor-tree-width)', maxWidth: fill ? '100%' : undefined }}
         aria-hidden={!visible}
       >
         <SidebarFilesTree visible={visible && active} />
@@ -393,7 +393,7 @@ export const ContextSurfacePanes: React.FC = () => {
   // The agent asked for a file to be shown. It opens in front of whatever tab
   // the user had, on purpose: the agent is pointing at a result, and the prior
   // tab is one click away.
-  React.useEffect(() => subscribeOpenchamberEvents((event) => {
+  React.useEffect(() => subscribemagioEvents((event) => {
     if (event.type !== 'file-open-request') return;
     const directory = event.directory ?? effectiveDirectory;
     if (!directory) return;
@@ -402,7 +402,7 @@ export const ContextSurfacePanes: React.FC = () => {
   // The agent asked for a saved plan to be shown: it opens in place in the
   // Project knowledge panel, as a click in its Plans list does, in the strip
   // of the asking session's project.
-  React.useEffect(() => subscribeOpenchamberEvents((event) => {
+  React.useEffect(() => subscribemagioEvents((event) => {
     if (event.type !== 'plan-open-request') return;
     const directory = event.directory ?? effectiveDirectory;
     const projectRef = resolvePlanRequestOwner(directory, event.projectId);
@@ -545,7 +545,7 @@ export const ContextSurfacePanes: React.FC = () => {
   React.useEffect(() => {
     // Only a Chromium host mounts views that agents can drive, so only it may
     // offer to wake a tab; anywhere else a claimed action could never run.
-    if (!window.__OPENCHAMBER_ELECTRON__) return;
+    if (!window.__MAGIO_ELECTRON__) return;
     const unregister = sleepingBrowserTabs.map((tab) => registerSleepingBrowserTab({
       tabId: tab.id,
       directory: tab.directory,

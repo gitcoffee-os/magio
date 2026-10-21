@@ -138,7 +138,7 @@ export function useMobileViewportPin(options: MobileViewportPinOptions): void {
         // The form is trapped inside lower stacking contexts (the composer
         // wrapper's z-10), so it cannot out-stack the app header with z-index
         // alone — hide the header for the duration via a root class instead.
-        document.documentElement.classList.add('oc-browser-kb-fullscreen');
+        document.documentElement.classList.add('mg-browser-kb-fullscreen');
 
         const apply = () => {
             const top = Math.max(0, Math.floor(vv.offsetTop));
@@ -166,7 +166,7 @@ export function useMobileViewportPin(options: MobileViewportPinOptions): void {
             vv.removeEventListener('scroll', apply);
             window.removeEventListener('resize', apply);
             window.removeEventListener('scroll', apply, true);
-            document.documentElement.classList.remove('oc-browser-kb-fullscreen');
+            document.documentElement.classList.remove('mg-browser-kb-fullscreen');
             releaseForm(form);
             // Back in flow: the browser panned for the fullscreen session and
             // will not re-reveal the still-focused field on its own, which left

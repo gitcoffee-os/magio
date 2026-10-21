@@ -9,14 +9,14 @@ let dataDir;
 let previousDataDir;
 
 beforeEach(() => {
-  dataDir = fs.mkdtempSync(path.join(os.tmpdir(), 'oc-installed-sources-'));
-  previousDataDir = process.env.OPENCHAMBER_DATA_DIR;
-  process.env.OPENCHAMBER_DATA_DIR = dataDir;
+  dataDir = fs.mkdtempSync(path.join(os.tmpdir(), 'mg-installed-sources-'));
+  previousDataDir = process.env.MAGIO_DATA_DIR;
+  process.env.MAGIO_DATA_DIR = dataDir;
 });
 
 afterEach(() => {
-  if (previousDataDir === undefined) delete process.env.OPENCHAMBER_DATA_DIR;
-  else process.env.OPENCHAMBER_DATA_DIR = previousDataDir;
+  if (previousDataDir === undefined) delete process.env.MAGIO_DATA_DIR;
+  else process.env.MAGIO_DATA_DIR = previousDataDir;
   fs.rmSync(dataDir, { recursive: true, force: true });
 });
 

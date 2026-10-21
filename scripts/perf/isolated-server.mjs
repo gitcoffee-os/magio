@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 /**
- * An OpenChamber server for perf captures that shares nothing with the user's
+ * An Magio server for perf captures that shares nothing with the user's
  * own app: its own HOME (OpenCode's sessions database), its own
- * OPENCHAMBER_DATA_DIR, an environment rebuilt from scratch so no
- * OPENCHAMBER_* / OPENCODE_* variable from the desktop app leaks in, no UI
+ * MAGIO_DATA_DIR, an environment rebuilt from scratch so no
+ * MAGIO_* / OPENCODE_* variable from the desktop app leaks in, no UI
  * password, and the fixture provider registered as the default model.
  *
  * As a command (`bun run profile:serve`) it starts the fixture provider and the
@@ -28,11 +28,11 @@ import { AGENT_READ_FILES, agentReadFileContent, fixtureProviderConfig } from ".
 
 export const REPO_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..", "..")
 const FIXTURE_SCRIPT = join(REPO_ROOT, "scripts/perf/fixture-provider.mjs")
-const MAC_BUNDLED_OPENCODE = "/Applications/OpenChamber.app/Contents/Resources/opencode-cli/opencode"
+const MAC_BUNDLED_OPENCODE = "/Applications/Magio.app/Contents/Resources/opencode-cli/opencode"
 
 const HELP = `Usage: bun run profile:serve -- [options]
 
-Starts the fixture provider and an isolated OpenChamber server on a build, and
+Starts the fixture provider and an isolated Magio server on a build, and
 keeps them running until Ctrl-C, which stops both. Point the profile:*
 commands at the printed URL with --dir <root>/project.
 
@@ -48,7 +48,7 @@ Options:
   --fixture-port <port>    Fixture provider port (default: 4798); reused when
                            something already listens there
   --opencode-binary <path> OpenCode CLI (default: $OPENCODE_BINARY, else the
-                           one bundled in /Applications/OpenChamber.app on macOS,
+                           one bundled in /Applications/Magio.app on macOS,
                            else the server's own resolution)
   --help                   Show this help`
 
@@ -65,7 +65,7 @@ const portInUse = (port) => new Promise((resolvePort) => {
 export const isolatedEnv = (overrides = {}) => {
   const env = {}
   for (const [key, value] of Object.entries(process.env)) {
-    if (/^(OPENCHAMBER_|OPENCODE_|ELECTRON_)/.test(key)) continue
+    if (/^(MAGIO_|OPENCODE_|ELECTRON_)/.test(key)) continue
     env[key] = value
   }
   return { ...env, ...overrides }
@@ -141,7 +141,7 @@ const servedMainChunk = async (url) => {
 }
 
 const writeSettings = (state, project) => {
-  const file = join(state, "oc-data", "settings.json")
+  const file = join(state, "mg-data", "settings.json")
   if (existsSync(file)) return
   const id = `path_${Buffer.from(project).toString("base64url")}`
   const now = Date.now()
@@ -183,7 +183,7 @@ export const startIsolatedServer = async ({ repo, dist, state, project, port, fi
   const built = builtMainChunk(dist)
   if (!built) throw new Error(`${dist}/index.html has no main chunk; build it first.`)
   mkdirSync(join(state, "home"), { recursive: true })
-  mkdirSync(join(state, "oc-data"), { recursive: true })
+  mkdirSync(join(state, "mg-data"), { recursive: true })
   ensureProject(project)
   writeSettings(state, project)
   const config = { ...fixtureProviderConfig(fixturePort), model: "perf/stream-300cps", small_model: "perf/stream-1200cps", autoupdate: false, share: "disabled" }
@@ -194,8 +194,8 @@ export const startIsolatedServer = async ({ repo, dist, state, project, port, fi
     SHELL: process.env.SHELL ?? "/bin/sh",
     TMPDIR: process.env.TMPDIR ?? "/tmp",
     LANG: process.env.LANG ?? "en_US.UTF-8",
-    OPENCHAMBER_DATA_DIR: join(state, "oc-data"),
-    OPENCHAMBER_DIST_DIR: dist,
+    MAGIO_DATA_DIR: join(state, "mg-data"),
+    MAGIO_DIST_DIR: dist,
     OPENCODE_CONFIG_CONTENT: JSON.stringify(config),
   }
   if (opencodeBinary) env.OPENCODE_BINARY = opencodeBinary

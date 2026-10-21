@@ -16,7 +16,7 @@ describe('session warming routes', () => {
   let app;
 
   beforeEach(() => {
-    root = fs.mkdtempSync(path.join(os.tmpdir(), 'oc-session-warming-routes-'));
+    root = fs.mkdtempSync(path.join(os.tmpdir(), 'mg-session-warming-routes-'));
     runtime = createSessionWarmingRuntime({
       dataDir: root,
       buildOpenCodeUrl: (route) => `http://127.0.0.1:1${route}`,

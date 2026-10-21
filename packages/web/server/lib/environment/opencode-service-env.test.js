@@ -9,7 +9,7 @@ describe('readOpenCodeServiceEnv', () => {
   let configDir;
 
   beforeEach(() => {
-    configDir = fs.mkdtempSync(path.join(os.tmpdir(), 'oc-service-env-'));
+    configDir = fs.mkdtempSync(path.join(os.tmpdir(), 'mg-service-env-'));
   });
 
   afterEach(() => {

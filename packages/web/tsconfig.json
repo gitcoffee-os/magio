@@ -22,10 +22,10 @@
       "node"
     ],
     "paths": {
-      "@openchamber/sdk": [
+      "@magio/sdk": [
         "../sdk/src/index.ts"
       ],
-      "@openchamber/sdk/schemas": [
+      "@magio/sdk/schemas": [
         "../sdk/src/schemas.ts"
       ],
       "@/*": [
@@ -35,10 +35,10 @@
       "@web/*": [
         "./src/*"
       ],
-      "@openchamber/ui/*": [
+      "@magio/ui/*": [
         "../ui/src/*"
       ],
-      "@openchamber/web/*": [
+      "@magio/web/*": [
         "./src/*"
       ]
     }

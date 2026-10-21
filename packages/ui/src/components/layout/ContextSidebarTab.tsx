@@ -431,7 +431,7 @@ export const ContextPanelContent: React.FC = () => {
         {/* ── Session header ── */}
         <div className="mb-6">
           {inPanelHeader ? null : (
-            <h2 dir="auto" className="typography-ui-header font-semibold text-foreground truncate oc-ui-start-align">{viewModel.sessionTitle}</h2>
+            <h2 dir="auto" className="typography-ui-header font-semibold text-foreground truncate mg-ui-start-align">{viewModel.sessionTitle}</h2>
           )}
           <div className={cn(!inPanelHeader && 'mt-1', 'flex flex-wrap items-center gap-x-2 gap-y-0.5 typography-micro text-muted-foreground/70')}>
             <span>{viewModel.providerModel.providerName} / {viewModel.providerModel.modelName}</span>

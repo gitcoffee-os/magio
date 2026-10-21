@@ -29,7 +29,7 @@ import * as sessionActions from '@/sync/session-actions';
 // Guest surfaces load on demand: VS Code and mobile never mount them, and the
 // composer must not pay for the guest bridge before an extension is installed.
 const GuestAttachDialog = React.lazy(() => import('@/components/layout/GuestAttachDialog').then((module) => ({ default: module.GuestAttachDialog })));
-import type { AttachIssueRequest } from '@openchamber/sdk';
+import type { AttachIssueRequest } from '@magio/sdk';
 import { getInlineCommentDraftKey, useInlineCommentDraftStore, type InlineCommentDraft, type InlineCommentDraftTarget } from '@/stores/useInlineCommentDraftStore';
 import { useSnippetsStore } from '@/stores/useSnippetsStore';
 import { renderMagicPrompt } from '@/lib/magicPrompts';
@@ -3452,7 +3452,7 @@ const ChatInputComponent: React.FC<ChatInputProps> = ({
         e.preventDefault();
         e.stopPropagation();
         dragEnterCountRef.current++;
-        const isInternal = e.dataTransfer.types?.includes('application/x-openchamber-file-path') ?? false;
+        const isInternal = e.dataTransfer.types?.includes('application/x-magio-file-path') ?? false;
         if (isInternal !== isInternalDrag) {
             setIsInternalDrag(isInternal);
         }
@@ -3506,7 +3506,7 @@ const ChatInputComponent: React.FC<ChatInputProps> = ({
         if (!currentSessionId && !newSessionDraftOpen) return;
 
         // Internal drag: file tree → chat input (relative path as @mention)
-        const internalPath = e.dataTransfer.getData('application/x-openchamber-file-path');
+        const internalPath = e.dataTransfer.getData('application/x-magio-file-path');
         if (internalPath && internalPath !== '.') {
             confirmedMentionsRef.current.add(internalPath);
             const mention = `@${internalPath}`;
@@ -4102,7 +4102,7 @@ const ChatInputComponent: React.FC<ChatInputProps> = ({
 
     /** The dictation engine listens for this globally; the composer only asks. */
     const toggleDictation = React.useCallback(() => {
-        window.dispatchEvent(new CustomEvent('openchamber:dictation-toggle'));
+        window.dispatchEvent(new CustomEvent('magio:dictation-toggle'));
     }, []);
 
     const openMobileAttachSheet = React.useCallback(() => {
@@ -4257,7 +4257,7 @@ const ChatInputComponent: React.FC<ChatInputProps> = ({
                 "relative w-full pt-0 pb-4",
                 isDesktopExpanded && 'flex h-full min-h-0 flex-col pt-4',
                 isMobileExpanded && 'flex h-full min-h-0 flex-col pt-2',
-                isMobile && 'bottom-safe-area oc-mobile-composer'
+                isMobile && 'bottom-safe-area mg-mobile-composer'
             )}
             style={isMobile && inputBarOffset > 0 ? { marginBottom: `${inputBarOffset}px` } : undefined}
         >
@@ -4409,12 +4409,12 @@ const ChatInputComponent: React.FC<ChatInputProps> = ({
                         "flex flex-col relative overflow-visible",
                         isComposerExpanded && 'flex-1 min-h-0',
                         // Opaque: always on screen over the moving transcript
-                        // (see .oc-surface-floating in design-system.css).
-                        'oc-surface-floating',
+                        // (see .mg-surface-floating in design-system.css).
+                        'mg-surface-floating',
                         // Lit like a dropdown (top edge, hairline, shadow). Its
                         // box-shadow would hide the drag ring, so it steps aside
                         // while a file is dragged over.
-                        isDragging ? "ring-2 ring-primary ring-offset-2" : 'oc-glass-floating oc-composer-sheen',
+                        isDragging ? "ring-2 ring-primary ring-offset-2" : 'mg-glass-floating mg-composer-sheen',
                     )}
                     style={{ borderRadius: chatInputRadius }}
                     ref={dropZoneRef}

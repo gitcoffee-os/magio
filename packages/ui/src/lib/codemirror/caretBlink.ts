@@ -3,7 +3,7 @@ import { drawSelection, EditorView, ViewPlugin, type ViewUpdate } from '@codemir
 
 /** Half of CodeMirror's 1.2 s blink cycle, so the rhythm stays the same. */
 const CARET_PHASE_MS = 600;
-const HIDDEN_CLASS = 'oc-caret-hidden';
+const HIDDEN_CLASS = 'mg-caret-hidden';
 
 /**
  * Blinks the caret `drawSelection()` paints from a timer. CodeMirror's own

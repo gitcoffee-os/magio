@@ -331,7 +331,7 @@ export const renderGrepOutput = (output: string, isMobile: boolean, options?: { 
             <div
                 className={cn(
                     'space-y-2 w-full min-w-0',
-                    options?.unstyled ? null : 'p-3 oc-tile rounded-xl'
+                    options?.unstyled ? null : 'p-3 mg-tile rounded-xl'
                 )}
                 style={typography.tool.popup}
             >
@@ -400,7 +400,7 @@ export const renderGlobOutput = (output: string, isMobile: boolean, options?: { 
             <div
                 className={cn(
                     'space-y-2 w-full min-w-0',
-                    options?.unstyled ? null : 'p-3 oc-tile rounded-xl'
+                    options?.unstyled ? null : 'p-3 mg-tile rounded-xl'
                 )}
                 style={typography.tool.popup}
             >
@@ -434,7 +434,7 @@ export const renderWebSearchOutput = (output: string, options?: { unstyled?: boo
         const parsed = parseWebSearchOutput(output);
         if (parsed) {
             return (
-                <div className={cn('w-full min-w-0', options?.unstyled ? null : 'p-2 oc-tile rounded-xl')}>
+                <div className={cn('w-full min-w-0', options?.unstyled ? null : 'p-2 mg-tile rounded-xl')}>
                     <WebSearchResults output={parsed} providerId={null} />
                 </div>
             );
@@ -443,7 +443,7 @@ export const renderWebSearchOutput = (output: string, options?: { unstyled?: boo
             <div
                 className={cn(
                     'typography-code max-w-none w-full min-w-0',
-                    options?.unstyled ? null : 'p-3 oc-tile rounded-xl'
+                    options?.unstyled ? null : 'p-3 mg-tile rounded-xl'
                 )}
                 style={typography.tool.popup}
             >

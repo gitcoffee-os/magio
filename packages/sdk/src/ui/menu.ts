@@ -31,10 +31,10 @@ let menuCount = 0;
 export const mountMenu = (root: Element, initial: MenuProps): MenuHandle => {
   ensureStyle(UI_CSS);
   let props = initial;
-  const uid = `oc-sdk-menu-${menuCount += 1}`;
-  const wrap = el('div', 'oc-sdk oc-sdk-menu');
+  const uid = `mg-sdk-menu-${menuCount += 1}`;
+  const wrap = el('div', 'mg-sdk mg-sdk-menu');
   root.append(wrap);
-  const popup = el('div', 'oc-sdk oc-sdk-popup');
+  const popup = el('div', 'mg-sdk mg-sdk-popup');
   popup.setAttribute('role', 'menu');
   popup.tabIndex = -1;
   let closePopup: (() => void) | null = null;
@@ -60,7 +60,7 @@ export const mountMenu = (root: Element, initial: MenuProps): MenuHandle => {
     clearNode(popup);
     for (const item of props.items) {
       if ('separator' in item) {
-        const line = el('div', 'oc-sdk-separator');
+        const line = el('div', 'mg-sdk-separator');
         line.dataset.labeled = 'false';
         popup.append(line);
         continue;

@@ -95,12 +95,12 @@ describe('menus when the window loses focus', () => {
     const changes: boolean[] = [];
     await act(async () => root.render(<ControlledContextMenu onOpenChange={(open) => changes.push(open)} />));
     expect(menuOpen()).toBe(true);
-    expect(document.documentElement.classList.contains('oc-menu-open')).toBe(true);
+    expect(document.documentElement.classList.contains('mg-menu-open')).toBe(true);
 
     await blurWindow();
     expect(changes).toEqual([false]);
     expect(menuOpen()).toBe(false);
-    expect(document.documentElement.classList.contains('oc-menu-open')).toBe(false);
+    expect(document.documentElement.classList.contains('mg-menu-open')).toBe(false);
   });
 
   test('a session row menu with a pending rename closes and still runs the rename', async () => {
@@ -128,7 +128,7 @@ describe('menus when the window loses focus', () => {
 
     await blurWindow();
     expect(menuOpen()).toBe(false);
-    expect(document.documentElement.classList.contains('oc-menu-open')).toBe(false);
+    expect(document.documentElement.classList.contains('mg-menu-open')).toBe(false);
   });
 
   test('the title bar stays undraggable until the last open menu closes', async () => {
@@ -145,11 +145,11 @@ describe('menus when the window loses focus', () => {
         </DropdownMenu>
       </>,
     ));
-    expect(document.documentElement.classList.contains('oc-menu-open')).toBe(true);
+    expect(document.documentElement.classList.contains('mg-menu-open')).toBe(true);
 
     // The second menu is pinned open by its owner, so the class stays.
     await blurWindow();
     expect(document.querySelectorAll('[role="menu"]').length).toBe(1);
-    expect(document.documentElement.classList.contains('oc-menu-open')).toBe(true);
+    expect(document.documentElement.classList.contains('mg-menu-open')).toBe(true);
   });
 });

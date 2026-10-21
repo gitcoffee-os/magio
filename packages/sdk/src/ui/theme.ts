@@ -6,39 +6,39 @@ export type ThemeRoot = {
     setProperty: (name: string, value: string) => void;
   };
   dataset?: {
-    ocSurface?: string;
-    ocTheme?: string;
+    mgSurface?: string;
+    mgTheme?: string;
   };
 };
 
 const TOKEN_VARS = [
-  ['--oc-bg', 'background'],
-  ['--oc-elevated', 'elevated'],
-  ['--oc-fg', 'foreground'],
-  ['--oc-muted', 'muted'],
-  ['--oc-subtle', 'subtle'],
-  ['--oc-border', 'border'],
-  ['--oc-hover', 'hover'],
-  ['--oc-selection', 'selection'],
-  ['--oc-focus', 'focus'],
-  ['--oc-primary', 'primary'],
-  ['--oc-muted-surface', 'mutedSurface'],
-  ['--oc-elevated-fg', 'elevatedForeground'],
-  ['--oc-active', 'active'],
-  ['--oc-selection-fg', 'selectionForeground'],
-  ['--oc-primary-fg', 'primaryForeground'],
-  ['--oc-primary-text', 'primaryText'],
-  ['--oc-success-text', 'successText'],
-  ['--oc-warning-text', 'warningText'],
-  ['--oc-error-text', 'errorText'],
-  ['--oc-info-text', 'infoText'],
-  ['--oc-success', 'success'],
-  ['--oc-warning', 'warning'],
-  ['--oc-error', 'error'],
-  ['--oc-info', 'info'],
-  ['--oc-font', 'font'],
-  ['--oc-mono', 'mono'],
-  ['--oc-radius', 'radius'],
+  ['--mg-bg', 'background'],
+  ['--mg-elevated', 'elevated'],
+  ['--mg-fg', 'foreground'],
+  ['--mg-muted', 'muted'],
+  ['--mg-subtle', 'subtle'],
+  ['--mg-border', 'border'],
+  ['--mg-hover', 'hover'],
+  ['--mg-selection', 'selection'],
+  ['--mg-focus', 'focus'],
+  ['--mg-primary', 'primary'],
+  ['--mg-muted-surface', 'mutedSurface'],
+  ['--mg-elevated-fg', 'elevatedForeground'],
+  ['--mg-active', 'active'],
+  ['--mg-selection-fg', 'selectionForeground'],
+  ['--mg-primary-fg', 'primaryForeground'],
+  ['--mg-primary-text', 'primaryText'],
+  ['--mg-success-text', 'successText'],
+  ['--mg-warning-text', 'warningText'],
+  ['--mg-error-text', 'errorText'],
+  ['--mg-info-text', 'infoText'],
+  ['--mg-success', 'success'],
+  ['--mg-warning', 'warning'],
+  ['--mg-error', 'error'],
+  ['--mg-info', 'info'],
+  ['--mg-font', 'font'],
+  ['--mg-mono', 'mono'],
+  ['--mg-radius', 'radius'],
   ['--surface-background', 'background'],
   ['--surface-elevated', 'elevated'],
   ['--surface-foreground', 'foreground'],
@@ -69,14 +69,14 @@ const TOKEN_VARS = [
 ] as const;
 
 const SYNTAX_TOKEN_VARS = [
-  ['--oc-syntax-keyword', '--syntax-keyword', 'syntaxKeyword'],
-  ['--oc-syntax-string', '--syntax-string', 'syntaxString'],
-  ['--oc-syntax-number', '--syntax-number', 'syntaxNumber'],
-  ['--oc-syntax-function', '--syntax-function', 'syntaxFunction'],
-  ['--oc-syntax-type', '--syntax-type', 'syntaxType'],
-  ['--oc-syntax-comment', '--syntax-comment', 'syntaxComment'],
-  ['--oc-syntax-variable', '--syntax-variable', 'syntaxVariable'],
-  ['--oc-syntax-operator', '--syntax-operator', 'syntaxOperator'],
+  ['--mg-syntax-keyword', '--syntax-keyword', 'syntaxKeyword'],
+  ['--mg-syntax-string', '--syntax-string', 'syntaxString'],
+  ['--mg-syntax-number', '--syntax-number', 'syntaxNumber'],
+  ['--mg-syntax-function', '--syntax-function', 'syntaxFunction'],
+  ['--mg-syntax-type', '--syntax-type', 'syntaxType'],
+  ['--mg-syntax-comment', '--syntax-comment', 'syntaxComment'],
+  ['--mg-syntax-variable', '--syntax-variable', 'syntaxVariable'],
+  ['--mg-syntax-operator', '--syntax-operator', 'syntaxOperator'],
 ] as const;
 
 /**
@@ -107,7 +107,7 @@ export const applyHostReady = (
 ): void => {
   applyHostTheme(ctx.theme, root);
   if (root.dataset) {
-    root.dataset.ocSurface = ctx.surface;
-    root.dataset.ocTheme = ctx.theme.mode;
+    root.dataset.mgSurface = ctx.surface;
+    root.dataset.mgTheme = ctx.theme.mode;
   }
 };

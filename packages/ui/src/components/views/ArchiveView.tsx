@@ -234,7 +234,7 @@ export function ArchiveSessionsView({ layout, onLeave, initialQuery = '' }: {
         </div>
         <div
           className="min-h-0 flex-1 overflow-y-auto pt-1"
-          style={{ paddingBottom: 'calc(0.5rem + var(--oc-safe-area-bottom, 0px))' }}
+          style={{ paddingBottom: 'calc(0.5rem + var(--mg-safe-area-bottom, 0px))' }}
         >
           {visibleSessions.length === 0 ? emptyState : visibleSessions.map((session, index) => {
             const sessionDirectory = normalizePath(resolveGlobalSessionDirectory(session)) ?? '';
@@ -245,7 +245,7 @@ export function ArchiveSessionsView({ layout, onLeave, initialQuery = '' }: {
             return (
               <React.Fragment key={session.id}>
                 {parentTitle ? (
-                  <p dir="auto" className="truncate oc-ui-start-align px-4 pt-2 typography-micro text-muted-foreground">{parentTitle}</p>
+                  <p dir="auto" className="truncate mg-ui-start-align px-4 pt-2 typography-micro text-muted-foreground">{parentTitle}</p>
                 ) : null}
                 <div className="flex items-center pe-1.5">
                   <button
@@ -258,7 +258,7 @@ export function ArchiveSessionsView({ layout, onLeave, initialQuery = '' }: {
                     onClick={() => openSession(session)}
                   >
                     <span className="flex min-w-0 flex-1 flex-col">
-                      <span dir="auto" className="block truncate oc-ui-start-align typography-ui-label text-foreground">
+                      <span dir="auto" className="block truncate mg-ui-start-align typography-ui-label text-foreground">
                         {title}
                       </span>
                       <span className="flex items-center gap-2.5 typography-micro text-muted-foreground">
@@ -386,7 +386,7 @@ export function ArchiveSessionsView({ layout, onLeave, initialQuery = '' }: {
                 return (
                   <React.Fragment key={session.id}>
                     {parentTitle ? (
-                      <p dir="auto" className="truncate oc-ui-start-align px-2 pt-2 typography-micro text-muted-foreground">{parentTitle}</p>
+                      <p dir="auto" className="truncate mg-ui-start-align px-2 pt-2 typography-micro text-muted-foreground">{parentTitle}</p>
                     ) : null}
                     <div
                       className={cn(
@@ -403,7 +403,7 @@ export function ArchiveSessionsView({ layout, onLeave, initialQuery = '' }: {
                         }
                       }}
                     >
-                      <span dir="auto" className="min-w-0 flex-1 truncate oc-ui-start-align typography-ui-label text-foreground">
+                      <span dir="auto" className="min-w-0 flex-1 truncate mg-ui-start-align typography-ui-label text-foreground">
                         {session.title || t('sessions.sidebar.session.untitled')}
                       </span>
                       {normalizedQuery && directoryLabel ? (

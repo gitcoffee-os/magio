@@ -3,51 +3,51 @@ import path from 'node:path';
 
 import { asNonEmptyString, isBoolean } from '../shared/guards.js';
 import {
-  OPENCHAMBER_AGENT_TOOL_ACTION_DEFINITIONS,
-  OPENCHAMBER_AGENT_TOOL_ACTIONS,
-  OPENCHAMBER_KNOWLEDGE_ACTION_DEFINITIONS,
-  OPENCHAMBER_KNOWLEDGE_ACTIONS,
-  OPENCHAMBER_MEMORY_ACTION_DEFINITIONS,
-  OPENCHAMBER_MEMORY_ACTIONS,
-  OPENCHAMBER_NOTIFY_ACTION_DEFINITIONS,
-  OPENCHAMBER_NOTIFY_ACTIONS,
-  OPENCHAMBER_RENDER_ACTION_DEFINITIONS,
-  OPENCHAMBER_RENDER_ACTIONS,
-  OPENCHAMBER_SCHEDULE_ACTION_DEFINITIONS,
-  OPENCHAMBER_SCHEDULE_ACTIONS,
+  MAGIO_AGENT_TOOL_ACTION_DEFINITIONS,
+  MAGIO_AGENT_TOOL_ACTIONS,
+  MAGIO_KNOWLEDGE_ACTION_DEFINITIONS,
+  MAGIO_KNOWLEDGE_ACTIONS,
+  MAGIO_MEMORY_ACTION_DEFINITIONS,
+  MAGIO_MEMORY_ACTIONS,
+  MAGIO_NOTIFY_ACTION_DEFINITIONS,
+  MAGIO_NOTIFY_ACTIONS,
+  MAGIO_RENDER_ACTION_DEFINITIONS,
+  MAGIO_RENDER_ACTIONS,
+  MAGIO_SCHEDULE_ACTION_DEFINITIONS,
+  MAGIO_SCHEDULE_ACTIONS,
   resolveAgentToolAction,
-  OPENCHAMBER_WEB_ACTION_DEFINITIONS,
-  OPENCHAMBER_WEB_ACTIONS,
-} from '../openchamber-control/actions.js';
+  MAGIO_WEB_ACTION_DEFINITIONS,
+  MAGIO_WEB_ACTIONS,
+} from '../magio-control/actions.js';
 import {
   RENDER_PAGE_CLOSED_IN_CHAT_NOTE,
   RENDER_PAGE_MAX_HTML_LENGTH,
   RENDER_PAGE_MAX_TITLE_LENGTH,
-} from '../openchamber-control/render-page.js';
+} from '../magio-control/render-page.js';
 import { createCallbackAddress } from './callback-address.js';
 
 const TOOL_SCHEMA_VERSION = 1;
-const PLUGIN_ID = 'openchamber-agent-tool';
+const PLUGIN_ID = 'magio-agent-tool';
 // Everything either managed tool may ask for; the agent allowlist stays
 // narrower than the full control surface.
 const ACTIONS = new Set([
-  ...OPENCHAMBER_AGENT_TOOL_ACTIONS,
-  ...OPENCHAMBER_SCHEDULE_ACTIONS,
-  ...OPENCHAMBER_WEB_ACTIONS,
-  ...OPENCHAMBER_MEMORY_ACTIONS,
-  ...OPENCHAMBER_KNOWLEDGE_ACTIONS,
-  ...OPENCHAMBER_NOTIFY_ACTIONS,
-  ...OPENCHAMBER_RENDER_ACTIONS,
+  ...MAGIO_AGENT_TOOL_ACTIONS,
+  ...MAGIO_SCHEDULE_ACTIONS,
+  ...MAGIO_WEB_ACTIONS,
+  ...MAGIO_MEMORY_ACTIONS,
+  ...MAGIO_KNOWLEDGE_ACTIONS,
+  ...MAGIO_NOTIFY_ACTIONS,
+  ...MAGIO_RENDER_ACTIONS,
 ]);
 const AGENT_TOOL_ACTION_TITLES = Object.fromEntries(
   [
-    ...OPENCHAMBER_AGENT_TOOL_ACTION_DEFINITIONS,
-    ...OPENCHAMBER_SCHEDULE_ACTION_DEFINITIONS,
-    ...OPENCHAMBER_WEB_ACTION_DEFINITIONS,
-    ...OPENCHAMBER_MEMORY_ACTION_DEFINITIONS,
-    ...OPENCHAMBER_KNOWLEDGE_ACTION_DEFINITIONS,
-    ...OPENCHAMBER_NOTIFY_ACTION_DEFINITIONS,
-    ...OPENCHAMBER_RENDER_ACTION_DEFINITIONS,
+    ...MAGIO_AGENT_TOOL_ACTION_DEFINITIONS,
+    ...MAGIO_SCHEDULE_ACTION_DEFINITIONS,
+    ...MAGIO_WEB_ACTION_DEFINITIONS,
+    ...MAGIO_MEMORY_ACTION_DEFINITIONS,
+    ...MAGIO_KNOWLEDGE_ACTION_DEFINITIONS,
+    ...MAGIO_NOTIFY_ACTION_DEFINITIONS,
+    ...MAGIO_RENDER_ACTION_DEFINITIONS,
   ].map(({ action, title }) => [action, title]),
 );
 
@@ -190,7 +190,7 @@ const KNOWLEDGE_PARAMETER_PROPERTIES = {
 const NOTIFY_PARAMETER_PROPERTIES = {
   title: { type: 'string', description: 'Up to 120 characters' },
   body: { type: 'string', description: 'Up to 500 characters' },
-  showWhenFocused: { type: 'boolean', description: 'Show it while the user is in OpenChamber too, otherwise it shows only while they are away. Only for what cannot wait' },
+  showWhenFocused: { type: 'boolean', description: 'Show it while the user is in Magio too, otherwise it shows only while they are away. Only for what cannot wait' },
 };
 
 // Where the agent saves a screenshot for a page, so it stays out of the
@@ -207,17 +207,17 @@ const OPENCODE_TEMP_DIRECTORY = path.join(os.tmpdir(), 'opencode');
 const RENDER_PAGE_HTML_DESCRIPTION = [
   `One self-contained HTML document, at most ${RENDER_PAGE_MAX_HTML_LENGTH} characters, with inline <style> and <script>. Remote scripts and stylesheets do not load in every client, so draw charts with inline SVG or your own script.`,
   "Layout: fluid width, as wide as the reply column (about 720px on desktop, 360px on phones), no horizontal padding on the outermost element, nothing wider; stack or wrap, and give a wide table its own overflow-x:auto box. The frame takes the page's height, so keep it short, give charts fixed pixel heights, and never use 100vh or height:100% on html or body.",
-  "Ready classes in the app's look, so these need no CSS of your own: .oc-box (a box; a box inside it steps up a tone), .oc-muted (secondary text), .oc-table on a div around a <table> (scrolls sideways when wide), .oc-num (tabular figures, end-aligned), .oc-badge with optional data-tone=\"success|warning|error|info\", .oc-dot (a legend dot) and .oc-bar (a horizontal bar) colored by --color (default --chart-1), the bar as long as --value (a percentage), .oc-field (a <label> around its text and control), .oc-input on an input, select or textarea, .oc-switch on a checkbox, .oc-segmented around <button>s (aria-pressed=\"true\" on the chosen one; also tabs). A line only where it means something, such as a divider between sections.",
+  "Ready classes in the app's look, so these need no CSS of your own: .mg-box (a box; a box inside it steps up a tone), .mg-muted (secondary text), .mg-table on a div around a <table> (scrolls sideways when wide), .mg-num (tabular figures, end-aligned), .mg-badge with optional data-tone=\"success|warning|error|info\", .mg-dot (a legend dot) and .mg-bar (a horizontal bar) colored by --color (default --chart-1), the bar as long as --value (a percentage), .mg-field (a <label> around its text and control), .mg-input on an input, select or textarea, .mg-switch on a checkbox, .mg-segmented around <button>s (aria-pressed=\"true\" on the chosen one; also tabs). A line only where it means something, such as a divider between sections.",
   "Theme variables on :root, updated live on a theme switch: --background, --foreground, --muted, --muted-foreground, --card, --card-foreground, --border, --primary, --primary-foreground, --destructive, --warning, --success, --info, --code-background, --code-foreground, --chart-1 to --chart-6 (series), --radius, --font-sans, --font-mono. A base stylesheet already sets text color, font and size; the root font size is the chat's text size and follows the user's interface size, so size text in rem or em, not px. A page with its own colors, such as a mockup of the user's project, sets a color on all its text and gives itself a background: text without a color takes the theme's, and without a background the page shows the chat's.",
   "Scripts may add tooltips, tabs, toggles, sorting. On a phone a tap shows a hover tooltip, so keep tooltips and popups inside the page and flip them near an edge.",
   `Images: https, data:, or a local PNG, JPEG, GIF or WebP named by absolute path in src, CSS url() or a quoted script string, at most 10 MB each and 12 per page. Save a screenshot for a page in ${OPENCODE_TEMP_DIRECTORY}.`,
-  "The page is sandboxed: no access to OpenChamber, the network session or local files; links open in the user's browser.",
+  "The page is sandboxed: no access to Magio, the network session or local files; links open in the user's browser.",
 ].join(' ');
 
 const RENDER_PAGE_AWAIT_DESCRIPTION = [
-  "Wait for the user to choose, fill in fields, or both, on the page. Give it one button whose click calls openchamber.submit(data, summary): data is the JSON your next step needs, summary the choice in a few words of the user's language, shown under the page. submit works only from a click on a waiting page and returns a promise; disable the button once it resolves.",
+  "Wait for the user to choose, fill in fields, or both, on the page. Give it one button whose click calls magio.submit(data, summary): data is the JSON your next step needs, summary the choice in a few words of the user's language, shown under the page. submit works only from a click on a waiting page and returns a promise; disable the button once it resolves.",
   "The call returns summary and data, or answered: false when the user wrote in the chat instead; their message follows.",
-  "Reloaded, the page gets openchamber.answer set to its data, to show the choice. Base classes: .oc-options (a grid), .oc-option on a <button> (aria-pressed=\"true\" when chosen), .oc-button (the send button; data-variant=\"outline\" for a secondary action, \"destructive\" for a dangerous one).",
+  "Reloaded, the page gets magio.answer set to its data, to show the choice. Base classes: .mg-options (a grid), .mg-option on a <button> (aria-pressed=\"true\" when chosen), .mg-button (the send button; data-variant=\"outline\" for a secondary action, \"destructive\" for a dangerous one).",
 ].join(' ');
 
 // Its own names: `title` here names the page.
@@ -235,18 +235,18 @@ const RENDER_PARAMETER_PROPERTIES = {
 // The worktree move is an introduction, not a rule: whether a busy checkout
 // calls for a worktree depends on how the user works, and users ask for a pull
 // request or for work kept apart rather than for a worktree.
-const CONTROL_TOOL_DESCRIPTION = "OpenChamber projects, sessions and worktrees. One action per call; projectId or directory scope it, default this session's directory. "
+const CONTROL_TOOL_DESCRIPTION = "Magio projects, sessions and worktrees. One action per call; projectId or directory scope it, default this session's directory. "
   + "A session you create, send to or fork belongs to the user, who follows and talks to it. Dispatch one when the user asks, even for work related to yours, with any agent, optionally in a new worktree; to delegate part of your own task, use the subagent tool. A dispatch returns at once; returnResult brings its final answer back here as a message. session.send always starts a new prompt. "
   + "session.moveToWorktree moves this session into a new worktree on a new branch from the default branch, taking the changed files you name in carry. It can help when the checkout looks busy: someone's pull request branch, uncommitted changes, another session here, a branch changed between your messages. Whether that fits depends on how the user works: ask, unless the request already calls for separate work, such as a pull request of its own. Unlike git worktree add, the session moves along and the branch starts from the default branch. "
   + "This tool cannot delete sessions or worktrees.";
 
-const SCHEDULE_TOOL_DESCRIPTION = "Scheduled tasks: prompts OpenChamber runs on a schedule, in a new session each run or in targetSessionId. A task is the user's; create or change one when the user asks. One action per call; projectId or directory scope it, default this session's directory.";
+const SCHEDULE_TOOL_DESCRIPTION = "Scheduled tasks: prompts Magio runs on a schedule, in a new session each run or in targetSessionId. A task is the user's; create or change one when the user asks. One action per call; projectId or directory scope it, default this session's directory.";
 
-const WEB_TOOL_DESCRIPTION = "OpenChamber's browser panel, to check your work by looking at it. One action per call: open, snapshot for text, selectors and errors, then click, type or scroll by those selectors. Close tabs you opened for your own work with browser.close; leave open the ones you opened to show the user something. The page runs with the user's real logins; treat it as their live session.";
+const WEB_TOOL_DESCRIPTION = "Magio's browser panel, to check your work by looking at it. One action per call: open, snapshot for text, selectors and errors, then click, type or scroll by those selectors. Close tabs you opened for your own work with browser.close; leave open the ones you opened to show the user something. The page runs with the user's real logins; treat it as their live session.";
 
 const MEMORY_TOOL_DESCRIPTION = "Memory that persists across sessions. One fact per entry. Save what code and docs do not show: a decision and its reason, a rejected alternative, a deliberate \"leave this as it is\", the user's corrections and preferences, a hard-won pointer. Never one-off task state, secrets or credentials, or what the user asked you not to keep; what the user explicitly asks you to remember, save. Put project conventions in project scope.";
 
-const KNOWLEDGE_TOOL_DESCRIPTION = "The project's Notes, Todos and Plans, shown in OpenChamber's Project knowledge panel and shared by its sessions. One action per call; list returns everything. "
+const KNOWLEDGE_TOOL_DESCRIPTION = "The project's Notes, Todos and Plans, shown in Magio's Project knowledge panel and shared by its sessions. One action per call; list returns everything. "
   + "Notes: short facts the user wants at hand; your own learnings go to memory. Todos: the user's backlog; add one when asked or when you stop with work left, never for the steps of your current task. "
   + "Plans: markdown files. list gives their paths; read and edit them with your file tools, save creates or replaces one whole. A plan starts with a # title and a ## Steps checklist (- [ ] per coarse step), then detail. A plan written for the user: save, show, wait for their comments; they send it to a session. Implementing one: tick each step (- [x]) as you finish it and change nothing else unless asked; never drop a constraint. "
   + "Replacing a note or plan: pass expected. If the save fails on it, refresh and retry the save with the same id.";
@@ -357,7 +357,7 @@ const ANSWER_CLOSED_IN_CHAT = String.raw`
             const answer = { answered: false, reason: "chat" }
             const payload = { schemaVersion: ${TOOL_SCHEMA_VERSION}, ok: true, action: args.action, data: { answer, note: ${JSON.stringify(RENDER_PAGE_CLOSED_IN_CHAT_NOTE)} } }
             await progress({ ok: true })
-            return { content: JSON.stringify(payload), metadata: { openchamber: { schemaVersion: ${TOOL_SCHEMA_VERSION}, action: args.action, description: title, ok: true, answer } } }
+            return { content: JSON.stringify(payload), metadata: { magio: { schemaVersion: ${TOOL_SCHEMA_VERSION}, action: args.action, description: title, ok: true, answer } } }
           }`;
 
 /**
@@ -383,7 +383,7 @@ const booleanNormalizationBlock = (parameters) => {
 };
 
 const multiActionSchema = (definitions) => ({
-  property: { type: 'string', oneOf: definitions.map((entry) => ({ const: entry.action, description: entry.description })), description: 'OpenChamber action to perform' },
+  property: { type: 'string', oneOf: definitions.map((entry) => ({ const: entry.action, description: entry.description })), description: 'Magio action to perform' },
   required: ['action'],
   normalize: '',
 });
@@ -485,17 +485,17 @@ ${actionSchema.normalize}${normalizeBooleans}        const actionTitles = ${JSON
           },
         })
         await progress()
-        const endpoint = process.env.OPENCHAMBER_AGENT_TOOL_URL
-        const token = process.env.OPENCHAMBER_AGENT_TOOL_TOKEN
+        const endpoint = process.env.MAGIO_AGENT_TOOL_URL
+        const token = process.env.MAGIO_AGENT_TOOL_TOKEN
         // No output schema is declared, so a result must never carry an output
         // field: OpenCode rejects that with "Tool result declared output
         // without an output schema". The envelope travels as text content.
         const failure = (payload) => ({
           content: JSON.stringify(payload),
-          metadata: { openchamber: { schemaVersion: ${TOOL_SCHEMA_VERSION}, action: args.action, description: title, ok: false } },
+          metadata: { magio: { schemaVersion: ${TOOL_SCHEMA_VERSION}, action: args.action, description: title, ok: false } },
         })
         if (!endpoint || !token) {
-          return failure({ schemaVersion: ${TOOL_SCHEMA_VERSION}, ok: false, action: args.action, error: { message: "OpenChamber managed tool connection is unavailable" } })
+          return failure({ schemaVersion: ${TOOL_SCHEMA_VERSION}, ok: false, action: args.action, error: { message: "Magio managed tool connection is unavailable" } })
         }
 ${answers ? ANSWER_WAIT_SETUP : ''}
         try {
@@ -506,9 +506,9 @@ ${answers ? ANSWER_WAIT_SETUP : ''}
               "content-type": "application/json",
             },
             // OpenCode 2 no longer hands a tool its session directory, so the
-            // session id goes over instead and OpenChamber resolves the
+            // session id goes over instead and Magio resolves the
             // directory on its own side. The signal fires when the session is
-            // aborted, so the OpenChamber side stops the action too.
+            // aborted, so the Magio side stops the action too.
             body: JSON.stringify({ input: args, sessionID: context.sessionID, callID: context.id, tool: ${JSON.stringify(name)} }),
             signal: ${answers ? 'waitSignal' : 'context.signal'},${answers ? ANSWER_FETCH_TIMEOUT : ''}
           })
@@ -517,8 +517,8 @@ ${answers ? ANSWER_WAIT_SETUP : ''}
           try { result = JSON.parse(content) } catch {}
           const valid = result?.schemaVersion === ${TOOL_SCHEMA_VERSION} && typeof result?.ok === "boolean" && typeof result?.action === "string"
           await progress({ ok: valid && result.ok === true })
-          if (valid) return { content, metadata: { openchamber: { schemaVersion: ${TOOL_SCHEMA_VERSION}, action: args.action, description: title, ok: result.ok === true${answers ? ANSWER_METADATA : ''} } } }
-          return failure({ schemaVersion: ${TOOL_SCHEMA_VERSION}, ok: false, action: args.action, error: { message: "OpenChamber returned an invalid response", kind: "runtime", status: response.status } })
+          if (valid) return { content, metadata: { magio: { schemaVersion: ${TOOL_SCHEMA_VERSION}, action: args.action, description: title, ok: result.ok === true${answers ? ANSWER_METADATA : ''} } } }
+          return failure({ schemaVersion: ${TOOL_SCHEMA_VERSION}, ok: false, action: args.action, error: { message: "Magio returned an invalid response", kind: "runtime", status: response.status } })
         } catch (error) {${answers ? ANSWER_CLOSED_IN_CHAT : ''}
           return failure({ schemaVersion: ${TOOL_SCHEMA_VERSION}, ok: false, action: args.action, error: { message: error instanceof Error ? error.message : String(error), kind: "runtime" } })
         }${answers ? ANSWER_WAIT_RELEASE : ''}
@@ -547,63 +547,63 @@ const createPluginSource = ({ includeControl, includeSchedule, includeWeb, inclu
   }
   if (includeControl) {
     entries.push(createToolEntry({
-      name: 'openchamber',
+      name: 'magio',
       description: CONTROL_TOOL_DESCRIPTION,
-      definitions: OPENCHAMBER_AGENT_TOOL_ACTION_DEFINITIONS,
+      definitions: MAGIO_AGENT_TOOL_ACTION_DEFINITIONS,
       parameters: CONTROL_PARAMETER_PROPERTIES,
       codeMode,
     }));
   }
   if (includeSchedule) {
     entries.push(createToolEntry({
-      name: 'openchamber_schedule',
+      name: 'magio_schedule',
       description: SCHEDULE_TOOL_DESCRIPTION,
-      definitions: OPENCHAMBER_SCHEDULE_ACTION_DEFINITIONS,
+      definitions: MAGIO_SCHEDULE_ACTION_DEFINITIONS,
       parameters: SCHEDULE_PARAMETER_PROPERTIES,
       codeMode,
     }));
   }
   if (includeWeb) {
     entries.push(createToolEntry({
-      name: 'openchamber_web',
+      name: 'magio_web',
       description: WEB_TOOL_DESCRIPTION,
-      definitions: OPENCHAMBER_WEB_ACTION_DEFINITIONS,
+      definitions: MAGIO_WEB_ACTION_DEFINITIONS,
       parameters: WEB_PARAMETER_PROPERTIES,
       codeMode,
     }));
   }
   if (includeMemory) {
     entries.push(createToolEntry({
-      name: 'openchamber_memory',
+      name: 'magio_memory',
       description: MEMORY_TOOL_DESCRIPTION,
-      definitions: OPENCHAMBER_MEMORY_ACTION_DEFINITIONS,
+      definitions: MAGIO_MEMORY_ACTION_DEFINITIONS,
       parameters: MEMORY_PARAMETER_PROPERTIES,
       codeMode,
     }));
   }
   if (includeKnowledge) {
     entries.push(createToolEntry({
-      name: 'openchamber_knowledge',
+      name: 'magio_knowledge',
       description: KNOWLEDGE_TOOL_DESCRIPTION,
-      definitions: OPENCHAMBER_KNOWLEDGE_ACTION_DEFINITIONS,
+      definitions: MAGIO_KNOWLEDGE_ACTION_DEFINITIONS,
       parameters: KNOWLEDGE_PARAMETER_PROPERTIES,
       codeMode,
     }));
   }
   if (includeNotify) {
     entries.push(createToolEntry({
-      name: 'openchamber_notify',
+      name: 'magio_notify',
       description: NOTIFY_TOOL_DESCRIPTION,
-      definitions: OPENCHAMBER_NOTIFY_ACTION_DEFINITIONS,
+      definitions: MAGIO_NOTIFY_ACTION_DEFINITIONS,
       parameters: NOTIFY_PARAMETER_PROPERTIES,
       codeMode,
     }));
   }
   if (includeRender) {
     entries.push(createToolEntry({
-      name: 'openchamber_render',
+      name: 'magio_render',
       description: RENDER_TOOL_DESCRIPTION,
-      definitions: OPENCHAMBER_RENDER_ACTION_DEFINITIONS,
+      definitions: MAGIO_RENDER_ACTION_DEFINITIONS,
       parameters: RENDER_PARAMETER_PROPERTIES,
       // Never behind Code Mode: the chat draws the page from this tool's own
       // call, its input and the result it stores. Called from an execute
@@ -620,7 +620,7 @@ const createPluginSource = ({ includeControl, includeSchedule, includeWeb, inclu
   // exemption is added inside the child because only there is the final
   // NO_PROXY, merged from the shell and server environments, visible.
   return `const exemptCallbackFromProxy = () => {
-  const endpoint = process.env.OPENCHAMBER_AGENT_TOOL_URL
+  const endpoint = process.env.MAGIO_AGENT_TOOL_URL
   if (!endpoint || !URL.canParse(endpoint)) return
   const host = new URL(endpoint).hostname.replace(/^\\[|\\]$/g, "")
   for (const key of ["NO_PROXY", "no_proxy"]) {
@@ -649,7 +649,7 @@ ${entries.join('')}    })${includeRender ? `
 // A configured plugin has to be a directory carrying a package.json that
 // resolves an entrypoint; OpenCode skips a plain .js path.
 const PLUGIN_PACKAGE_JSON = `${JSON.stringify({
-  name: 'openchamber-agent-tool',
+  name: 'magio-agent-tool',
   version: '0.0.0',
   private: true,
   type: 'module',
@@ -686,7 +686,7 @@ export const createAgentToolRuntime = (dependencies) => {
    */
   const materializePlugin = async ({ includeControl = true, includeSchedule = false, includeWeb = true, includeMemory = true, includeKnowledge = false, includeNotify = false, includeRender = false, codeMode = false } = {}) => {
     if (!includeControl && !includeSchedule && !includeWeb && !includeMemory && !includeKnowledge && !includeNotify && !includeRender) {
-      throw new Error('At least one OpenChamber managed tool must be enabled to inject the plugin');
+      throw new Error('At least one Magio managed tool must be enabled to inject the plugin');
     }
     await fsPromises.mkdir(pluginDirectory, { recursive: true });
     await fsPromises.writeFile(pluginManifestPath, PLUGIN_PACKAGE_JSON, { mode: 0o600 });
@@ -704,12 +704,12 @@ export const createAgentToolRuntime = (dependencies) => {
   const createChildEnv = () => {
     const port = getActivePort();
     if (!Number.isInteger(port) || port <= 0) {
-      throw new Error('OpenChamber listener port is unavailable for managed tool injection');
+      throw new Error('Magio listener port is unavailable for managed tool injection');
     }
     activeToken = crypto.randomBytes(32).toString('base64url');
     return {
-      OPENCHAMBER_AGENT_TOOL_URL: `http://${callbackHost()}:${port}/api/openchamber/agent-tool`,
-      OPENCHAMBER_AGENT_TOOL_TOKEN: activeToken,
+      MAGIO_AGENT_TOOL_URL: `http://${callbackHost()}:${port}/api/magio/agent-tool`,
+      MAGIO_AGENT_TOOL_TOKEN: activeToken,
     };
   };
 
@@ -733,21 +733,21 @@ export const createAgentToolRuntime = (dependencies) => {
     }
     const action = resolution.action;
     if (!ACTIONS.has(action)) {
-      return createResult({ ok: false, action, error: { message: `Unsupported OpenChamber action: ${action}`, kind: 'usage' } });
+      return createResult({ ok: false, action, error: { message: `Unsupported Magio action: ${action}`, kind: 'usage' } });
     }
     const usageError = nonBooleanParameterError(payload.input ?? {}) ?? agentOnlyUsageError(action, payload.input ?? {});
     if (usageError) {
       return createResult({ ok: false, action, error: { message: usageError, kind: 'usage' } });
     }
     if (typeof executeAction !== 'function') {
-      return createResult({ ok: false, action, error: { message: 'OpenChamber control service is unavailable', kind: 'runtime' } });
+      return createResult({ ok: false, action, error: { message: 'Magio control service is unavailable', kind: 'runtime' } });
     }
     // OpenCode 2 tools no longer receive a directory, so the plugin sends the
     // session id and the directory is resolved here. An unresolvable session
     // falls through with no directory, exactly like the old "no directory" path.
     // Knowledge writes are attributed to the calling session, so no payload
     // field may stand in for the session OpenCode reported.
-    const knowledgeAction = OPENCHAMBER_KNOWLEDGE_ACTIONS.includes(action);
+    const knowledgeAction = MAGIO_KNOWLEDGE_ACTIONS.includes(action);
     let contextDirectory = knowledgeAction ? undefined : asNonEmptyString(payload.contextDirectory) ?? undefined;
     const sessionID = asNonEmptyString(payload.sessionID);
     if (!contextDirectory && sessionID && typeof resolveSessionDirectory === 'function') {
@@ -808,7 +808,7 @@ export const createAgentToolRuntime = (dependencies) => {
   };
 
   const registerRoutes = (app, express) => {
-    app.post('/api/openchamber/agent-tool', express.json({ limit: '1mb' }), async (req, res) => {
+    app.post('/api/magio/agent-tool', express.json({ limit: '1mb' }), async (req, res) => {
       if (!authorize(req)) return res.status(401).json({ error: 'Unauthorized' });
       const controller = new AbortController();
       const abortOnDisconnect = () => {

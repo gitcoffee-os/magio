@@ -4,7 +4,7 @@ import { runtimeFetch } from '@/lib/runtime-fetch';
 import { getRuntimeKey } from '@/lib/runtime-switch';
 import { isFilePathWithinDirectory, toAbsoluteFilePath } from '@/lib/path-utils';
 
-const LOCAL_ASSET_ATTR = 'data-oc-local-asset';
+const LOCAL_ASSET_ATTR = 'data-mg-local-asset';
 const MAX_LOCAL_IMAGE_BYTES = 25 * 1024 * 1024;
 
 /** A `src`/`href` the page itself cannot resolve: not a URL, not an anchor. */
@@ -49,7 +49,7 @@ const parseSrcset = (value: string): SrcsetCandidate[] => value.split(',').flatM
   return url ? [{ url, descriptor: descriptor.join(' ') }] : [];
 });
 
-const MEDIA_SOURCE_ATTR = 'data-oc-media';
+const MEDIA_SOURCE_ATTR = 'data-mg-media';
 const COLOR_SCHEME_FEATURE_RE = /\(\s*prefers-color-scheme\s*:\s*(light|dark)\s*\)/gi;
 
 /**

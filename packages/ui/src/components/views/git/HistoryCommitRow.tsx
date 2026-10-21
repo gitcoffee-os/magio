@@ -356,7 +356,7 @@ export const HistoryCommitRow = React.memo(({
           'w-full flex items-start gap-3 px-3 py-2 text-start transition-colors',
           isGraphMode
             ? 'hover:bg-[var(--interactive-hover)]/40'
-            : isExpanded ? 'oc-tile-inset' : 'oc-tile-hover'
+            : isExpanded ? 'mg-tile-inset' : 'mg-tile-hover'
         )}
       >
         {isGraphMode && laned && totalLanes !== undefined ? (
@@ -431,7 +431,7 @@ export const HistoryCommitRow = React.memo(({
       </button>
 
       {isExpanded && (
-        <div className="oc-tile-inset px-3 pb-2 ps-8">
+        <div className="mg-tile-inset px-3 pb-2 ps-8">
           {/* Action buttons */}
           {isGraphMode && pendingAction ? (
             /* Confirmation banner — replaces the button row while an action is pending */
@@ -476,7 +476,7 @@ export const HistoryCommitRow = React.memo(({
                       if (e.key === 'Escape') { setShowCreateBranch(false); setNewBranchName(''); }
                     }}
                     placeholder={t('gitView.history.actions.createBranchPlaceholder')}
-                    className="oc-raised oc-field h-6 text-xs px-2 rounded bg-surface-elevated outline-none min-w-0 w-32"
+                    className="mg-raised mg-field h-6 text-xs px-2 rounded bg-surface-elevated outline-none min-w-0 w-32"
                   />
                   <Button variant="outline" size="xs" className="h-6"
                     disabled={!newBranchName.trim() || actionLoading !== null}
@@ -573,7 +573,7 @@ export const HistoryCommitRow = React.memo(({
                     type="button"
                     onClick={() => toggleFileDiff(file)}
                     // An open file needs no fill: its diff opens right below.
-                    className="oc-tile-hover w-full flex items-center gap-2 typography-micro text-start cursor-pointer rounded px-1"
+                    className="mg-tile-hover w-full flex items-center gap-2 typography-micro text-start cursor-pointer rounded px-1"
                   >
                     <span
                       className={cn(

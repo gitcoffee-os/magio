@@ -9,7 +9,7 @@ import { cva } from 'class-variance-authority';
  * in every surface follows. Do not re-declare these classes at call sites —
  * call sites may only add layout (width/min-width/max-width, truncation).
  *
- * Look: a raised control (`oc-raised`), the same edge and shadow as the text
+ * Look: a raised control (`mg-raised`), the same edge and shadow as the text
  * fields and the active tab pill. Light themes paint elevated darker than the
  * canvas, so the trigger takes the canvas colour there to stand up. Width
  * hugs the value, the chevron right after it; call sites cap it with a
@@ -24,8 +24,8 @@ import { cva } from 'class-variance-authority';
  */
 export const dropdownTriggerVariants = cva(
   [
-    'oc-surface-elevated oc-raised flex items-center justify-between gap-1.5 rounded-md bg-[var(--surface-background)] dark:bg-surface-elevated',
-    'aria-invalid:[--oc-raised-edge:var(--status-error)]',
+    'mg-surface-elevated mg-raised flex items-center justify-between gap-1.5 rounded-md bg-[var(--surface-background)] dark:bg-surface-elevated',
+    'aria-invalid:[--mg-raised-edge:var(--status-error)]',
     'typography-ui-label whitespace-nowrap outline-none text-start',
     'hover:[background-image:linear-gradient(var(--interactive-hover),var(--interactive-hover))] data-[popup-open]:[background-image:linear-gradient(var(--interactive-active),var(--interactive-active))]',
     'focus-visible:outline-none',

@@ -33,7 +33,7 @@ describe('parsePlanProgress', () => {
 
 describe('createPlanSummaryCache', () => {
   test('re-reads a file only after it changed, and forgets one that is gone', async () => {
-    const dir = await fsPromises.mkdtemp(path.join(os.tmpdir(), 'oc-plan-progress-'));
+    const dir = await fsPromises.mkdtemp(path.join(os.tmpdir(), 'mg-plan-progress-'));
     try {
       const file = path.join(dir, 'plan.md');
       await fsPromises.writeFile(file, '# Plan\n\n## Steps\n- [ ] one\n- [ ] two\n');

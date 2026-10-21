@@ -19,7 +19,7 @@
  * re-renders or remounts in the virtualized list. Runtimes without
  * `CSS.highlights` get the scroll without the highlight.
  *
- * A quote taken inside a page the agent showed (`openchamber_render`) has a
+ * A quote taken inside a page the agent showed (`magio_render`) has a
  * `page` in its anchor and lives in the page's frame, out of reach here. Its
  * marks, reveal and clicks go through `pageQuoteBridge.ts` to the frame, which
  * paints, scrolls and hit-tests in the page. Its popover opens on click only:
@@ -39,8 +39,8 @@ import { ChatQuoteMarkPopover } from './ChatQuoteMarkPopover';
 import type { HtmlRenderMark } from './parts/htmlRender';
 import { onPageMarkClick, revealPageMark, setPageMarks } from './pageQuoteBridge';
 
-const MARK_HIGHLIGHT = 'oc-chat-quote';
-const FOCUS_HIGHLIGHT = 'oc-chat-quote-focus';
+const MARK_HIGHLIGHT = 'mg-chat-quote';
+const FOCUS_HIGHLIGHT = 'mg-chat-quote-focus';
 const FLASH_DURATION_MS = 1600;
 // Hover must rest on a mark before its popover opens, so reading across the
 // text does not flicker popovers; leaving gets a grace period to reach it.

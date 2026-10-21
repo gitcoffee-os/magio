@@ -35,7 +35,7 @@ import {
 } from './usageStatsModel';
 import { selectUsageStatsEntry, selectUsageToolsEntry, useUsageStatsStore, type UsageToolsEntry } from './usageStatsStore';
 
-/** Select value for the unfiltered report; project values are OpenChamber project ids. */
+/** Select value for the unfiltered report; project values are Magio project ids. */
 const ALL_PROJECTS = '__all__';
 
 /** One bar color per token segment; the order matches `tokenSegments`. */
@@ -365,7 +365,7 @@ function ActivityChart({ stats, formats }: { stats: UsageStats; formats: Formats
           })}
           {activeBar && active !== null ? (
             <div
-              className="oc-glass-tooltip pointer-events-none absolute bottom-full z-10 mb-1.5 w-max max-w-56 rounded-xl border border-border/60 px-3 py-1.5 typography-meta text-[var(--surface-elevated-foreground)]"
+              className="mg-glass-tooltip pointer-events-none absolute bottom-full z-10 mb-1.5 w-max max-w-56 rounded-xl border border-border/60 px-3 py-1.5 typography-meta text-[var(--surface-elevated-foreground)]"
               style={{
                 left: `${((active + 0.5) / count) * 100}%`,
                 transform: `translateX(${active < count / 3 ? '-15%' : active > (count * 2) / 3 ? '-85%' : '-50%'})`,

@@ -64,7 +64,7 @@ describe('checked-in SDK examples', () => {
   });
 
   test('all shipped bundles match their source and current SDK', async () => {
-    const temporary = await mkdtemp(path.join(tmpdir(), 'oc-example-bundles-'));
+    const temporary = await mkdtemp(path.join(tmpdir(), 'mg-example-bundles-'));
     try {
     for (const entry of ['hello-kit/panel/main', 'hello-kit/background/main', 'github-token/panel/main', 'config-editor/panel/main', 'service-echo/panel/main',
       'service-echo/service/main', 'browser-provider-stub/service/main', 'browser-provider-stub/panel/main', 'tools-only/mcp', 'tasks-demo/panel/main', 'tasks-demo/panel/attach', 'tasks-demo/panel/page',

@@ -44,12 +44,12 @@ export const useMobileAutocompleteMaxHeight = (
         };
         measure();
         window.addEventListener('resize', measure);
-        window.addEventListener('oc:keyboard-settled', measure);
+        window.addEventListener('mg:keyboard-settled', measure);
         window.visualViewport?.addEventListener('resize', measure);
         window.visualViewport?.addEventListener('scroll', measure);
         return () => {
             window.removeEventListener('resize', measure);
-            window.removeEventListener('oc:keyboard-settled', measure);
+            window.removeEventListener('mg:keyboard-settled', measure);
             window.visualViewport?.removeEventListener('resize', measure);
             window.visualViewport?.removeEventListener('scroll', measure);
         };

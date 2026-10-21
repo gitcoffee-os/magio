@@ -97,7 +97,7 @@ export const CustomProviderModelDiscovery: React.FC<Props> = ({ models, existing
       ) : null}
 
       <ScrollableOverlay
-        outerClassName="oc-tile-inset max-h-[min(18rem,45dvh)] rounded-md"
+        outerClassName="mg-tile-inset max-h-[min(18rem,45dvh)] rounded-md"
         className="px-2 py-1"
         disableHorizontal
         preventOverscroll

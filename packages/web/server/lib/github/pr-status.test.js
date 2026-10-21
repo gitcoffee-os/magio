@@ -12,7 +12,7 @@ const listMock = mock(async () => ({ data: [] }));
 const isAncestorMock = mock(async () => false);
 
 const octokitFor = (token, accountId) => ({
-  openChamberCacheIdentity: getOctokitCacheIdentity(createOctokit(token, accountId)),
+  magioCacheIdentity: getOctokitCacheIdentity(createOctokit(token, accountId)),
   rest: { pulls: { list: listMock } },
 });
 
@@ -335,7 +335,7 @@ describe('resolveGitHubPrStatus for a contributor fork checkout', () => {
     head: { ref: 'fix/thing', label: 'contrib:fix/thing', user: { login: 'contrib' }, repo: { owner: { login: 'contrib' }, name: 'app' } },
   };
   const octokit = () => ({
-    openChamberCacheIdentity: getOctokitCacheIdentity(createOctokit('fork-token', 'fork-account')),
+    magioCacheIdentity: getOctokitCacheIdentity(createOctokit('fork-token', 'fork-account')),
     rest: {
       repos: {
         get: async ({ owner, repo }) => ({
@@ -403,7 +403,7 @@ describe('resolveGitHubPrStatus when GitHub refuses the repository', () => {
     response: { status, data: { message } },
   });
   const octokit = (token, get) => ({
-    openChamberCacheIdentity: getOctokitCacheIdentity(createOctokit(token, `${token}-account`)),
+    magioCacheIdentity: getOctokitCacheIdentity(createOctokit(token, `${token}-account`)),
     rest: { repos: { get }, pulls: { list: async () => ({ data: [] }) } },
   });
 
@@ -482,7 +482,7 @@ const git = (directory, ...args) => execFileSync('git', ['-C', directory, ...arg
 });
 
 const createRebasedCheckout = async (suffix, branch = 'feature') => {
-  const directory = await fs.mkdtemp(path.join(os.tmpdir(), `oc-pr-history-${suffix}-`));
+  const directory = await fs.mkdtemp(path.join(os.tmpdir(), `mg-pr-history-${suffix}-`));
   git(directory, 'init', `--initial-branch=${branch}`);
   git(directory, 'config', 'user.name', 'Test User');
   git(directory, 'config', 'user.email', 'test@example.com');
@@ -508,7 +508,7 @@ const createForkNetworkOctokit = ({ suffix, historicalPr, forkHistoricalPr = nul
   const parent = { owner: `upstream-${suffix}`, repo: `app-${suffix}` };
   const contributor = { owner: `contributor-${suffix}`, repo: `app-${suffix}` };
   const octokit = {
-    openChamberCacheIdentity: getOctokitCacheIdentity(createOctokit(`token-${suffix}`, `account-${suffix}`)),
+    magioCacheIdentity: getOctokitCacheIdentity(createOctokit(`token-${suffix}`, `account-${suffix}`)),
     rest: {
       repos: {
         get: async ({ owner, repo }) => {

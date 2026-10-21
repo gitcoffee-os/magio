@@ -355,7 +355,7 @@ const ZONE_GEOMETRY = {
     gutterSize: '0.875rem',
     expanded: 'absolute inset-y-0 inset-e-0 z-20 min-w-0',
     handle: 'absolute bottom-2 inset-s-1 top-0 z-50 w-2 cursor-col-resize',
-    sizeVariable: '--oc-context-panel-width',
+    sizeVariable: '--mg-context-panel-width',
   },
   left: {
     axis: 'x',
@@ -363,7 +363,7 @@ const ZONE_GEOMETRY = {
     gutterSize: '0.875rem',
     expanded: 'absolute inset-y-0 inset-s-0 z-20 min-w-0',
     handle: 'absolute bottom-2 inset-e-1 top-0 z-50 w-2 cursor-col-resize',
-    sizeVariable: '--oc-context-panel-width',
+    sizeVariable: '--mg-context-panel-width',
   },
   bottom: {
     axis: 'y',
@@ -371,7 +371,7 @@ const ZONE_GEOMETRY = {
     gutterSize: '1rem',
     expanded: 'absolute inset-x-0 bottom-0 z-20 min-h-0',
     handle: 'absolute inset-x-0 top-1 z-50 h-2 cursor-row-resize',
-    sizeVariable: '--oc-context-panel-height',
+    sizeVariable: '--mg-context-panel-height',
   },
 } as const;
 
@@ -1184,9 +1184,9 @@ export const ContextPanel: React.FC<{ zone?: ContextZone }> = ({ zone = 'right' 
           isVertical ? null : 'h-[calc(100%-0.5rem)]',
           // A framed card, inset from the chat: its own border and radius rather
           // than a divider running the length of the window.
-          // The dropdown's hairline ring (`oc-panel-edge`), shared with the
+          // The dropdown's hairline ring (`mg-panel-edge`), shared with the
           // work-status card.
-          'oc-panel-edge overflow-hidden rounded-[10px] bg-background',
+          'mg-panel-edge overflow-hidden rounded-[10px] bg-background',
           // Size animates in sync with the zone (surface switches, resize
           // release).
           isVertical ? 'transition-[height,opacity]' : 'transition-[width,opacity]',

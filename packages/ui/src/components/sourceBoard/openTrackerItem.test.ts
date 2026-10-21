@@ -7,13 +7,13 @@ describe('trackerTargetOfUrl', () => {
     expect(trackerTargetOfUrl('https://github.com/openchamber/openchamber/issues/4483')).toEqual({ source: 'repository', kind: 'issue' });
     expect(trackerTargetOfUrl('https://gitlab.com/group/sub/app/-/merge_requests/7')).toEqual({ source: 'repository', kind: 'pull' });
     expect(trackerTargetOfUrl('https://gitlab.com/group/sub/app/-/issues/3')).toEqual({ source: 'repository', kind: 'issue' });
-    expect(trackerTargetOfUrl('https://linear.app/openchamber/issue/ope-282/some-title')).toEqual({ source: 'linear', identifier: 'OPE-282' });
+    expect(trackerTargetOfUrl('https://linear.app/magio/issue/ope-282/some-title')).toEqual({ source: 'linear', identifier: 'OPE-282' });
   });
 
   test('leaves anything else to the browser', () => {
     expect(trackerTargetOfUrl('#12')).toBeNull();
     expect(trackerTargetOfUrl('https://example.com/tickets/12')).toBeNull();
-    expect(trackerTargetOfUrl('https://github.com/openchamber/openchamber')).toBeNull();
+    expect(trackerTargetOfUrl('https://github.com/gitcoffee-os/magio')).toBeNull();
   });
 });
 
@@ -39,7 +39,7 @@ describe('trackerItemLabel', () => {
     expect(trackerItemLabel('https://github.com/openchamber/openchamber/pull/4500/files')).toBe('#4500');
     expect(trackerItemLabel('https://gitlab.com/group/app/-/merge_requests/7')).toBe('!7');
     expect(trackerItemLabel('https://gitlab.com/group/app/-/issues/7')).toBe('#7');
-    expect(trackerItemLabel('https://linear.app/openchamber/issue/ope-282/some-title')).toBe('OPE-282');
+    expect(trackerItemLabel('https://linear.app/magio/issue/ope-282/some-title')).toBe('OPE-282');
     expect(trackerItemLabel('https://example.com/tickets/12')).toBeNull();
   });
 });

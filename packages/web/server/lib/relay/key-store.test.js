@@ -13,7 +13,7 @@ const makePair = () => {
 
 let dataDir;
 beforeEach(() => {
-  dataDir = fs.mkdtempSync(path.join(os.tmpdir(), 'oc-relay-keys-'));
+  dataDir = fs.mkdtempSync(path.join(os.tmpdir(), 'mg-relay-keys-'));
 });
 afterEach(() => {
   fs.rmSync(dataDir, { recursive: true, force: true });

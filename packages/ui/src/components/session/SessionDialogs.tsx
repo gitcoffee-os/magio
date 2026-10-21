@@ -618,7 +618,7 @@ export const SessionDialogs: React.FC = () => {
                                 <span className={cn(!isWorktreeDelete && 'hidden')}>
                                     •
                                 </span>
-                                <span dir="auto" className="oc-ui-start-align truncate">
+                                <span dir="auto" className="mg-ui-start-align truncate">
                                     {session.title || t('sessions.sidebar.session.untitled')}
                                 </span>
                             </li>

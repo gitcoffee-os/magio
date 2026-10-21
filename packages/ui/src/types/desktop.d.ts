@@ -2,13 +2,13 @@ import type { DesktopBootOutcome } from '@/lib/desktopBoot';
 
 declare global {
   interface Window {
-    __OPENCHAMBER_HOME__?: string;
-    __OPENCHAMBER_MACOS_MAJOR__?: number;
-    __OPENCHAMBER_LOCAL_ORIGIN__?: string;
-    __OPENCHAMBER_SSH_FORWARD_API_URL__?: string;
-    __OPENCHAMBER_ELECTRON__?: { runtime?: string; arch?: string; trayEnabled?: boolean; nativeFrame?: boolean };
-    __OPENCHAMBER_PLATFORM__?: string;
-    __OPENCHAMBER_DESKTOP_BOOT_OUTCOME__?: DesktopBootOutcome;
+    __MAGIO_HOME__?: string;
+    __MAGIO_MACOS_MAJOR__?: number;
+    __MAGIO_LOCAL_ORIGIN__?: string;
+    __MAGIO_SSH_FORWARD_API_URL__?: string;
+    __MAGIO_ELECTRON__?: { runtime?: string; arch?: string; trayEnabled?: boolean; nativeFrame?: boolean };
+    __MAGIO_PLATFORM__?: string;
+    __MAGIO_DESKTOP_BOOT_OUTCOME__?: DesktopBootOutcome;
   }
 
   interface WebviewElement extends HTMLElement {

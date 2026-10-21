@@ -10,10 +10,10 @@ import { registerGuestRoutes } from './routes.js';
 const roots = [];
 afterEach(async () => { await Promise.all(roots.splice(0).map((root) => fs.rm(root, { recursive: true, force: true }))); });
 const fixture = async () => {
-  const root = await fs.mkdtemp(path.join(os.tmpdir(), 'oc-background-')); roots.push(root);
+  const root = await fs.mkdtemp(path.join(os.tmpdir(), 'mg-background-')); roots.push(root);
   const packageRoot = path.join(root, 'package');
   await fs.mkdir(packageRoot);
-  await fs.writeFile(path.join(packageRoot, 'package.json'), JSON.stringify({ name: 'background-test', version: '1.0.0', openchamber: {
+  await fs.writeFile(path.join(packageRoot, 'package.json'), JSON.stringify({ name: 'background-test', version: '1.0.0', magio: {
     apiVersion: 1, contributes: {
       panel: { id: 'background-test', name: 'Background Test', icon: 'apps' },
       background: { entry: 'index.html' },
@@ -60,15 +60,15 @@ test('background install serves sandboxed assets and storage obeys approval and 
   const { root, packageRoot } = await fixture();
   await fs.writeFile(path.join(packageRoot, 'index.html'), '<script src="main.js"></script>');
   await fs.writeFile(path.join(packageRoot, 'main.js'), 'void 0;');
-  const app = express(); registerGuestRoutes(app, { openchamberDataDir: root, resolveGitBinaryForSpawn: () => 'git' });
+  const app = express(); registerGuestRoutes(app, { magioDataDir: root, resolveGitBinaryForSpawn: () => 'git' });
   const installed = await request(app).post('/api/guests').send({ path: packageRoot }).expect(201);
   expect(installed.body.guest.backgroundEntry).toBe('index.html');
   expect(installed.body.guest.entry).toBeUndefined();
   const catalog = await request(app).get('/api/guests').expect(200);
   expect(catalog.body.guests[0].backgroundEntry).toBe('index.html');
-  const html = await request(app).get('/api/guests/background-test/index.html?oc_url_token=test-scope').expect(200);
+  const html = await request(app).get('/api/guests/background-test/index.html?mg_url_token=test-scope').expect(200);
   expect(html.headers['content-security-policy']).toMatch(/^sandbox allow-scripts; default-src 'none';/);
-  expect(html.text).toContain('main.js?oc_url_token=test-scope');
+  expect(html.text).toContain('main.js?mg_url_token=test-scope');
   expect((await request(app).get('/api/guests/background-test/main.js').expect(200)).text).toBe('void 0;');
   await request(app).post('/api/guests/background-test/storage').send({ op: 'set', key: 'count', value: 1 }).expect(400);
   await request(app).put('/api/guests/background-test/capabilities').send({ granted: ['files'] }).expect(200);

@@ -7,7 +7,7 @@ import { execFileSync } from 'node:child_process';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
 
-// Every package.json a release bumps. `oc-dev create-release` imports this so
+// Every package.json a release bumps. `mg-dev create-release` imports this so
 // the commit it suggests stages exactly these files.
 export const RELEASE_PACKAGE_FILES = [
   'package.json',

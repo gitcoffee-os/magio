@@ -16,7 +16,7 @@ describe('content search with ripgrep', () => {
   let search;
 
   beforeAll(async () => {
-    repo = await mkdtemp(path.join(tmpdir(), 'oc-find-in-files-'));
+    repo = await mkdtemp(path.join(tmpdir(), 'mg-find-in-files-'));
     execFileSync('git', ['init', '-q'], { cwd: repo });
     await mkdir(path.join(repo, 'src'), { recursive: true });
     await mkdir(path.join(repo, '.hidden'), { recursive: true });

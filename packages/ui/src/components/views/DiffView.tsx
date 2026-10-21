@@ -419,7 +419,7 @@ const FileList = React.memo<FileListProps>(({
                                     {descriptor.code}
                                 </span>
                                 <span
-                                    className="oc-ui-start-align min-w-0 flex-1 truncate typography-meta"
+                                    className="mg-ui-start-align min-w-0 flex-1 truncate typography-meta"
                                     style={{ direction: 'rtl', unicodeBidi: 'plaintext' }}
                                     title={file.path}
                                 >
@@ -951,7 +951,7 @@ const NestedRepositoryChanges = React.memo<NestedRepositoryChangesProps>(({
                                     </span>
                                     <FileTypeIcon filePath={nestedFile.path} className="size-3.5 shrink-0" />
                                     <span
-                                        className="oc-ui-start-align min-w-0 flex-1 truncate typography-meta"
+                                        className="mg-ui-start-align min-w-0 flex-1 truncate typography-meta"
                                         style={{ direction: 'rtl', unicodeBidi: 'plaintext' }}
                                     >
                                         {nestedFile.path}
@@ -1416,7 +1416,7 @@ export const MultiFileDiffEntry = React.memo<MultiFileDiffEntryProps>(({
                                     if (lastSlash === -1) {
                                         return (
                                             <span
-                                                className="oc-ui-start-align block min-w-0 truncate typography-ui-label text-foreground"
+                                                className="mg-ui-start-align block min-w-0 truncate typography-ui-label text-foreground"
                                                 style={{ direction: 'rtl', unicodeBidi: 'plaintext' }}
                                             >
                                                 {file.path}
@@ -1430,7 +1430,7 @@ export const MultiFileDiffEntry = React.memo<MultiFileDiffEntryProps>(({
                                     return (
                                         <span dir="ltr" className="flex min-w-0 items-baseline overflow-hidden">
                                             <span
-                                                className="oc-ui-start-align min-w-0 truncate typography-ui-label text-muted-foreground"
+                                                className="mg-ui-start-align min-w-0 truncate typography-ui-label text-muted-foreground"
                                                 style={{ direction: 'rtl', unicodeBidi: 'plaintext' }}
                                             >
                                                 {dir}

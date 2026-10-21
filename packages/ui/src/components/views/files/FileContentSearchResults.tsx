@@ -96,7 +96,7 @@ export const FileContentSearchResults: React.FC<Props> = ({ state, activeMatchKe
                 <span className="min-w-0 flex-shrink truncate typography-meta" dir="auto">{name}</span>
                 {directory ? (
                   <span
-                    className="oc-ui-start-align min-w-0 flex-1 truncate typography-micro text-muted-foreground"
+                    className="mg-ui-start-align min-w-0 flex-1 truncate typography-micro text-muted-foreground"
                     style={{ direction: 'rtl' }}
                   >
                     {/* Left-to-right marks keep a leading "." in place inside the rtl box. */}

@@ -392,7 +392,7 @@ const UserTextPart: React.FC<UserTextPartProps> = ({
             {terminalContextState.contexts.length > 0 ? (
                 <div className="mt-2 space-y-1.5">
                     {terminalContextState.contexts.map((context, index) => (
-                        <details key={`${context.terminalLabel}-${context.startLine}-${index}`} className="oc-tile rounded-md px-2 py-1.5 text-xs">
+                        <details key={`${context.terminalLabel}-${context.startLine}-${index}`} className="mg-tile rounded-md px-2 py-1.5 text-xs">
                             <summary className="cursor-pointer text-muted-foreground">
                                 {t('chat.message.terminalContext', { terminal: context.terminalLabel, start: context.startLine, end: context.endLine })}
                             </summary>

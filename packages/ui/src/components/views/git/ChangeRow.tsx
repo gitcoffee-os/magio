@@ -144,7 +144,7 @@ export const ChangeRow = React.memo<ChangeRowProps>(function ChangeRow({
           if (lastSlash === -1 || nameOnly) {
             return (
               <span
-                className="oc-ui-start-align flex-1 min-w-0 truncate typography-ui-label text-foreground"
+                className="mg-ui-start-align flex-1 min-w-0 truncate typography-ui-label text-foreground"
                 style={{ direction: 'rtl', unicodeBidi: 'plaintext' }}
                 title={file.path}
               >

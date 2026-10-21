@@ -42,9 +42,9 @@ const holdingCommand = (marker: string) => `
 `;
 
 test('a Git process terminated by a signal is never reported as successful', { skip: process.platform === 'win32' }, async () => {
-  const cwd = await fs.mkdtemp(path.join(os.tmpdir(), 'oc-vscode-git-'));
+  const cwd = await fs.mkdtemp(path.join(os.tmpdir(), 'mg-vscode-git-'));
   try {
-    const result = await execGit(['-c', 'alias.oc-interrupt=!kill -TERM "$PPID"', 'oc-interrupt'], cwd);
+    const result = await execGit(['-c', 'alias.mg-interrupt=!kill -TERM "$PPID"', 'mg-interrupt'], cwd);
     assert.notEqual(result.exitCode, 0);
   } finally {
     await fs.rm(cwd, { recursive: true, force: true });
@@ -54,7 +54,7 @@ test('a Git process terminated by a signal is never reported as successful', { s
 // Twelve processes, a 1.5 s deadline and a tree kill each take about 4.5 s on Windows, too close to
 // Bun's 5 s default under a parallel run.
 test('repeated read deadlines terminate the processes, not just the waiters', { timeout: 30_000 }, async () => {
-  const cwd = await fs.mkdtemp(path.join(os.tmpdir(), 'oc-vscode-deadlines-'));
+  const cwd = await fs.mkdtemp(path.join(os.tmpdir(), 'mg-vscode-deadlines-'));
   const marker = path.join(cwd, 'pids');
   try {
     const requests = Array.from({ length: 12 }, () => execGit(['-e', holdingCommand(marker)], cwd, {
@@ -84,7 +84,7 @@ test('drains verbose stderr and sends EOF to non-interactive command stdin', asy
 });
 
 test('deactivation terminates outstanding Git work and rejects new launches', async () => {
-  const cwd = await fs.mkdtemp(path.join(os.tmpdir(), 'oc-vscode-stop-'));
+  const cwd = await fs.mkdtemp(path.join(os.tmpdir(), 'mg-vscode-stop-'));
   const marker = path.join(cwd, 'pids');
   try {
     const pending = execGit(['-e', holdingCommand(marker)], cwd, { binary: process.execPath });

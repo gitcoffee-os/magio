@@ -20,16 +20,16 @@
     "skipLibCheck": true,
     "noEmit": true,
     "paths": {
-      "@openchamber/sdk": [
+      "@magio/sdk": [
         "../sdk/src/index.ts"
       ],
-      "@openchamber/sdk/schemas": [
+      "@magio/sdk/schemas": [
         "../sdk/src/schemas.ts"
       ],
       "@/*": [
         "./src/*"
       ],
-      "@openchamber/ui/*": [
+      "@magio/ui/*": [
         "./src/*"
       ]
     }

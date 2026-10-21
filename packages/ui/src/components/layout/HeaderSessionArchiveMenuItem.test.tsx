@@ -85,7 +85,7 @@ for (const archived of [undefined, 0]) {
     useGlobalSessionsStore.getState().upsertSession(session('target', archived));
     const button = await renderMenuItem();
     expect(button.textContent).toBe('Archive');
-    expect(button.querySelector('use')?.getAttribute('href')).toBe('#oc-inbox-archive');
+    expect(button.querySelector('use')?.getAttribute('href')).toBe('#mg-inbox-archive');
     await act(async () => button.click());
     expect(archiveRequests).toBe(1);
     expect(restoreRequests).toEqual([]);
@@ -96,7 +96,7 @@ test('restores the menu session, including an inactive tab, and reacts to archiv
   useGlobalSessionsStore.getState().upsertSession(session('target', 2));
   const button = await renderMenuItem();
   expect(button.textContent).toBe('Restore');
-  expect(button.querySelector('use')?.getAttribute('href')).toBe('#oc-inbox-unarchive');
+  expect(button.querySelector('use')?.getAttribute('href')).toBe('#mg-inbox-unarchive');
   await act(async () => button.click());
   expect(restoreRequests).toEqual(['target']);
   expect(archiveRequests).toBe(0);

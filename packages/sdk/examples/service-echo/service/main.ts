@@ -2,10 +2,10 @@
 import { execFile } from 'node:child_process';
 import http from 'node:http';
 
-const port = Number(process.env.OPENCHAMBER_SERVICE_PORT);
-const token = process.env.OPENCHAMBER_SERVICE_TOKEN ?? '';
+const port = Number(process.env.MAGIO_SERVICE_PORT);
+const token = process.env.MAGIO_SERVICE_TOKEN ?? '';
 if (!port || !token) {
-  console.error('OPENCHAMBER_SERVICE_PORT and OPENCHAMBER_SERVICE_TOKEN are required');
+  console.error('MAGIO_SERVICE_PORT and MAGIO_SERVICE_TOKEN are required');
   process.exit(1);
 }
 

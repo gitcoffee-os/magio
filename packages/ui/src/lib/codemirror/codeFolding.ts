@@ -14,7 +14,7 @@ const createFoldMarker = (open: boolean): HTMLElement => {
   svg.setAttribute('viewBox', '0 0 24 24');
   svg.setAttribute('aria-hidden', 'true');
   const use = document.createElementNS('http://www.w3.org/2000/svg', 'use');
-  use.setAttribute('href', open ? '#oc-arrow-down-s' : '#oc-arrow-right-s');
+  use.setAttribute('href', open ? '#mg-arrow-down-s' : '#mg-arrow-right-s');
   svg.appendChild(use);
   marker.appendChild(svg);
   return marker;

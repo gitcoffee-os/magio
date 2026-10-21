@@ -1238,7 +1238,7 @@ export function DesktopHostSwitcherInline() {
         type="button"
         variant="ghost"
         size="sm"
-        data-oc-host-switcher
+        data-mg-host-switcher
         className="w-full justify-center"
         onClick={() => setOpen(true)}
       >

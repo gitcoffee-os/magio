@@ -41,9 +41,9 @@ const JUMP_SETTLE_MS = 1200;
 // walkthrough deliberately hands out no verdicts — so the emphasis is carried by
 // weight and full-strength text instead, and the tooltip states the axis outright.
 const IMPORTANCE_CLASS: Record<WalkthroughStopImportance, string> = {
-  critical: 'oc-tile-inset font-medium text-foreground',
-  normal: 'oc-tile-inset text-muted-foreground',
-  context: 'oc-tile-inset text-muted-foreground',
+  critical: 'mg-tile-inset font-medium text-foreground',
+  normal: 'mg-tile-inset text-muted-foreground',
+  context: 'mg-tile-inset text-muted-foreground',
 };
 
 const StopHeader = ({ stopView }: { stopView: WalkthroughStopView }) => {
@@ -53,7 +53,7 @@ const StopHeader = ({ stopView }: { stopView: WalkthroughStopView }) => {
   return (
     <header className="flex flex-col gap-2 px-4 pt-5 pb-3">
       <div className="flex items-center gap-2">
-        <span className="oc-tile-inset typography-micro flex h-5 min-w-5 shrink-0 items-center justify-center rounded-full px-1.5 tabular-nums text-muted-foreground">
+        <span className="mg-tile-inset typography-micro flex h-5 min-w-5 shrink-0 items-center justify-center rounded-full px-1.5 tabular-nums text-muted-foreground">
           {stopView.position}
         </span>
         <h3 className="typography-ui-header min-w-0 font-semibold text-foreground">{stop.title}</h3>

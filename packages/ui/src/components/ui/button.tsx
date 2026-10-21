@@ -6,10 +6,10 @@ import { Slot } from "@/components/ui/slot"
 
 // Tinted buttons: very pale tinted fill (a desaturated version of the border
 // tone) + saturated tinted border + saturated tinted text, lit like the other
-// controls (`oc-raised-button`). Dark theme mixes into transparent over the
+// controls (`mg-raised-button`). Dark theme mixes into transparent over the
 // surface so the tone sits atop the dark background.
 const TINT_PRIMARY = [
-  "oc-raised-button",
+  "mg-raised-button",
   "bg-[color-mix(in_srgb,var(--primary-base)_10%,var(--background))]",
   "text-[var(--primary-text)]",
   "border border-[color-mix(in_srgb,var(--primary-base)_12%,transparent)]",
@@ -22,7 +22,7 @@ const TINT_PRIMARY = [
 ].join(" ")
 
 const TINT_DESTRUCTIVE = [
-  "oc-raised-button",
+  "mg-raised-button",
   "bg-[color-mix(in_srgb,var(--status-error)_7%,var(--background))]",
   "text-[var(--error-text)]",
   "border border-[color-mix(in_srgb,var(--status-error)_9%,transparent)]",
@@ -35,7 +35,7 @@ const TINT_DESTRUCTIVE = [
 ].join(" ")
 
 const TINT_INFO = [
-  "oc-raised-button",
+  "mg-raised-button",
   "bg-[color-mix(in_srgb,var(--status-info)_4%,var(--background))]",
   "text-[var(--info-text)]",
   "border border-[color-mix(in_srgb,var(--status-info)_8%,transparent)]",
@@ -62,11 +62,11 @@ const buttonVariants = cva(
         destructive: TINT_DESTRUCTIVE,
         info: TINT_INFO,
          neutral:
-           "oc-raised bg-secondary text-secondary-foreground hover:[background-image:linear-gradient(var(--interactive-hover),var(--interactive-hover))] active:[background-image:linear-gradient(var(--interactive-active),var(--interactive-active))]",
+           "mg-raised bg-secondary text-secondary-foreground hover:[background-image:linear-gradient(var(--interactive-hover),var(--interactive-hover))] active:[background-image:linear-gradient(var(--interactive-active),var(--interactive-active))]",
         outline:
            // Raised like the dropdown triggers: canvas-coloured in light themes,
            // where elevated is darker than the page.
-           "oc-surface-elevated oc-raised bg-[var(--surface-background)] dark:bg-surface-elevated text-foreground hover:[background-image:linear-gradient(var(--interactive-hover),var(--interactive-hover))] active:[background-image:linear-gradient(var(--interactive-active),var(--interactive-active))]",
+           "mg-surface-elevated mg-raised bg-[var(--surface-background)] dark:bg-surface-elevated text-foreground hover:[background-image:linear-gradient(var(--interactive-hover),var(--interactive-hover))] active:[background-image:linear-gradient(var(--interactive-active),var(--interactive-active))]",
          // A chip represents selection, independently of the primary action.
         chip: cn(
           // Flat by tone, no border: a filter or a toggle, not a raised control.

@@ -138,7 +138,7 @@ describe('scheduled-tasks runtime helpers', () => {
 
 describe('scheduled-tasks runtime syncProject wiring', () => {
   const createTempProject = async () => {
-    const tempRoot = await mkdtemp(path.join(os.tmpdir(), 'oc-runtime-loop-'));
+    const tempRoot = await mkdtemp(path.join(os.tmpdir(), 'mg-runtime-loop-'));
     const repoPath = path.join(tempRoot, 'repo');
     await mkdir(path.join(repoPath, '.agents', 'loops'), { recursive: true });
     return {
@@ -247,7 +247,7 @@ Run something else.
 
 describe('scheduled-tasks runtime syncAllProjects', () => {
   it('keeps scheduling the other projects when one project cannot be synced', async () => {
-    const tempRoot = await mkdtemp(path.join(os.tmpdir(), 'oc-runtime-sync-all-'));
+    const tempRoot = await mkdtemp(path.join(os.tmpdir(), 'mg-runtime-sync-all-'));
     try {
       const brokenPath = path.join(tempRoot, 'broken');
       const healthyPath = path.join(tempRoot, 'healthy');
@@ -343,7 +343,7 @@ describe('scheduled-tasks runtime prompt dispatch', () => {
     runtime.stop();
 
     // The run is marked, so it stays out of In work.
-    expect(posts.find((post) => post.pathname === '/api/session')?.body.metadata).toEqual({ openchamber: { kind: 'scheduled' } });
+    expect(posts.find((post) => post.pathname === '/api/session')?.body.metadata).toEqual({ magio: { kind: 'scheduled' } });
     // The project knowledge is written into the session before anything is sent to it.
     const dispatch = posts.filter((post) => post.pathname.startsWith('/api/session/ses_run/') || post.pathname.startsWith('knowledge:'));
     expect(dispatch.map((post) => post.pathname.split('/').at(-1))).toEqual(['knowledge:ses_run', 'synthetic', 'prompt']);
@@ -417,7 +417,7 @@ describe('scheduled-tasks runtime chats scope', () => {
   };
 
   const createChatsRuntime = async ({ sessionStatus = 200 } = {}) => {
-    const tempRoot = await mkdtemp(path.join(os.tmpdir(), 'oc-runtime-chats-'));
+    const tempRoot = await mkdtemp(path.join(os.tmpdir(), 'mg-runtime-chats-'));
     const chatsScope = createChatsScope(path.join(tempRoot, 'chats'));
     const sessionBodies = [];
     vi.stubGlobal('fetch', vi.fn(async (input, init = {}) => {

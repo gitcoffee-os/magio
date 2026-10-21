@@ -6,7 +6,7 @@ import { mkdtemp, rm, writeFile, mkdir } from 'fs/promises';
 import { parseLoopDefinition, discoverLoops, discoverLoopFiles } from './loops.js';
 
 const createProject = async () => {
-  const tempRoot = await mkdtemp(path.join(os.tmpdir(), 'oc-loops-'));
+  const tempRoot = await mkdtemp(path.join(os.tmpdir(), 'mg-loops-'));
   const projectPath = path.join(tempRoot, 'repo');
   await mkdir(projectPath, { recursive: true });
   await mkdir(path.join(projectPath, '.git'), { recursive: true });
@@ -258,7 +258,7 @@ From the root.
 
   it('discovers user-scope loops from ~/.agents/loops', async () => {
     const { projectPath, cleanup } = await createProject();
-    const home = await mkdtemp(path.join(os.tmpdir(), 'oc-loops-home-'));
+    const home = await mkdtemp(path.join(os.tmpdir(), 'mg-loops-home-'));
     const userDir = path.join(home, '.agents', 'loops');
     await mkdir(userDir, { recursive: true });
     await writeFile(path.join(userDir, 'user-loop.md'), `---
@@ -285,7 +285,7 @@ User scope.
 
   it('lets project scope shadow user scope on name collision', async () => {
     const { projectPath, cleanup } = await createProject();
-    const home = await mkdtemp(path.join(os.tmpdir(), 'oc-loops-home-'));
+    const home = await mkdtemp(path.join(os.tmpdir(), 'mg-loops-home-'));
     const userDir = path.join(home, '.agents', 'loops');
     await mkdir(userDir, { recursive: true });
     await writeFile(path.join(userDir, 'same-name.md'), `---

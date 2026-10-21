@@ -4,8 +4,8 @@ import os from 'node:os';
 import path from 'node:path';
 import express from 'express';
 import request from 'supertest';
-import { GUEST_SCROLLBAR_CSS, GUEST_SCROLLBAR_SCRIPT } from '@openchamber/sdk';
-import { GUEST_UI_LOOK_CSS } from '@openchamber/sdk/ui';
+import { GUEST_SCROLLBAR_CSS, GUEST_SCROLLBAR_SCRIPT } from '@magio/sdk';
+import { GUEST_UI_LOOK_CSS } from '@magio/sdk/ui';
 import { injectGuestDocumentStyles } from './html-styles.js';
 import { registerGuestRoutes } from './routes.js';
 import { setCapabilityGrants, writeExtensionStore } from './persist.js';
@@ -15,13 +15,13 @@ afterEach(async () => { await Promise.all(roots.splice(0).map((root) => fs.rm(ro
 
 describe('approved origins in the frame policy', () => {
   test('open only once the user approved exactly the declared list', async () => {
-    const root = await fs.mkdtemp(path.join(os.tmpdir(), 'oc-guest-origins-')); roots.push(root);
+    const root = await fs.mkdtemp(path.join(os.tmpdir(), 'mg-guest-origins-')); roots.push(root);
     const packageRoot = path.join(root, 'guest'); await fs.mkdir(packageRoot);
     await fs.writeFile(path.join(packageRoot, 'index.html'), '<!doctype html><html><head></head><body></body></html>');
-    await fs.writeFile(path.join(packageRoot, 'package.json'), JSON.stringify({ name: 'guest', version: '1.0.0', openchamber: { apiVersion: 1, contributes: { panel: { id: 'fonts-guest', name: 'Fonts', icon: 'apps', entry: 'index.html' }, origins: ['https://fonts.example.com'] } } }));
+    await fs.writeFile(path.join(packageRoot, 'package.json'), JSON.stringify({ name: 'guest', version: '1.0.0', magio: { apiVersion: 1, contributes: { panel: { id: 'fonts-guest', name: 'Fonts', icon: 'apps', entry: 'index.html' }, origins: ['https://fonts.example.com'] } } }));
     const persistPath = path.join(root, 'extensions.json');
     await writeExtensionStore(persistPath, { paths: [packageRoot], sources: { [packageRoot]: 'path' } });
-    const app = express(); registerGuestRoutes(app, { openchamberDataDir: root });
+    const app = express(); registerGuestRoutes(app, { magioDataDir: root });
     const policy = async () => (await request(app).get('/api/guests/fonts-guest/index.html').set('Host', 'oc.test').expect(200)).headers['content-security-policy'];
 
     expect(await policy()).not.toContain('https://fonts.example.com');
@@ -40,8 +40,8 @@ describe('guest document styles', () => {
     const meta = '<meta name="color-scheme" content="light dark">';
     expect(decorated.startsWith(`<!doctype html>${meta}${html.slice('<!doctype html>'.length)}`)).toBe(true);
     expect(decorated).toContain(GUEST_SCROLLBAR_CSS);
-    expect(decorated).toContain('data-openchamber-guest-styles');
-    expect(decorated).toContain(`<script data-openchamber-guest-scrollbar>${GUEST_SCROLLBAR_SCRIPT}</script>`);
+    expect(decorated).toContain('data-magio-guest-styles');
+    expect(decorated).toContain(`<script data-magio-guest-scrollbar>${GUEST_SCROLLBAR_SCRIPT}</script>`);
   });
 
   test('declares the color scheme before any authored content', () => {
@@ -53,16 +53,16 @@ describe('guest document styles', () => {
   });
 
   test('serves scrollbar defaults to existing guests with or without an asset token', async () => {
-    const root = await fs.mkdtemp(path.join(os.tmpdir(), 'oc-guest-styles-')); roots.push(root);
+    const root = await fs.mkdtemp(path.join(os.tmpdir(), 'mg-guest-styles-')); roots.push(root);
     const packageRoot = path.join(root, 'guest'); await fs.mkdir(packageRoot);
     const html = '<!doctype html><html><head></head><body><script src="main.js"></script></body></html>';
     const script = 'console.log("existing bundle");';
     await fs.writeFile(path.join(packageRoot, 'index.html'), html);
     await fs.writeFile(path.join(packageRoot, 'main.js'), script);
-    await fs.writeFile(path.join(packageRoot, 'package.json'), JSON.stringify({ name: 'guest', version: '1.0.0', openchamber: { apiVersion: 1, contributes: { panel: { id: 'old-guest', name: 'Old guest', icon: 'apps', entry: 'index.html' } } } }));
+    await fs.writeFile(path.join(packageRoot, 'package.json'), JSON.stringify({ name: 'guest', version: '1.0.0', magio: { apiVersion: 1, contributes: { panel: { id: 'old-guest', name: 'Old guest', icon: 'apps', entry: 'index.html' } } } }));
     await writeExtensionStore(path.join(root, 'extensions.json'), { paths: [packageRoot], sources: { [packageRoot]: 'path' } });
-    const app = express(); registerGuestRoutes(app, { openchamberDataDir: root });
-    for (const suffix of ['', '?oc_url_token=fixture-scope']) {
+    const app = express(); registerGuestRoutes(app, { magioDataDir: root });
+    for (const suffix of ['', '?mg_url_token=fixture-scope']) {
       const response = await request(app).get(`/api/guests/old-guest/index.html${suffix}`).set('Host', 'oc.example:3000').expect(200);
       // Sandboxed and off the network: its own package path is the one place it may connect.
       const csp = response.headers['content-security-policy'];
@@ -76,7 +76,7 @@ describe('guest document styles', () => {
       // The kit's look follows this app, after the authored document so it outranks the bundle's own copy.
       expect(response.text.indexOf(GUEST_UI_LOOK_CSS)).toBeGreaterThan(response.text.indexOf('</html>'));
       expect(response.text.startsWith('<!doctype html>')).toBe(true);
-      expect(response.text).toContain(suffix ? 'main.js?oc_url_token=fixture-scope' : 'src="main.js"');
+      expect(response.text).toContain(suffix ? 'main.js?mg_url_token=fixture-scope' : 'src="main.js"');
     }
     expect((await request(app).get('/api/guests/old-guest/main.js').expect(200)).text).toBe(script);
     // A Host that is not a plain host[:port] never reaches the policy: no connections at all.
@@ -84,12 +84,12 @@ describe('guest document styles', () => {
     // origin; the answer the server's CORS layer gave it must survive.
     const uiApp = express();
     uiApp.use((req, res, next) => {
-      if (req.headers.origin === 'openchamber-ui://app') res.setHeader('Access-Control-Allow-Origin', req.headers.origin);
+      if (req.headers.origin === 'magio-ui://app') res.setHeader('Access-Control-Allow-Origin', req.headers.origin);
       next();
     });
-    registerGuestRoutes(uiApp, { openchamberDataDir: root });
-    const fromUi = await request(uiApp).get('/api/guests/old-guest/main.js').set('Origin', 'openchamber-ui://app').expect(200);
-    expect(fromUi.headers['access-control-allow-origin']).toBe('openchamber-ui://app');
+    registerGuestRoutes(uiApp, { magioDataDir: root });
+    const fromUi = await request(uiApp).get('/api/guests/old-guest/main.js').set('Origin', 'magio-ui://app').expect(200);
+    expect(fromUi.headers['access-control-allow-origin']).toBe('magio-ui://app');
     const fromFrame = await request(uiApp).get('/api/guests/old-guest/main.js').set('Origin', 'null').expect(200);
     expect(fromFrame.headers['access-control-allow-origin']).toBe('null');
     const forged = await request(app).get('/api/guests/old-guest/index.html').set('Host', "evil.test; connect-src *").expect(200);

@@ -18,7 +18,7 @@ const variants = [
   },
   {
     variant: "generate-effect",
-    // One CSS sweep over the whole text (`.oc-text-generate` in index.css),
+    // One CSS sweep over the whole text (`.mg-text-generate` in index.css),
     // not a span and a JS animation per character: streaming tool rows
     // mount these constantly, and the per-character version cost a quarter
     // of the main thread's work in an agent run. The sweep plays once on mount;
@@ -28,7 +28,7 @@ const variants = [
       if (children === null || children === undefined || children === "") return null;
 
       return (
-        <span {...props} className={cn("oc-text-generate inline-block align-baseline", className)}>
+        <span {...props} className={cn("mg-text-generate inline-block align-baseline", className)}>
           {children}
         </span>
       );

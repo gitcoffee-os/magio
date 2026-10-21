@@ -973,7 +973,7 @@ const renderPathLikeGitChanges = (path: string, grow = true) => {
     if (lastSlash === -1) {
         return (
             <span
-                className={cn('oc-ui-start-align min-w-0 truncate typography-ui-label text-foreground', grow && 'flex-1')}
+                className={cn('mg-ui-start-align min-w-0 truncate typography-ui-label text-foreground', grow && 'flex-1')}
                 style={{ direction: 'rtl', unicodeBidi: 'plaintext' }}
                 title={path}
             >
@@ -990,7 +990,7 @@ const renderPathLikeGitChanges = (path: string, grow = true) => {
     return (
         <span dir="ltr" className={cn('min-w-0 flex items-baseline overflow-hidden typography-ui-label', grow && 'flex-1')} title={path}>
             {hasAbsoluteRoot ? <span className="flex-shrink-0 text-muted-foreground">/</span> : null}
-            <span className="oc-ui-start-align min-w-0 truncate text-muted-foreground" style={{ direction: 'rtl', unicodeBidi: 'plaintext' }}>
+            <span className="mg-ui-start-align min-w-0 truncate text-muted-foreground" style={{ direction: 'rtl', unicodeBidi: 'plaintext' }}>
                 {displayDir}
             </span>
             <span className="flex-shrink-0">
@@ -1030,7 +1030,7 @@ const renderAnimatedPathWithIcon = (path: string, animate = true, grow = true, s
             <span dir="ltr" className={cn('min-w-0 inline-flex max-w-full items-baseline overflow-hidden', textClassName, grow && 'flex-1')}>
                 {hasAbsoluteRoot ? <span className="flex-shrink-0" style={{ color: 'var(--tools-description)' }}>/</span> : null}
                 <span
-                    className="oc-ui-start-align min-w-0 shrink truncate whitespace-nowrap"
+                    className="mg-ui-start-align min-w-0 shrink truncate whitespace-nowrap"
                     style={{
                         color: 'var(--tools-description)',
                         direction: 'rtl',
@@ -1112,13 +1112,13 @@ const ToolExpandedContent: React.FC<ToolExpandedContentProps> = React.memo(({
     );
     const hasVisualDiffEntry = diffEntries.some((entry) => entry.renderMode === 'diff');
     // `execute` renders its script and its call list itself, below.
-    const hideToolInputPreview = part.tool === 'openchamber'
-        || part.tool === 'openchamber_schedule'
-        || part.tool === 'openchamber_web'
-        || part.tool === 'openchamber_memory'
-        || part.tool === 'openchamber_knowledge'
-        || part.tool === 'openchamber_notify'
-        || part.tool === 'openchamber_render'
+    const hideToolInputPreview = part.tool === 'magio'
+        || part.tool === 'magio_schedule'
+        || part.tool === 'magio_web'
+        || part.tool === 'magio_memory'
+        || part.tool === 'magio_knowledge'
+        || part.tool === 'magio_notify'
+        || part.tool === 'magio_render'
         || isPatchTool(part.tool)
         || isEditTool(part.tool)
         || isExecuteTool(part.tool);
@@ -1241,7 +1241,7 @@ const ToolExpandedContent: React.FC<ToolExpandedContentProps> = React.memo(({
                         </div>
                         <div className="space-y-1">
                             {diagnosticSection.diagnostics.map((diagnostic, index) => (
-                                <div key={`${diagnosticSection.displayPath}:${diagnostic.line}:${diagnostic.character}:${index}`} className="oc-tile-inset rounded-md px-2 py-1">
+                                <div key={`${diagnosticSection.displayPath}:${diagnostic.line}:${diagnostic.character}:${index}`} className="mg-tile-inset rounded-md px-2 py-1">
                                     <div className="flex items-start gap-2 min-w-0">
                                         <span className="typography-micro shrink-0" style={{ color: 'var(--status-error)' }}>
                                             [{diagnostic.line}:{diagnostic.character}]
@@ -1328,7 +1328,7 @@ const ToolExpandedContent: React.FC<ToolExpandedContentProps> = React.memo(({
                                 {Array.isArray(q.options) && q.options.length > 0 ? (
                                     <div className="flex flex-wrap gap-1 mt-0.5">
                                         {q.options.map((opt) => (
-                                            <span key={coerceToText(opt.label)} className="typography-micro px-1.5 py-0.5 rounded oc-tile-inset text-muted-foreground">
+                                            <span key={coerceToText(opt.label)} className="typography-micro px-1.5 py-0.5 rounded mg-tile-inset text-muted-foreground">
                                                 {coerceToText(opt.label)}
                                             </span>
                                         ))}

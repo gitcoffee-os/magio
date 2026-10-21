@@ -7,16 +7,16 @@ import type {
   FileSearchQuery,
   FileSearchResult,
   FilesAPI,
-} from '@openchamber/ui/lib/api/types';
-import { opencodeClient } from '@openchamber/ui/lib/opencode/client';
+} from '@magio/ui/lib/api/types';
+import { opencodeClient } from '@magio/ui/lib/opencode/client';
 import {
   FilesystemError,
   parseFilesystemErrorReason,
   type FilesystemErrorReason,
-} from '@openchamber/ui/lib/api/files-errors';
-import { runtimeFetch } from '@openchamber/ui/lib/runtime-fetch';
-import { spaceIdOfDirectory, spaceRootDirectory } from '@openchamber/ui/lib/spaces/space-route';
-import { shareFileFromNativeApp } from '@openchamber/ui/lib/nativeFileShare';
+} from '@magio/ui/lib/api/files-errors';
+import { runtimeFetch } from '@magio/ui/lib/runtime-fetch';
+import { spaceIdOfDirectory, spaceRootDirectory } from '@magio/ui/lib/spaces/space-route';
+import { shareFileFromNativeApp } from '@magio/ui/lib/nativeFileShare';
 
 const normalizePath = (path: string): string => path.replace(/\\/g, '/');
 

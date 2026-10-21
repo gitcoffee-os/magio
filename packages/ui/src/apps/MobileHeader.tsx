@@ -87,10 +87,10 @@ export const MobileHeader: React.FC<{
   return (
     <>
       <header
-        className="oc-mobile-header relative z-30 flex shrink-0 items-center gap-1 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80"
-        style={{ paddingTop: 'var(--oc-safe-area-top, 0px)' }}
+        className="mg-mobile-header relative z-30 flex shrink-0 items-center gap-1 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80"
+        style={{ paddingTop: 'var(--mg-safe-area-top, 0px)' }}
       >
-        <div className="flex h-[var(--oc-header-height,56px)] w-full items-center gap-1 px-2">
+        <div className="flex h-[var(--mg-header-height,56px)] w-full items-center gap-1 px-2">
           <button
             type="button"
             className="flex size-10 shrink-0 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-interactive-hover hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
@@ -116,7 +116,7 @@ export const MobileHeader: React.FC<{
             style={{ touchAction: 'manipulation' }}
           >
             <span className="flex min-w-0 items-center gap-1">
-              <span dir="auto" className="block min-w-0 truncate oc-ui-start-align typography-ui-label text-foreground">{primaryLabel}</span>
+              <span dir="auto" className="block min-w-0 truncate mg-ui-start-align typography-ui-label text-foreground">{primaryLabel}</span>
               {/* Discoverability: the chevron marks the title as a disclosure
                   trigger and flips while the switcher is open. */}
               <Icon

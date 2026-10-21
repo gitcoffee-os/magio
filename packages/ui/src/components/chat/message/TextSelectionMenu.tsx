@@ -45,7 +45,7 @@ interface TextSelectionMenuProps {
   readingKey: string;
   canReadAloud: boolean;
   // This menu answers to the selections made in the page frames inside its
-  // container (`openchamber_render`), not to the container's own text. Each
+  // container (`magio_render`), not to the container's own text. Each
   // page has its own such menu (HtmlRenderFrame), so a page works wherever it
   // is drawn: in a message, in the live turn's hoisted pages, or full screen.
   // `readingKey` is then the id of the message the page belongs to.
@@ -527,7 +527,7 @@ const TextSelectionMenuImpl: React.FC<TextSelectionMenuProps> = ({ containerRef,
     };
   }, [containerRef, handleSelectionChange, hideMenu, showMenu]);
 
-  // A selection made inside a page frame (`openchamber_render`) arrives as an
+  // A selection made inside a page frame (`magio_render`) arrives as an
   // event from the frame, never through window.getSelection().
   React.useEffect(() => {
     const container = containerRef.current;
@@ -566,7 +566,7 @@ const TextSelectionMenuImpl: React.FC<TextSelectionMenuProps> = ({ containerRef,
     addMarkdownToChat(selectedTextMarkdown);
   }, [addMarkdownToChat, selectedTextMarkdown]);
 
-  const handleAskOpenChamber = React.useCallback(() => {
+  const handleAskMagio = React.useCallback(() => {
     if (!currentSessionId || !selectedTextMarkdown) return;
     requestBtwComposer({
       parentSessionId: currentSessionId,
@@ -749,7 +749,7 @@ const TextSelectionMenuImpl: React.FC<TextSelectionMenuProps> = ({ containerRef,
         {commentRects.map((rect, index) => (
           <div
             key={index}
-            className="oc-chat-comment-rect absolute"
+            className="mg-chat-comment-rect absolute"
             style={{ left: rect.left, top: rect.top, width: rect.width, height: rect.height }}
           />
         ))}
@@ -761,7 +761,7 @@ const TextSelectionMenuImpl: React.FC<TextSelectionMenuProps> = ({ containerRef,
   const commentInput = (
     <div
       className={cn(
-        'oc-glass-popover oc-glass-floating relative flex items-end gap-2 rounded-3xl',
+        'mg-glass-popover mg-glass-floating relative flex items-end gap-2 rounded-3xl',
         'ps-4',
         'py-1 pe-1',
         'transition-[opacity,transform] duration-200 ease-out',
@@ -810,7 +810,7 @@ const TextSelectionMenuImpl: React.FC<TextSelectionMenuProps> = ({ containerRef,
         ref={menuRef}
         className={cn(
           'fixed inset-s-3 inset-e-3 bottom-0 z-50 mx-auto max-w-[420px]',
-          'oc-glass-popover oc-glass-floating rounded-2xl',
+          'mg-glass-popover mg-glass-floating rounded-2xl',
           'p-2',
           'safe-area-bottom',
           'transition-[opacity,transform] duration-200 ease-out will-change-[opacity,transform]',
@@ -881,7 +881,7 @@ const TextSelectionMenuImpl: React.FC<TextSelectionMenuProps> = ({ containerRef,
           <div className="grid grid-cols-2 gap-2">
             {currentSessionId ? (
               <button
-                onClick={handleAskOpenChamber}
+                onClick={handleAskMagio}
                 className={cn(
                   'flex min-w-0 items-center gap-2 rounded-xl px-3 py-2.5 text-start',
                   'text-sm font-medium leading-tight',
@@ -889,11 +889,11 @@ const TextSelectionMenuImpl: React.FC<TextSelectionMenuProps> = ({ containerRef,
                   'active:opacity-80',
                   'transition-opacity duration-150'
                 )}
-                title={t('chat.textSelection.title.askOpenChamber')}
+                title={t('chat.textSelection.title.askMagio')}
                 type="button"
               >
                 <Icon name="chat-ai-3" className="h-5 w-5 flex-shrink-0" />
-                <span className="min-w-0 whitespace-normal">{t('chat.textSelection.actions.askOpenChamber')}</span>
+                <span className="min-w-0 whitespace-normal">{t('chat.textSelection.actions.askMagio')}</span>
               </button>
             ) : null}
 
@@ -943,7 +943,7 @@ const TextSelectionMenuImpl: React.FC<TextSelectionMenuProps> = ({ containerRef,
         <div
           className={cn(
             'flex items-center whitespace-nowrap',
-            'oc-glass-popover oc-glass-floating rounded-full',
+            'mg-glass-popover mg-glass-floating rounded-full',
             'p-1',
             'transition-[opacity,transform] duration-200 ease-out',
             isOpening ? 'opacity-0 translate-y-[4px]' : 'opacity-100 translate-y-0'
@@ -968,7 +968,7 @@ const TextSelectionMenuImpl: React.FC<TextSelectionMenuProps> = ({ containerRef,
             <>
               <div className="mx-0.5 h-5 w-px shrink-0 bg-[var(--interactive-border)]" />
               <button
-                onClick={handleAskOpenChamber}
+                onClick={handleAskMagio}
                 className={cn(
                   'px-3.5 py-1.5 rounded-full',
                   'text-sm font-medium',
@@ -976,10 +976,10 @@ const TextSelectionMenuImpl: React.FC<TextSelectionMenuProps> = ({ containerRef,
                   'hover:bg-[var(--interactive-hover)]',
                   'transition-colors duration-150'
                 )}
-                title={t('chat.textSelection.title.askOpenChamber')}
+                title={t('chat.textSelection.title.askMagio')}
                 type="button"
               >
-                {t('chat.textSelection.actions.askOpenChamber')}
+                {t('chat.textSelection.actions.askMagio')}
               </button>
             </>
           ) : null}

@@ -47,7 +47,7 @@ export const BrowserDeviceBar: React.FC<{
   };
 
   const inputClass = cn(
-    'oc-raised oc-field h-6 w-14 rounded-full bg-[var(--surface-elevated)] px-2 text-center',
+    'mg-raised mg-field h-6 w-14 rounded-full bg-[var(--surface-elevated)] px-2 text-center',
     'typography-micro tabular-nums text-foreground outline-none',
   );
 
@@ -61,7 +61,7 @@ export const BrowserDeviceBar: React.FC<{
         }}
         aria-label={t('contextPanel.browser.device.preset')}
         className={cn(
-          'oc-raised oc-field h-6 shrink-0 rounded-full bg-[var(--surface-elevated)] px-2',
+          'mg-raised mg-field h-6 shrink-0 rounded-full bg-[var(--surface-elevated)] px-2',
           'typography-micro text-foreground outline-none',
         )}
       >

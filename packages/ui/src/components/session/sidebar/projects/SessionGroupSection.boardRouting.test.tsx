@@ -72,9 +72,9 @@ const PROJECT: ProjectEntry = { id: 'proj-1', path: '/repo' };
 const WORKTREE_DIRECTORY = '/home/user/.local/share/opencode/worktree/abc';
 
 const linkedIssuesMetadata: Metadata = {
-  openchamber: {
+  magio: {
     linked_issues: [{
-      id: 'openchamber/openchamber#5028',
+      id: 'magio/magio#5028',
       kind: 'issue',
       number: 5028,
       title: 'Worktree chip opens the browser instead of the board',

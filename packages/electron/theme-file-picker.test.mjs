@@ -6,7 +6,7 @@ import os from 'node:os';
 import { pickThemeFile } from './theme-file-picker.mjs';
 
 test('uses the local VS Code folder only when present and returns bounded contents without exposing paths', async () => {
-  const home = await fs.mkdtemp(path.join(os.tmpdir(), 'oc-theme-picker-'));
+  const home = await fs.mkdtemp(path.join(os.tmpdir(), 'mg-theme-picker-'));
   try {
     await pickThemeFile({ home, showDialog: async (options) => {
       assert.equal(options.defaultPath, undefined);

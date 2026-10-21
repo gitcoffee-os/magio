@@ -11,13 +11,13 @@
  * Shared by served extension documents and the UI kit, including older guest bundles.
  */
 /** Attribute present on an element for a moment after it scrolled. */
-const GUEST_SCROLLING_ATTRIBUTE = 'data-oc-scrolling';
+const GUEST_SCROLLING_ATTRIBUTE = 'data-mg-scrolling';
 
 export const GUEST_SCROLLBAR_CSS = `
 :root {
   /* Quiet at rest like the app's own thumbs; hover gives a clear grab target. */
-  --oc-scrollbar-thumb: color-mix(in srgb, var(--oc-muted, currentColor) 18%, transparent);
-  --oc-scrollbar-thumb-hover: color-mix(in srgb, var(--oc-muted, currentColor) 36%, transparent);
+  --mg-scrollbar-thumb: color-mix(in srgb, var(--mg-muted, currentColor) 18%, transparent);
+  --mg-scrollbar-thumb-hover: color-mix(in srgb, var(--mg-muted, currentColor) 36%, transparent);
   scrollbar-gutter: stable;
 }
 * {
@@ -25,7 +25,7 @@ export const GUEST_SCROLLBAR_CSS = `
   scrollbar-color: transparent transparent;
 }
 :hover, [${GUEST_SCROLLING_ATTRIBUTE}] {
-  scrollbar-color: var(--oc-scrollbar-thumb) transparent;
+  scrollbar-color: var(--mg-scrollbar-thumb) transparent;
 }
 /* Chromium's standard scrollbar properties otherwise override its pseudo-elements. */
 @supports selector(::-webkit-scrollbar) {
@@ -38,8 +38,8 @@ export const GUEST_SCROLLBAR_CSS = `
     min-width: 24px;
     min-height: 24px;
   }
-  :hover::-webkit-scrollbar-thumb, [${GUEST_SCROLLING_ATTRIBUTE}]::-webkit-scrollbar-thumb { background: var(--oc-scrollbar-thumb); }
-  ::-webkit-scrollbar-thumb:hover { background: var(--oc-scrollbar-thumb-hover); }
+  :hover::-webkit-scrollbar-thumb, [${GUEST_SCROLLING_ATTRIBUTE}]::-webkit-scrollbar-thumb { background: var(--mg-scrollbar-thumb); }
+  ::-webkit-scrollbar-thumb:hover { background: var(--mg-scrollbar-thumb-hover); }
   ::-webkit-scrollbar-corner { background: transparent; }
   ::-webkit-scrollbar-button { display: none; width: 0; height: 0; }
 }
@@ -57,18 +57,18 @@ export const GUEST_SCROLLBAR_CSS = `
  */
 export function installGuestScrollbarActivity(doc: Document): void {
   const root = doc.documentElement;
-  if (root.hasAttribute('data-oc-scrollbar-activity')) return;
-  root.setAttribute('data-oc-scrollbar-activity', '');
+  if (root.hasAttribute('data-mg-scrollbar-activity')) return;
+  root.setAttribute('data-mg-scrollbar-activity', '');
   const timers = new WeakMap<Element, ReturnType<typeof setTimeout>>();
   doc.addEventListener('scroll', (event) => {
     const target = event.target === doc ? root : event.target;
     if (!(target instanceof Element)) return;
-    if (!target.hasAttribute('data-oc-scrolling')) target.setAttribute('data-oc-scrolling', '');
+    if (!target.hasAttribute('data-mg-scrolling')) target.setAttribute('data-mg-scrolling', '');
     const pending = timers.get(target);
     if (pending !== undefined) clearTimeout(pending);
     timers.set(target, setTimeout(() => {
       timers.delete(target);
-      target.removeAttribute('data-oc-scrolling');
+      target.removeAttribute('data-mg-scrolling');
     }, 1000));
   }, { capture: true, passive: true });
 }

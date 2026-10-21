@@ -73,7 +73,7 @@ import {
   registerCommonRequestMiddleware,
   registerServerStatusRoutes,
 } from './lib/opencode/core-routes.js';
-import { registerOpenChamberRoutes } from './lib/opencode/openchamber-routes.js';
+import { registerMagioRoutes } from './lib/opencode/magio-routes.js';
 import { createServerUtilsRuntime } from './lib/opencode/server-utils-runtime.js';
 import { createStaticRoutesRuntime } from './lib/opencode/static-routes-runtime.js';
 import { createSettingsRuntime } from './lib/opencode/settings-runtime.js';
@@ -119,7 +119,7 @@ import { guestServiceRegistryDir } from './lib/guests/service-registry.js';
 import { findInstalledGuest } from './lib/guests/catalog.js';
 import { extensionsPersistPath } from './lib/guests/persist.js';
 import { createGuestSurfaceRuntime } from './lib/guests/surface.js';
-import { BROWSER_PROVIDER_IDLE_MS } from '@openchamber/sdk';
+import { BROWSER_PROVIDER_IDLE_MS } from '@magio/sdk';
 import { createProjectConfigRuntime } from './lib/projects/project-config.js';
 import { ensureChatsDir, migrateLegacyUserDirs } from './lib/data-dir-migration.js';
 import { createProjectContextRuntime } from './lib/project-context/runtime.js';
@@ -154,15 +154,15 @@ import { createDevTunnelRuntime } from './lib/dev-tunnel/runtime.js';
 import { registerBrowserControlRoutes } from './lib/browser-control/routes.js';
 import { createManagedConfigRuntime } from './lib/opencode/managed-config-file.js';
 import { prepareInstanceDir } from './lib/opencode/instance-dir.js';
-import { createOpenChamberSessionService } from './lib/openchamber-sessions/routes.js';
-import { createSessionMetadataStore, createOpenCodeSessionMetadata } from './lib/openchamber-sessions/session-metadata-store.js';
-import { createOpenCodeClient } from './lib/openchamber-sessions/opencode-client.js';
+import { createMagioSessionService } from './lib/magio-sessions/routes.js';
+import { createSessionMetadataStore, createOpenCodeSessionMetadata } from './lib/magio-sessions/session-metadata-store.js';
+import { createOpenCodeClient } from './lib/magio-sessions/opencode-client.js';
 import { createScheduledTaskService } from './lib/scheduled-tasks/service.js';
-import { createOpenChamberControlService } from './lib/openchamber-control/service.js';
+import { createMagioControlService } from './lib/magio-control/service.js';
 import { createPluginNotificationEmitter } from './lib/notifications/emit-route.js';
-import { OpenChamberControlError } from './lib/openchamber-control/error.js';
-import { createSessionLinker } from './lib/openchamber-sessions/session-link.js';
-import { createFileOpenRequester } from './lib/openchamber-control/file-open.js';
+import { MagioControlError } from './lib/magio-control/error.js';
+import { createSessionLinker } from './lib/magio-sessions/session-link.js';
+import { createFileOpenRequester } from './lib/magio-control/file-open.js';
 import { applyConnectAttemptTimeout } from './lib/network-defaults.js';
 import { applyOutboundProxyFromEnv } from './lib/outbound-proxy.js';
 
@@ -174,10 +174,10 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const DEFAULT_PORT = 3000;
-const DESKTOP_NOTIFY_PREFIX = '[OpenChamberDesktopNotify] ';
+const DESKTOP_NOTIFY_PREFIX = '[MagioDesktopNotify] ';
 const uiNotificationClients = new Set();
 const uiNotificationWsClients = new Set();
-const uiOpenChamberEventClients = new Set();
+const uiMagioEventClients = new Set();
 const HEALTH_CHECK_INTERVAL = 15000;
 const SHUTDOWN_TIMEOUT = 10000;
 const MODELS_DEV_API_URL = 'https://models.dev/api.json';
@@ -217,12 +217,12 @@ const SSE_PATH_PREFIXES = [
   '/api/event',
   '/api/global/event',
   '/api/notifications/stream',
-  '/api/openchamber/events',
-  '/api/openchamber/realtime-proxy/sse',
+  '/api/magio/events',
+  '/api/magio/realtime-proxy/sse',
 ];
 
 function shouldSkipCompression(req, res) {
-  if (process.env.OPENCHAMBER_RUNTIME === 'desktop') {
+  if (process.env.MAGIO_RUNTIME === 'desktop') {
     return true;
   }
 
@@ -244,7 +244,7 @@ function shouldSkipCompression(req, res) {
   return headerIncludesEventStream(res.getHeader('Content-Type'));
 }
 
-const OPENCHAMBER_VERSION = (() => {
+const MAGIO_VERSION = (() => {
   try {
     const packagePath = path.resolve(__dirname, '..', 'package.json');
     const raw = fs.readFileSync(packagePath, 'utf8');
@@ -272,13 +272,13 @@ const isEnvFlagDisabled = (value) => {
 };
 
 const shouldSkipApiCompression = () => {
-  if (isEnvFlagEnabled(process.env.OPENCHAMBER_SKIP_API_COMPRESSION)) return true;
-  if (isEnvFlagEnabled(process.env.OPENCHAMBER_COMPRESS_API)) return false;
-  if (isEnvFlagDisabled(process.env.OPENCHAMBER_COMPRESS_API)) return true;
-  return process.env.OPENCHAMBER_RUNTIME === 'desktop';
+  if (isEnvFlagEnabled(process.env.MAGIO_SKIP_API_COMPRESSION)) return true;
+  if (isEnvFlagEnabled(process.env.MAGIO_COMPRESS_API)) return false;
+  if (isEnvFlagDisabled(process.env.MAGIO_COMPRESS_API)) return true;
+  return process.env.MAGIO_RUNTIME === 'desktop';
 };
 
-const OPENCHAMBER_VERBOSE_REQUEST_LOGS = isEnvFlagEnabled(process.env.OPENCHAMBER_VERBOSE_REQUEST_LOGS);
+const MAGIO_VERBOSE_REQUEST_LOGS = isEnvFlagEnabled(process.env.MAGIO_VERBOSE_REQUEST_LOGS);
 
 const fsPromises = fs.promises;
 
@@ -313,22 +313,22 @@ const sanitizeModelRefs = (...args) => settingsNormalizationRuntime.sanitizeMode
 const sanitizeSkillCatalogs = (...args) => settingsNormalizationRuntime.sanitizeSkillCatalogs(...args);
 const sanitizeProjects = (...args) => settingsNormalizationRuntime.sanitizeProjects(...args);
 
-// Every OpenChamber-owned file and folder hangs off one root: the default
-// `~/.config/openchamber`, or `OPENCHAMBER_DATA_DIR` when set. The user
+// Every Magio-owned file and folder hangs off one root: the default
+// `~/.config/magio`, or `MAGIO_DATA_DIR` when set. The user
 // folders (`projects/`, `themes/`, `speech-models/`) are copied into a custom
 // root once at startup (`migrateLegacyUserDirs`), because they used to ignore
 // the variable.
-const OPENCHAMBER_DEFAULT_CONFIG_ROOT = path.join(os.homedir(), '.config', 'openchamber');
-const OPENCHAMBER_USER_CONFIG_ROOT = process.env.OPENCHAMBER_DATA_DIR
-  ? path.resolve(process.env.OPENCHAMBER_DATA_DIR)
-  : OPENCHAMBER_DEFAULT_CONFIG_ROOT;
-const OPENCHAMBER_USER_THEMES_DIR = path.join(OPENCHAMBER_USER_CONFIG_ROOT, 'themes');
-const OPENCHAMBER_PROJECTS_CONFIG_DIR = path.join(OPENCHAMBER_USER_CONFIG_ROOT, 'projects');
-// OPENCHAMBER_CHATS_DIR relocates managed chat worktrees — needed when the
+const MAGIO_DEFAULT_CONFIG_ROOT = path.join(os.homedir(), '.config', 'magio');
+const MAGIO_USER_CONFIG_ROOT = process.env.MAGIO_DATA_DIR
+  ? path.resolve(process.env.MAGIO_DATA_DIR)
+  : MAGIO_DEFAULT_CONFIG_ROOT;
+const MAGIO_USER_THEMES_DIR = path.join(MAGIO_USER_CONFIG_ROOT, 'themes');
+const MAGIO_PROJECTS_CONFIG_DIR = path.join(MAGIO_USER_CONFIG_ROOT, 'projects');
+// MAGIO_CHATS_DIR relocates managed chat worktrees — needed when the
 // OpenCode server runs as a separate user that cannot traverse $HOME.
-const OPENCHAMBER_CHATS_DIR = process.env.OPENCHAMBER_CHATS_DIR && process.env.OPENCHAMBER_CHATS_DIR.trim()
-  ? path.resolve(process.env.OPENCHAMBER_CHATS_DIR.trim())
-  : path.join(OPENCHAMBER_USER_CONFIG_ROOT, 'chats');
+const MAGIO_CHATS_DIR = process.env.MAGIO_CHATS_DIR && process.env.MAGIO_CHATS_DIR.trim()
+  ? path.resolve(process.env.MAGIO_CHATS_DIR.trim())
+  : path.join(MAGIO_USER_CONFIG_ROOT, 'chats');
 
 const MAX_THEME_JSON_BYTES = 512 * 1024;
 
@@ -336,7 +336,7 @@ const MAX_THEME_JSON_BYTES = 512 * 1024;
 const themeRuntime = createThemeRuntime({
   fsPromises,
   path,
-  themesDir: OPENCHAMBER_USER_THEMES_DIR,
+  themesDir: MAGIO_USER_THEMES_DIR,
   maxThemeJsonBytes: MAX_THEME_JSON_BYTES,
   logger: console,
 });
@@ -361,17 +361,17 @@ const maybeCacheSessionInfoFromEvent = (...args) => notificationTemplateRuntime.
 const buildTemplateVariables = (...args) => notificationTemplateRuntime.buildTemplateVariables(...args);
 const getCachedZenModels = (...args) => notificationTemplateRuntime.getCachedZenModels(...args);
 
-const OPENCHAMBER_DATA_DIR = OPENCHAMBER_USER_CONFIG_ROOT;
-const SETTINGS_FILE_PATH = path.join(OPENCHAMBER_DATA_DIR, 'settings.json');
-const PUSH_SUBSCRIPTIONS_FILE_PATH = path.join(OPENCHAMBER_DATA_DIR, 'push-subscriptions.json');
-const APNS_TOKENS_FILE_PATH = path.join(OPENCHAMBER_DATA_DIR, 'apns-tokens.json');
-const REMOTE_CLIENTS_FILE_PATH = path.join(OPENCHAMBER_DATA_DIR, 'remote-clients.json');
-const CLIENT_PAIRING_SESSIONS_FILE_PATH = path.join(OPENCHAMBER_DATA_DIR, 'client-pairing-sessions.json');
-const CLOUDFLARE_MANAGED_REMOTE_TUNNELS_FILE_PATH = path.join(OPENCHAMBER_DATA_DIR, 'cloudflare-managed-remote-tunnels.json');
-const CLOUDFLARE_LEGACY_NAMED_TUNNELS_FILE_PATH = path.join(OPENCHAMBER_DATA_DIR, 'cloudflare-named-tunnels.json');
+const MAGIO_DATA_DIR = MAGIO_USER_CONFIG_ROOT;
+const SETTINGS_FILE_PATH = path.join(MAGIO_DATA_DIR, 'settings.json');
+const PUSH_SUBSCRIPTIONS_FILE_PATH = path.join(MAGIO_DATA_DIR, 'push-subscriptions.json');
+const APNS_TOKENS_FILE_PATH = path.join(MAGIO_DATA_DIR, 'apns-tokens.json');
+const REMOTE_CLIENTS_FILE_PATH = path.join(MAGIO_DATA_DIR, 'remote-clients.json');
+const CLIENT_PAIRING_SESSIONS_FILE_PATH = path.join(MAGIO_DATA_DIR, 'client-pairing-sessions.json');
+const CLOUDFLARE_MANAGED_REMOTE_TUNNELS_FILE_PATH = path.join(MAGIO_DATA_DIR, 'cloudflare-managed-remote-tunnels.json');
+const CLOUDFLARE_LEGACY_NAMED_TUNNELS_FILE_PATH = path.join(MAGIO_DATA_DIR, 'cloudflare-named-tunnels.json');
 const CLOUDFLARE_MANAGED_REMOTE_TUNNELS_VERSION = 1;
 const worktreeBootstrapStore = createWorktreeBootstrapStore({
-  filePath: path.join(OPENCHAMBER_DATA_DIR, 'git-worktree-bootstrap.json'),
+  filePath: path.join(MAGIO_DATA_DIR, 'git-worktree-bootstrap.json'),
   fsImpl: fsPromises,
 });
 
@@ -447,7 +447,7 @@ const settingsRuntime = createSettingsRuntime({
   normalizeManagedRemoteTunnelPresetTokens,
   syncManagedRemoteTunnelConfigWithPresets,
   upsertManagedRemoteTunnelToken,
-  chatRoots: [path.join(OPENCHAMBER_USER_CONFIG_ROOT, 'chats'), OPENCHAMBER_CHATS_DIR],
+  chatRoots: [path.join(MAGIO_USER_CONFIG_ROOT, 'chats'), MAGIO_CHATS_DIR],
   onManagedPluginSettingsChanged: () => managedConfigRuntime?.refreshManagedConfigFile(),
   // Declared further down; settings are only saved once the server serves requests.
   onMessageSearchEnabledChanged: (enabled) => messageSearchRuntime.setEnabled(enabled),
@@ -506,7 +506,7 @@ const setPushInitialized = (...args) => pushRuntime.setPushInitialized(...args);
 const relayKeyStore = createRelayKeyStore({
   fsPromises,
   path,
-  dataDir: OPENCHAMBER_DATA_DIR,
+  dataDir: MAGIO_DATA_DIR,
   readSettingsFromDiskMigrated,
   readSettingsStrict: readSettingsFromDiskStrict,
   writeSettingsToDisk,
@@ -540,7 +540,7 @@ const notificationEmitterRuntime = createNotificationEmitterRuntime({
   getDesktopNotifyEnabled: () => ENV_DESKTOP_NOTIFY,
   desktopNotifyPrefix: DESKTOP_NOTIFY_PREFIX,
   getUiNotificationClients: () => uiNotificationClients,
-  getOpenChamberEventClients: () => uiOpenChamberEventClients,
+  getMagioEventClients: () => uiMagioEventClients,
   getBroadcastGlobalUiEvent: () => broadcastGlobalUiEvent,
 });
 
@@ -553,23 +553,23 @@ const broadcastGlobalUiEvent = createGlobalUiEventBroadcaster({
 });
 const broadcastUiNotification = (...args) => notificationEmitterRuntime.broadcastUiNotification(...args);
 
-// OpenChamber-owned events (queue changes, archive state) travel on the shared
+// Magio-owned events (queue changes, archive state) travel on the shared
 // control stream, not on OpenCode's event proxy. One broadcaster so every owner
 // reaches the same clients.
-const broadcastOpenChamberUiEvent = createGlobalUiEventBroadcaster({
-  sseClients: uiOpenChamberEventClients,
+const broadcastMagioUiEvent = createGlobalUiEventBroadcaster({
+  sseClients: uiMagioEventClients,
   wsClients: uiNotificationWsClients,
   writeSseEvent,
 });
 
 /**
- * Per-session OpenChamber state (goal progress, the assist recap, the
+ * Per-session Magio state (goal progress, the assist recap, the
  * obligatory-context cursor, pinned notes) lives in OpenCode's session
  * metadata. The store merge-patches it there and migrates what older
- * OpenChamber versions kept in `sessions-metadata.json`.
+ * Magio versions kept in `sessions-metadata.json`.
  */
 const sessionMetadataStore = createSessionMetadataStore({
-  dataDir: OPENCHAMBER_DATA_DIR,
+  dataDir: MAGIO_DATA_DIR,
   // Called, not captured: the OpenCode URL and auth helpers are declared
   // further down and only ever used once a request arrives.
   openCode: {
@@ -584,14 +584,14 @@ const persistSessionMetadataPatch = async (sessionID, patch, { directory = '' } 
   const metadata = await sessionMetadataStore.setSessionMetadata(sessionID, patch, { directory });
   // The full merged object, so a client that missed an earlier patch does not
   // have to reconstruct it.
-  broadcastOpenChamberUiEvent({
-    type: 'openchamber:session-metadata',
+  broadcastMagioUiEvent({
+    type: 'magio:session-metadata',
     properties: { sessionID, metadata },
   });
   // The write itself arms the goal loop: it is the authoritative signal and
   // does not depend on the event stream being connected.
   // Called, not captured: the runtime is declared further down.
-  if (patch?.openchamber && 'goal' in patch.openchamber) {
+  if (patch?.magio && 'goal' in patch.magio) {
     void Promise.resolve(sessionGoalRuntime.notifyGoalChanged(sessionID, directory, metadata))
       .catch((error) => console.warn('[session-goal] could not arm after a goal change:', error?.message ?? error));
   }
@@ -602,8 +602,8 @@ const persistSessionMetadataPatch = async (sessionID, patch, { directory = '' } 
 const updateSessionMetadataWith = async (sessionID, decide, { directory = '' } = {}) => {
   const result = await sessionMetadataStore.updateSessionMetadata(sessionID, decide, { directory });
   if (result.changed) {
-    broadcastOpenChamberUiEvent({
-      type: 'openchamber:session-metadata',
+    broadcastMagioUiEvent({
+      type: 'magio:session-metadata',
       properties: { sessionID, metadata: result.metadata },
     });
   }
@@ -627,27 +627,27 @@ const getUpstreamStallTimeoutMs = () => (
 const movedUserDirs = await migrateLegacyUserDirs({
   fsPromises,
   path,
-  dataDir: OPENCHAMBER_USER_CONFIG_ROOT,
-  legacyRoot: OPENCHAMBER_DEFAULT_CONFIG_ROOT,
+  dataDir: MAGIO_USER_CONFIG_ROOT,
+  legacyRoot: MAGIO_DEFAULT_CONFIG_ROOT,
   warn: (message) => console.warn(`[data-dir] ${message}`),
 });
 if (movedUserDirs.length > 0) {
-  console.log(`[data-dir] Copied ${movedUserDirs.join(', ')} into ${OPENCHAMBER_USER_CONFIG_ROOT}`);
+  console.log(`[data-dir] Copied ${movedUserDirs.join(', ')} into ${MAGIO_USER_CONFIG_ROOT}`);
 }
 
 const projectConfigRuntime = createProjectConfigRuntime({
   fsPromises,
   path,
-  projectsDirPath: OPENCHAMBER_PROJECTS_CONFIG_DIR,
+  projectsDirPath: MAGIO_PROJECTS_CONFIG_DIR,
 });
 
 const projectContextRuntime = createProjectContextRuntime({
   fsPromises,
   path,
-  projectsDirPath: OPENCHAMBER_PROJECTS_CONFIG_DIR,
+  projectsDirPath: MAGIO_PROJECTS_CONFIG_DIR,
   resolveSharedPlansDir: (projectId) => projectConfigRuntime.resolveSharedPlansDir(projectId),
-  onChanged: (projectId) => broadcastOpenChamberUiEvent({
-    type: 'openchamber:project-context-changed',
+  onChanged: (projectId) => broadcastMagioUiEvent({
+    type: 'magio:project-context-changed',
     properties: { projectId },
   }),
 });
@@ -655,8 +655,8 @@ const projectContextRuntime = createProjectContextRuntime({
 const agentMemoryRuntime = createAgentMemoryRuntime({
   fsPromises,
   path,
-  projectsDirPath: OPENCHAMBER_PROJECTS_CONFIG_DIR,
-  userConfigRoot: OPENCHAMBER_USER_CONFIG_ROOT,
+  projectsDirPath: MAGIO_PROJECTS_CONFIG_DIR,
+  userConfigRoot: MAGIO_USER_CONFIG_ROOT,
 });
 
 /**
@@ -680,7 +680,7 @@ const hmrStateRuntime = createHmrStateRuntime({
   globalThisLike: globalThis,
   os,
   processLike: process,
-  stateKey: '__openchamberHmrState',
+  stateKey: '__magioHmrState',
 });
 const hmrState = hmrStateRuntime.getOrCreateHmrState();
 hmrStateRuntime.ensureUserProvidedOpenCodePassword(hmrState);
@@ -784,19 +784,19 @@ const {
 });
 
 const ENV_SKIP_OPENCODE_START = process.env.OPENCODE_SKIP_START === 'true' ||
-                                    process.env.OPENCHAMBER_SKIP_OPENCODE_START === 'true';
+                                    process.env.MAGIO_SKIP_OPENCODE_START === 'true';
 const ENV_DESKTOP_NOTIFY = (() => {
-  if (process.env.OPENCHAMBER_DESKTOP_NOTIFY === 'true') {
+  if (process.env.MAGIO_DESKTOP_NOTIFY === 'true') {
     return true;
   }
 
-  if (process.env.OPENCHAMBER_RUNTIME === 'desktop') {
+  if (process.env.MAGIO_RUNTIME === 'desktop') {
     return true;
   }
 
   const argv0 = typeof process.argv?.[0] === 'string' ? process.argv[0] : '';
   const argv1 = typeof process.argv?.[1] === 'string' ? process.argv[1] : '';
-  return /openchamber-server/i.test(argv0) || /openchamber-server/i.test(argv1);
+  return /magio-server/i.test(argv0) || /magio-server/i.test(argv1);
 })();
 const openCodeAuthStateRuntime = createOpenCodeAuthStateRuntime({
   crypto,
@@ -849,7 +849,7 @@ configureOpenCodeRuntimeProviders({
 });
 
 const ENV_CONFIGURED_API_PREFIX = normalizeApiPrefix(
-  process.env.OPENCODE_API_PREFIX || process.env.OPENCHAMBER_API_PREFIX || ''
+  process.env.OPENCODE_API_PREFIX || process.env.MAGIO_API_PREFIX || ''
 );
 
   if (ENV_CONFIGURED_API_PREFIX && ENV_CONFIGURED_API_PREFIX !== '') {
@@ -931,7 +931,7 @@ notificationTemplateRuntime = createNotificationTemplateRuntime({
   getOpenCodeAuthHeaders,
   resolveGitBinaryForSpawn,
   resolvePrimaryWorktreeRoot,
-  chatRoots: [path.join(OPENCHAMBER_USER_CONFIG_ROOT, 'chats'), OPENCHAMBER_CHATS_DIR],
+  chatRoots: [path.join(MAGIO_USER_CONFIG_ROOT, 'chats'), MAGIO_CHATS_DIR],
 });
 
 const notificationTriggerRuntime = createNotificationTriggerRuntime({
@@ -966,15 +966,15 @@ const sessionAssistRuntime = createSessionAssistRuntime({
   getOpenCodeAuthHeaders,
   getSmallModelService: async () => import('./lib/small-model/index.js'),
   persistSessionAssist: (sessionID, directory, assist) =>
-    persistSessionMetadataPatch(sessionID, { openchamber: { assist } }, { directory }),
+    persistSessionMetadataPatch(sessionID, { magio: { assist } }, { directory }),
   // Declared further down; only ever called after startup.
-  isSessionArchived: (sessionID) => openChamberSessionService.archiveStore.isArchived(sessionID),
+  isSessionArchived: (sessionID) => magioSessionService.archiveStore.isArchived(sessionID),
   // Declared further down; only ever called after startup.
   evaluateTurn: (input) => sessionWorkRuntime.evaluateTurnEnd(input),
   lineage: sessionLineage,
   // Clients hold a left chat's OpenCode location until its assist is done.
-  onPendingChange: ({ sessionId, directory, pending }) => broadcastOpenChamberUiEvent({
-    type: 'openchamber:session-assist',
+  onPendingChange: ({ sessionId, directory, pending }) => broadcastMagioUiEvent({
+    type: 'magio:session-assist',
     properties: { sessionID: sessionId, directory: directory || null, pending },
   }),
 });
@@ -987,7 +987,7 @@ const sessionGoalRuntime = createSessionGoalRuntime({
   jev: createJevClient(),
   readSessionMetadata: readStoredSessionMetadata,
   persistSessionGoal: (sessionID, directory, goal) =>
-    persistSessionMetadataPatch(sessionID, { openchamber: { goal } }, { directory }),
+    persistSessionMetadataPatch(sessionID, { magio: { goal } }, { directory }),
   emitGoalNotification: async ({ sessionId, directory, status, goal }) => {
     // The goal settle notification replaces the per-turn ready notifications
     // (suppressed while the goal is active) — so it obeys the same toggle.
@@ -1056,7 +1056,7 @@ const sessionKnowledgeRuntime = createSessionKnowledgeRuntime({
     return settings?.agentRenderToolEnabled !== false;
   },
   readSessionMetadata: readStoredSessionMetadata,
-  // Pins are read from and written to OpenChamber's own store.
+  // Pins are read from and written to Magio's own store.
   persistSessionMetadata: (sessionID, directory, patch) => persistSessionMetadataPatch(sessionID, patch, { directory }),
   instructionEntries: {
     put: (sessionID, directory, key, value) => openCodeSessionClient(directory)
@@ -1076,10 +1076,10 @@ const contextObligatoryRuntime = createContextObligatoryRuntime({
 // Keeps the prompt cache of the sessions the user picked warm while they sit
 // idle; the per-session counterpart of OpenCode's `warming` config.
 const sessionWarmingRuntime = createSessionWarmingRuntime({
-  dataDir: OPENCHAMBER_DATA_DIR,
+  dataDir: MAGIO_DATA_DIR,
   buildOpenCodeUrl,
   getOpenCodeAuthHeaders,
-  broadcast: broadcastOpenChamberUiEvent,
+  broadcast: broadcastMagioUiEvent,
 });
 sessionWarmingRuntime.start();
 
@@ -1095,10 +1095,10 @@ const globalMessageStreamHub = createGlobalMessageStreamHub({
 // Jev model routing and the permission safety net. Every failure keeps the
 // user's own model or the auto-accept reply it was asked about.
 const routingRuntime = createRoutingRuntime({
-  dataDir: OPENCHAMBER_DATA_DIR,
+  dataDir: MAGIO_DATA_DIR,
   buildOpenCodeUrl,
   getOpenCodeAuthHeaders,
-  broadcastGlobalUiEvent: broadcastOpenChamberUiEvent,
+  broadcastGlobalUiEvent: broadcastMagioUiEvent,
   isSessionWarm: (sessionId, cacheLifetimeMs) => sessionWarmingRuntime.isSessionWarm(sessionId, cacheLifetimeMs),
 });
 
@@ -1111,8 +1111,8 @@ const sessionWorkRuntime = createSessionWorkRuntime({
   jev: createJevClient(),
   readMetadata: (sessionID, directory) => sessionMetadataStore.get(sessionID, { directory }),
   updateMetadata: updateSessionMetadataWith,
-  isSessionArchived: (sessionID) => openChamberSessionService.archiveStore.isArchived(sessionID),
-  chatRoots: [path.join(OPENCHAMBER_USER_CONFIG_ROOT, 'chats'), OPENCHAMBER_CHATS_DIR],
+  isSessionArchived: (sessionID) => magioSessionService.archiveStore.isArchived(sessionID),
+  chatRoots: [path.join(MAGIO_USER_CONFIG_ROOT, 'chats'), MAGIO_CHATS_DIR],
   lineage: sessionLineage,
 });
 
@@ -1127,8 +1127,8 @@ const permissionAutoAcceptRuntime = createPermissionAutoAcceptRuntime({
   onPermissionReplied: (permissionId) => routingRuntime.forgetPermission(permissionId),
   resolveLegacyEnabledMode: async () => ((await routingRuntime.legacySafetyNetEnabled()) ? 'safety' : 'auto'),
   // Only a space's environment names this file: the host writes the user's default there.
-  readDefaultMode: process.env.OPENCHAMBER_SPACE_PERMISSION_DEFAULT_FILE
-    ? () => readSpacePermissionDefault(process.env.OPENCHAMBER_SPACE_PERMISSION_DEFAULT_FILE)
+  readDefaultMode: process.env.MAGIO_SPACE_PERMISSION_DEFAULT_FILE
+    ? () => readSpacePermissionDefault(process.env.MAGIO_SPACE_PERMISSION_DEFAULT_FILE)
     : undefined,
 });
 permissionAutoAcceptRuntime.start();
@@ -1145,17 +1145,17 @@ const messageQueueRuntime = createMessageQueueRuntime({
   buildOpenCodeUrl,
   getOpenCodeAuthHeaders,
   sessionKnowledgeRuntime,
-  // OpenCode's event SSE proxy cannot carry OpenChamber-owned events. Use the
+  // OpenCode's event SSE proxy cannot carry Magio-owned events. Use the
   // shared control stream for SSE clients and the existing WS fan-out.
-  broadcastGlobalUiEvent: broadcastOpenChamberUiEvent,
+  broadcastGlobalUiEvent: broadcastMagioUiEvent,
   resolveAutoSelection: (send) => routingRuntime.resolveAutoSelection(send),
   persistSessionGoal: (sessionID, directory, goal) =>
-    persistSessionMetadataPatch(sessionID, { openchamber: { goal } }, { directory }),
+    persistSessionMetadataPatch(sessionID, { magio: { goal } }, { directory }),
   onPromptSent: (sessionId) => sessionRuntime.markUserMessageSent(sessionId),
   beforeScheduledTaskSend: (...args) => scheduledTasksRuntime.beforeScheduledTaskSend(...args),
   validateScheduledTaskTarget: (...args) => scheduledTasksRuntime.validateTarget(...args),
   onScheduledTaskResult: (...args) => scheduledTasksRuntime.onScheduledTaskResult(...args),
-  dataDir: OPENCHAMBER_DATA_DIR,
+  dataDir: MAGIO_DATA_DIR,
 });
 messageQueueRuntime.start();
 
@@ -1165,9 +1165,9 @@ const dispatchResultsRuntime = createDispatchResultsRuntime({
   globalEventHub: globalMessageStreamHub,
   buildOpenCodeUrl,
   getOpenCodeAuthHeaders,
-  dataDir: OPENCHAMBER_DATA_DIR,
+  dataDir: MAGIO_DATA_DIR,
   // Declared further down; only ever called after startup.
-  isSessionArchived: (sessionID) => openChamberSessionService.archiveStore.isArchived(sessionID),
+  isSessionArchived: (sessionID) => magioSessionService.archiveStore.isArchived(sessionID),
 });
 dispatchResultsRuntime.start();
 
@@ -1175,7 +1175,7 @@ dispatchResultsRuntime.start();
 // replies). Opt-in: off by default, and off means idle. The index is derived
 // data in the data dir, fed from the same event stream; see lib/message-search.
 const messageSearchRuntime = createMessageSearchRuntime({
-  dataDir: OPENCHAMBER_DATA_DIR,
+  dataDir: MAGIO_DATA_DIR,
   buildOpenCodeUrl,
   getOpenCodeAuthHeaders,
   globalEventHub: globalMessageStreamHub,
@@ -1208,7 +1208,7 @@ globalMessageStreamHub.subscribeEvent((event) => {
   // The hub translates v2 wire events into the server's vocabulary once; these
   // consumers were written against it and stay unaware of the wire shape.
   for (const payload of event?.translated?.() ?? []) {
-    // The user cancelled the turn: stop the OpenChamber tool actions that
+    // The user cancelled the turn: stop the Magio tool actions that
     // turn still has running (a browser action, a memory write). OpenCode 2
     // gives the plugin no abort signal, so this is where the cancel lands.
     if (payload.type === 'session.idle' && payload.properties?.aborted === true) {
@@ -1226,7 +1226,7 @@ globalMessageStreamHub.subscribeEvent((event) => {
 
 /**
  * Browser bridges hand us the raw v2 wire payload (they forward it untouched to
- * the client). The synthetic OpenChamber frames the UI also expects are derived
+ * the client). The synthetic Magio frames the UI also expects are derived
  * from the translated event, so the translation happens here.
  */
 const processForwardedEventPayload = (payload, emitSyntheticEvent, { spaceId = null } = {}) => {
@@ -1259,7 +1259,7 @@ const processForwardedServerEvent = (payload, emitSyntheticEvent, spaceId = null
   }
 
   emitSyntheticEvent({
-    type: 'openchamber:session-status',
+    type: 'magio:session-status',
     properties: {
       sessionID: sessionId,
       status,
@@ -1280,7 +1280,7 @@ const processForwardedServerEvent = (payload, emitSyntheticEvent, spaceId = null
   });
 
   emitSyntheticEvent({
-    type: 'openchamber:session-activity',
+    type: 'magio:session-activity',
     properties: {
       sessionId,
       phase: status === 'busy' || status === 'retry' ? 'busy' : 'idle',
@@ -1292,7 +1292,7 @@ const processForwardedServerEvent = (payload, emitSyntheticEvent, spaceId = null
 const serverUtilsRuntime = createServerUtilsRuntime({
   // Read lazily: the archive store is created with the session service further
   // down, while the proxy is registered later still.
-  getArchivedSessions: () => openChamberSessionService.archiveStore.getAll(),
+  getArchivedSessions: () => magioSessionService.archiveStore.getAll(),
   getStoredSessionMetadata: () => sessionMetadataStore.listUnmigrated(),
   // Isolated spaces: with the switch on, the session list carries every space's sessions and
   // the global SSE stream their events. Called, not captured: the host is made in `main`.
@@ -1344,10 +1344,10 @@ const waitForOpenCodePort = (...args) => serverUtilsRuntime.waitForOpenCodePort(
 const buildAugmentedPath = (...args) => serverUtilsRuntime.buildAugmentedPath(...args);
 const buildManagedOpenCodePath = (...args) => serverUtilsRuntime.buildManagedOpenCodePath(...args);
 
-// Variables from Settings for the processes OpenChamber starts: the managed
+// Variables from Settings for the processes Magio starts: the managed
 // OpenCode, Git, the terminal and command execution (lib/environment).
 const environmentStore = createEnvironmentStore({
-  filePath: path.join(OPENCHAMBER_USER_CONFIG_ROOT, 'environment.json'),
+  filePath: path.join(MAGIO_USER_CONFIG_ROOT, 'environment.json'),
 });
 const listConfiguredProjects = async () => {
   const settings = await readSettingsFromDiskMigrated();
@@ -1403,7 +1403,7 @@ const bootstrapRuntime = createBootstrapRuntime({
   registerAuthAndAccessRoutes,
   registerTtsRoutes,
   registerNotificationRoutes,
-  registerOpenChamberRoutes,
+  registerMagioRoutes,
   registerAgentToolRoutes: (app, options) => options.agentToolRuntime.registerRoutes(app, options.express),
   express,
 });
@@ -1529,7 +1529,7 @@ const openCodeLifecycleRuntime = createOpenCodeLifecycleRuntime({
     )));
     return existing.filter(Boolean);
   },
-  noProjectDirectory: OPENCHAMBER_CHATS_DIR,
+  noProjectDirectory: MAGIO_CHATS_DIR,
   // A managed restart can move OpenCode to a NEW port (the old one may stay
   // occupied if killProcessOnPort/waitForPortRelease didn't free it in time,
   // on any platform). Rebind the message-stream upstream readers to the current port
@@ -1612,13 +1612,13 @@ const waitForAgentPresence = (...args) => openCodeLifecycleRuntime.waitForAgentP
 const refreshOpenCodeAfterConfigChange = (...args) => openCodeLifecycleRuntime.refreshOpenCodeAfterConfigChange(...args);
 const startHealthMonitoring = () => openCodeLifecycleRuntime.startHealthMonitoring(HEALTH_CHECK_INTERVAL);
 const triggerHealthCheck = () => openCodeLifecycleRuntime.triggerHealthCheck();
-const scheduledChatsScope = createChatsScope(OPENCHAMBER_CHATS_DIR);
+const scheduledChatsScope = createChatsScope(MAGIO_CHATS_DIR);
 const scheduledTasksRuntime = createScheduledTasksRuntime({
   projectConfigRuntime,
   chatsScope: scheduledChatsScope,
   messageQueueRuntime,
   resolvePrimaryWorktreeRoot,
-  isSessionArchived: (sessionID) => openChamberSessionService.archiveStore.isArchived(sessionID),
+  isSessionArchived: (sessionID) => magioSessionService.archiveStore.isArchived(sessionID),
   readSessionDefaults: async (projectID) => {
     const settings = await readSettingsFromDiskMigrated();
     const project = sanitizeProjects(settings?.projects || []).find((entry) => entry.id === projectID) ?? null;
@@ -1633,13 +1633,13 @@ const scheduledTasksRuntime = createScheduledTasksRuntime({
   waitForOpenCodeReady,
   sessionKnowledgeRuntime,
   persistSessionGoal: (sessionID, directory, goal) =>
-    persistSessionMetadataPatch(sessionID, { openchamber: { goal } }, { directory }),
+    persistSessionMetadataPatch(sessionID, { magio: { goal } }, { directory }),
   setSessionAutoAccept: (sessionId, enabled, directory) => permissionAutoAcceptRuntime.setSessionPolicy(sessionId, enabled, directory),
   emitTaskRunEvent: (event) => {
-    for (const client of uiOpenChamberEventClients) {
+    for (const client of uiMagioEventClients) {
       try {
         writeSseEvent(client, {
-          type: 'openchamber:scheduled-task-ran',
+          type: 'magio:scheduled-task-ran',
           properties: {
             projectId: scheduledChatsScope.toPublicID(event.projectID),
             taskId: event.taskID,
@@ -1649,17 +1649,17 @@ const scheduledTasksRuntime = createScheduledTasksRuntime({
           },
         });
       } catch {
-        uiOpenChamberEventClients.delete(client);
+        uiMagioEventClients.delete(client);
       }
     }
   },
   logger: console,
 });
 const emitSessionCreatedEvent = (event) => {
-  for (const client of uiOpenChamberEventClients) {
+  for (const client of uiMagioEventClients) {
     try {
       writeSseEvent(client, {
-        type: 'openchamber:session-created',
+        type: 'magio:session-created',
         properties: {
           sessionId: event.sessionID,
           directory: event.directory,
@@ -1671,7 +1671,7 @@ const emitSessionCreatedEvent = (event) => {
         },
       });
     } catch {
-      uiOpenChamberEventClients.delete(client);
+      uiMagioEventClients.delete(client);
     }
   }
 };
@@ -1685,7 +1685,7 @@ const resolveMemoryProjectId = createMemoryProjectResolver({
     return sanitizeProjects(settings?.projects || []).map((project) => project.path);
   },
   resolvePrimaryWorktreeRoot,
-  managedProjectRoots: [...new Set([path.join(OPENCHAMBER_USER_CONFIG_ROOT, 'chats'), OPENCHAMBER_CHATS_DIR])],
+  managedProjectRoots: [...new Set([path.join(MAGIO_USER_CONFIG_ROOT, 'chats'), MAGIO_CHATS_DIR])],
 });
 
 /**
@@ -1693,19 +1693,19 @@ const resolveMemoryProjectId = createMemoryProjectResolver({
  * stored is visible without reopening anything.
  */
 const emitAgentMemoryChangedEvent = (event) => {
-  for (const client of uiOpenChamberEventClients) {
+  for (const client of uiMagioEventClients) {
     try {
       writeSseEvent(client, {
-        // The UI listens for exactly this name (`lib/openchamberEvents.ts`);
+        // The UI listens for exactly this name (`lib/magioEvents.ts`);
         // under any other name the Memory panel only catches up on reload.
-        type: 'openchamber:agent-memory-changed',
+        type: 'magio:agent-memory-changed',
         properties: {
           scope: event.scope,
           ...(event.projectId ? { projectId: event.projectId } : {}),
         },
       });
     } catch {
-      uiOpenChamberEventClients.delete(client);
+      uiMagioEventClients.delete(client);
     }
   }
 };
@@ -1716,7 +1716,7 @@ const scheduledTaskService = createScheduledTaskService({
   scheduledTasksRuntime,
   chatsScope: scheduledChatsScope,
 });
-const openChamberSessionService = createOpenChamberSessionService({
+const magioSessionService = createMagioSessionService({
   readSettingsFromDiskMigrated,
   sanitizeProjects,
   validateDirectoryPath,
@@ -1728,17 +1728,17 @@ const openChamberSessionService = createOpenChamberSessionService({
   worktreeBootstrapStore,
   hydrateWorktreeCheckout: featureRoutesRuntime.hydrateBoundCheckout,
   createChangeRequestWorktree: featureRoutesRuntime.createChangeRequestWorktree,
-  // OpenCode 2.x has no archive route, so the state is OpenChamber's own and
+  // OpenCode 2.x has no archive route, so the state is Magio's own and
   // lives beside the instance it describes.
-  dataDir: OPENCHAMBER_DATA_DIR,
+  dataDir: MAGIO_DATA_DIR,
   sessionMetadataStore,
   persistSessionMetadata: persistSessionMetadataPatch,
   updateSessionMetadata: updateSessionMetadataWith,
-  broadcastGlobalUiEvent: broadcastOpenChamberUiEvent,
+  broadcastGlobalUiEvent: broadcastMagioUiEvent,
   resolveAutoSelection: (input) => routingRuntime.resolveAutoSelection(input),
   isAutoReady: async () => (await routingRuntime.describe()).autoReady,
 });
-// Browser actions are published to whichever OpenChamber clients are connected;
+// Browser actions are published to whichever Magio clients are connected;
 // the one owning the browser panel answers. `emitRequest` returns the number of
 // clients reached so the broker can fail fast when nobody is listening.
 const browserControlBroker = createBrowserControlBroker({
@@ -1749,11 +1749,11 @@ const browserControlBroker = createBrowserControlBroker({
     // lets the broker say "not here" instead of timing out.
     const needsBrowserView = request.action !== 'browser.open';
     let delivered = 0;
-    for (const client of uiOpenChamberEventClients) {
-      if (needsBrowserView && client.openchamberBrowserCapable !== true) continue;
+    for (const client of uiMagioEventClients) {
+      if (needsBrowserView && client.magioBrowserCapable !== true) continue;
       try {
         writeSseEvent(client, {
-          type: 'openchamber:browser-control-request',
+          type: 'magio:browser-control-request',
           properties: {
             requestId: request.requestId,
             action: request.action,
@@ -1763,7 +1763,7 @@ const browserControlBroker = createBrowserControlBroker({
         });
         delivered += 1;
       } catch {
-        uiOpenChamberEventClients.delete(client);
+        uiMagioEventClients.delete(client);
       }
     }
     return delivered;
@@ -1775,25 +1775,25 @@ const browserControlBroker = createBrowserControlBroker({
  * in-app browser, so Settings shows the change and the user hears why.
  */
 const emitBrowserProviderResetEvent = ({ guestId, guestName }) => {
-  for (const client of uiOpenChamberEventClients) {
+  for (const client of uiMagioEventClients) {
     try {
       writeSseEvent(client, {
-        type: 'openchamber:browser-provider-reset',
+        type: 'magio:browser-provider-reset',
         properties: { guestId, guestName },
       });
     } catch {
-      uiOpenChamberEventClients.delete(client);
+      uiMagioEventClients.delete(client);
     }
   }
 };
 // Every browser action passes through here: the in-app view by default, or an
-// extension service chosen in Settings → OpenChamber Tools.
+// extension service chosen in Settings → Magio Tools.
 const browserControlRouter = createBrowserControlRouter({
   broker: browserControlBroker,
   readSettings: () => readSettingsFromDiskMigrated(),
   persistSettings: (changes) => persistSettings(changes),
-  findGuest: (id) => findInstalledGuest(id, extensionsPersistPath(OPENCHAMBER_DATA_DIR)),
-  persistPath: extensionsPersistPath(OPENCHAMBER_DATA_DIR),
+  findGuest: (id) => findInstalledGuest(id, extensionsPersistPath(MAGIO_DATA_DIR)),
+  persistPath: extensionsPersistPath(MAGIO_DATA_DIR),
   emitProviderReset: emitBrowserProviderResetEvent,
   createId: () => `browser-${crypto.randomUUID()}`,
   surfaceControl: {
@@ -1808,12 +1808,12 @@ const browserControlRouter = createBrowserControlRouter({
 const fileOpenRequester = createFileOpenRequester({
   emit: (request) => {
     let delivered = 0;
-    for (const client of uiOpenChamberEventClients) {
+    for (const client of uiMagioEventClients) {
       try {
-        writeSseEvent(client, { type: 'openchamber:file-open-request', properties: request });
+        writeSseEvent(client, { type: 'magio:file-open-request', properties: request });
         delivered += 1;
       } catch {
-        uiOpenChamberEventClients.delete(client);
+        uiMagioEventClients.delete(client);
       }
     }
     return delivered;
@@ -1826,13 +1826,13 @@ const pluginNotificationEmitter = createPluginNotificationEmitter({
   broadcastUiNotification,
 });
 
-const openChamberControlService = createOpenChamberControlService({
+const magioControlService = createMagioControlService({
   readSettingsFromDiskMigrated,
   sanitizeProjects,
   buildOpenCodeUrl,
   getOpenCodeAuthHeaders,
   waitForOpenCodeReady,
-  sessionService: openChamberSessionService,
+  sessionService: magioSessionService,
   scheduledTaskService,
   browserControl: browserControlRouter,
   fileOpen: fileOpenRequester,
@@ -1846,12 +1846,12 @@ const openChamberControlService = createOpenChamberControlService({
   // project open the plan.
   showPlan: (request) => {
     let delivered = 0;
-    for (const client of uiOpenChamberEventClients) {
+    for (const client of uiMagioEventClients) {
       try {
-        writeSseEvent(client, { type: 'openchamber:plan-open-request', properties: request });
+        writeSseEvent(client, { type: 'magio:plan-open-request', properties: request });
         delivered += 1;
       } catch {
-        uiOpenChamberEventClients.delete(client);
+        uiMagioEventClients.delete(client);
       }
     }
     return delivered;
@@ -1872,15 +1872,15 @@ const openChamberControlService = createOpenChamberControlService({
     sessionRuntime.trackWaitingPage(change);
     if (change.type === 'waiting') {
       const payload = {
-        type: 'openchamber:page-waiting',
+        type: 'magio:page-waiting',
         properties: { sessionID: change.sessionId, directory: change.directory, page: { id: change.callId, title: change.title } },
       };
-      broadcastOpenChamberUiEvent(payload);
+      broadcastMagioUiEvent(payload);
       void maybeSendPushForTrigger(payload);
       return;
     }
-    broadcastOpenChamberUiEvent({
-      type: 'openchamber:page-settled',
+    broadcastMagioUiEvent({
+      type: 'magio:page-settled',
       properties: { sessionID: change.sessionId, pageID: change.callId },
     });
   },
@@ -1889,23 +1889,23 @@ const openChamberControlService = createOpenChamberControlService({
   notifyUser: async (input) => {
     const settings = await readSettingsFromDiskMigrated().catch(() => null);
     if (settings?.agentNotifyToolEnabled !== true) {
-      return { status: 403, body: { error: 'The notify tool is turned off in OpenChamber settings' } };
+      return { status: 403, body: { error: 'The notify tool is turned off in Magio settings' } };
     }
     return pluginNotificationEmitter.emit(input);
   },
   agentMemoryActions: createAgentMemoryActions({
     agentMemoryRuntime,
-    createError: (message, status) => new OpenChamberControlError(message, status),
+    createError: (message, status) => new MagioControlError(message, status),
     onMemoryChanged: emitAgentMemoryChangedEvent,
     isAgentMemoryEnabled,
     resolveProjectId: resolveMemoryProjectId,
   }),
   sessionLinks: createSessionLinker({
     updateMetadata: updateSessionMetadataWith,
-    createError: (message, status) => new OpenChamberControlError(message, status),
+    createError: (message, status) => new MagioControlError(message, status),
   }),
   dispatchResults: dispatchResultsRuntime,
-  archiveStore: openChamberSessionService.archiveStore,
+  archiveStore: magioSessionService.archiveStore,
 });
 
 const ensureGlobalWatcherStarted = async () => {
@@ -1936,7 +1936,7 @@ const bootstrapOpenCodeAtStartup = async (...args) => {
   // the session's next write or the next start.
   void waitForOpenCodeReady()
     .then(() => sessionMetadataStore.migrateLegacy())
-    .catch((error) => console.warn('[openchamber-sessions] session metadata migration failed:', error?.message ?? error));
+    .catch((error) => console.warn('[magio-sessions] session metadata migration failed:', error?.message ?? error));
 };
 const killProcessOnPort = (...args) => openCodeLifecycleRuntime.killProcessOnPort(...args);
 const waitForPortRelease = (...args) => openCodeLifecycleRuntime.waitForPortRelease(...args);
@@ -2003,26 +2003,26 @@ const gracefulShutdownRuntime = createGracefulShutdownRuntime({
 const gracefulShutdown = (...args) => gracefulShutdownRuntime.gracefulShutdown(...args);
 
 async function main(options = {}) {
-  beginGuestServiceHost({ registryDir: guestServiceRegistryDir(OPENCHAMBER_DATA_DIR) });
+  beginGuestServiceHost({ registryDir: guestServiceRegistryDir(MAGIO_DATA_DIR) });
   // Again at start: the desktop shell merges the login shell's environment,
   // where proxy variables often live, after this module first loaded.
   applyOutboundProxyFromEnv();
   const port = Number.isFinite(options.port) && options.port >= 0 ? Math.trunc(options.port) : DEFAULT_PORT;
   const host = typeof options.host === 'string' && options.host.length > 0 ? options.host : undefined;
   const effectiveBindHost = host
-    || (typeof process.env.OPENCHAMBER_HOST === 'string' && process.env.OPENCHAMBER_HOST.trim().length > 0
-      ? process.env.OPENCHAMBER_HOST.trim()
+    || (typeof process.env.MAGIO_HOST === 'string' && process.env.MAGIO_HOST.trim().length > 0
+      ? process.env.MAGIO_HOST.trim()
       : '127.0.0.1');
-  const instanceDir = await prepareInstanceDir({ fsPromises, path, dataDir: OPENCHAMBER_DATA_DIR });
+  const instanceDir = await prepareInstanceDir({ fsPromises, path, dataDir: MAGIO_DATA_DIR });
   agentToolRuntime = createAgentToolRuntime({
     crypto,
     fsPromises,
     path,
     instanceDir,
     env: process.env,
-    executeAction: (...args) => openChamberControlService.execute(...args),
+    executeAction: (...args) => magioControlService.execute(...args),
     // A v2 tool call carries no directory, only the session it runs in.
-    resolveSessionDirectory: (sessionID) => openChamberControlService.resolveSessionDirectory(sessionID),
+    resolveSessionDirectory: (sessionID) => magioControlService.resolveSessionDirectory(sessionID),
     getActivePort: () => {
       const address = server?.address?.();
       return typeof address === 'object' && address ? address.port : null;
@@ -2039,7 +2039,7 @@ async function main(options = {}) {
     readSettings: () => readSettingsFromDiskMigrated(),
     isAgentMemoryAvailable: isAgentMemoryFeatureAvailable,
   });
-  await ensureChatsDir({ fsPromises, chatsDir: OPENCHAMBER_CHATS_DIR, warn: (message) => console.warn(`[data-dir] ${message}`) });
+  await ensureChatsDir({ fsPromises, chatsDir: MAGIO_CHATS_DIR, warn: (message) => console.warn(`[data-dir] ${message}`) });
 
   // Pairing transports advertised to the create-device dialog. LAN reachability is
   // derived from the SERVER's actual bind (a wildcard bind → the machine's LAN IP;
@@ -2124,7 +2124,7 @@ async function main(options = {}) {
   };
   const uiPassword = typeof options.uiPassword === 'string'
     ? options.uiPassword
-    : (typeof process.env.OPENCHAMBER_UI_PASSWORD === 'string' ? process.env.OPENCHAMBER_UI_PASSWORD : null);
+    : (typeof process.env.MAGIO_UI_PASSWORD === 'string' ? process.env.MAGIO_UI_PASSWORD : null);
   if (
     isNetworkExposedBindHost(effectiveBindHost)
     && !(typeof uiPassword === 'string' && uiPassword.trim().length > 0)
@@ -2139,7 +2139,7 @@ async function main(options = {}) {
     throw new Error(NETWORK_ACCESS_BLOCKED_ERROR);
   }
   const tryCfTunnel = options.tryCfTunnel === true;
-  const apiOnly = options.apiOnly === true || isEnvFlagEnabled(process.env.OPENCHAMBER_API_ONLY);
+  const apiOnly = options.apiOnly === true || isEnvFlagEnabled(process.env.MAGIO_API_ONLY);
   const shouldUseCanonicalTunnelConfig = typeof options.tunnelMode === 'string'
     || typeof options.tunnelProvider === 'string'
     || options.tunnelConfigPath === null
@@ -2184,7 +2184,7 @@ async function main(options = {}) {
     ? options.desktopUpdater
     : null;
 
-  console.log(`Starting OpenChamber on port ${port === 0 ? 'auto' : port}`);
+  console.log(`Starting Magio on port ${port === 0 ? 'auto' : port}`);
 
   // Voice enumeration is independent from route registration. Start it now,
   // but do not hold server listen or managed OpenCode startup on `say -v "?"`.
@@ -2198,7 +2198,7 @@ async function main(options = {}) {
     headers: getOpenCodeAuthHeaders(),
   });
   const spaceArchive = createSpaceArchive({
-    dataDir: OPENCHAMBER_DATA_DIR,
+    dataDir: MAGIO_DATA_DIR,
     hostOpenCode: {
       importChat: (chat) => hostOpenCodeClient().session.import(chat),
       removeChat: (sessionID) => hostOpenCodeClient().session.remove({ sessionID }),
@@ -2208,7 +2208,7 @@ async function main(options = {}) {
   // The isolated-spaces switch, read here at start and changed live through its route below.
   // While it is off the feature has no place, no manager, no route and runs no `docker`.
   const buildSpacesHost = async () => createSpacesHost({
-    dataDir: OPENCHAMBER_DATA_DIR,
+    dataDir: MAGIO_DATA_DIR,
     dockerPath: searchPathFor('docker', buildAugmentedPath()) ?? 'docker',
     // The machine of the Docker over SSH place, when the settings name one.
     sshDockerHost: dockerHostOf((await readSettingsFromDiskMigrated().catch(() => null))?.isolatedSpacesSshHost),
@@ -2229,7 +2229,7 @@ async function main(options = {}) {
     readPermissionDefault: async () => permissionDefaultOf((await readSettingsFromDiskMigrated())?.permissionDefaultMode),
     archive: spaceArchive,
     // What the host says to the login issuer when it renews a browser login for a space.
-    userAgent: `OpenChamber/${OPENCHAMBER_VERSION}`,
+    userAgent: `Magio/${MAGIO_VERSION}`,
   });
   const startupSettings = await readSettingsFromDiskMigrated().catch(() => null);
   if (startupSettings?.isolatedSpacesEnabled === true) {
@@ -2245,7 +2245,7 @@ async function main(options = {}) {
   const app = express();
   const serverStartedAt = new Date().toISOString();
   const packagedClientOrigins = new Set([
-    'openchamber-ui://app',
+    'magio-ui://app',
     'capacitor://localhost',
     'http://localhost',
     'https://localhost',
@@ -2256,7 +2256,7 @@ async function main(options = {}) {
   // replaces this one.
   const frameAncestorsPolicy = buildFrameAncestorsPolicy({
     allowLocalDevOrigins,
-    extra: process.env.OPENCHAMBER_FRAME_ANCESTORS,
+    extra: process.env.MAGIO_FRAME_ANCESTORS,
   });
   // Forwarded headers are believed only from a proxy on this machine or a
   // private network (cloudflared, Docker, a LAN reverse proxy). From anyone
@@ -2289,10 +2289,10 @@ async function main(options = {}) {
       res.setHeader('Access-Control-Allow-Origin', origin);
       res.setHeader('Access-Control-Allow-Credentials', 'true');
       res.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,PATCH,DELETE,OPTIONS');
-      // The packaged desktop UI (openchamber-ui://) and the dev UI sit on a
+      // The packaged desktop UI (magio-ui://) and the dev UI sit on a
       // different origin, so every custom request header must be listed here or
       // the browser refuses the request at preflight, before it reaches a route.
-      res.setHeader('Access-Control-Allow-Headers', 'Content-Type,Authorization,Accept,X-Requested-With,Cache-Control,X-OpenCode-Directory,X-OpenCode-Directory-Encoding,Ngrok-Skip-Browser-Warning,X-OpenChamber-Surface,X-OpenChamber-Provider,X-OpenChamber-Model,X-OpenChamber-Part-Shells');
+      res.setHeader('Access-Control-Allow-Headers', 'Content-Type,Authorization,Accept,X-Requested-With,Cache-Control,X-OpenCode-Directory,X-OpenCode-Directory-Encoding,Ngrok-Skip-Browser-Warning,X-Magio-Surface,X-Magio-Provider,X-Magio-Model,X-Magio-Part-Shells');
       res.setHeader('Access-Control-Expose-Headers', 'x-next-cursor');
       res.setHeader('Vary', 'Origin');
       if (req.method === 'OPTIONS') {
@@ -2325,8 +2325,8 @@ async function main(options = {}) {
 
   const bootstrapResult = bootstrapRuntime.setupBaseRoutes(app, {
     process,
-    openchamberVersion: OPENCHAMBER_VERSION,
-    runtimeName: process.env.OPENCHAMBER_RUNTIME || 'web',
+    magioVersion: MAGIO_VERSION,
+    runtimeName: process.env.MAGIO_RUNTIME || 'web',
     serverStartedAt,
     gracefulShutdown,
     getHealthSnapshot: () => {
@@ -2370,7 +2370,7 @@ async function main(options = {}) {
       return Number.isFinite(port) && port > 0 ? port : null;
     },
     getTunnelUrl: () => tunnelRuntimeContextHolder?.tunnelService?.getPublicUrl?.() ?? null,
-    verboseRequestLogs: OPENCHAMBER_VERBOSE_REQUEST_LOGS,
+    verboseRequestLogs: MAGIO_VERBOSE_REQUEST_LOGS,
     uiPassword,
     tunnelAuthController,
     remoteClientAuthRuntime,
@@ -2397,9 +2397,9 @@ async function main(options = {}) {
     getServerLabel: () => {
       try {
         const name = os.hostname();
-        return typeof name === 'string' && name.trim().length > 0 ? name.trim() : 'OpenChamber';
+        return typeof name === 'string' && name.trim().length > 0 ? name.trim() : 'Magio';
       } catch {
-        return 'OpenChamber';
+        return 'Magio';
       }
     },
     readSettingsFromDiskMigrated,
@@ -2427,7 +2427,7 @@ async function main(options = {}) {
     path,
     server,
     __dirname,
-    openchamberDataDir: OPENCHAMBER_DATA_DIR,
+    magioDataDir: MAGIO_DATA_DIR,
     modelsDevApiUrl: MODELS_DEV_API_URL,
     modelsMetadataCacheTtl: MODELS_METADATA_CACHE_TTL,
     fetchFreeZenModels,
@@ -2451,7 +2451,7 @@ async function main(options = {}) {
     host.prepareUpgrades({ uiAuthController, isRequestOriginAllowed });
     // Every space's events join the host's hub, and the host asks each space for its live status;
     // each space's queue changes and permission modes reach the browsers on the streams the host's own use.
-    void host.startEvents(globalMessageStreamHub, { broadcastUiEvent: broadcastOpenChamberUiEvent, broadcastGlobalUiEvent }).catch((error) => {
+    void host.startEvents(globalMessageStreamHub, { broadcastUiEvent: broadcastMagioUiEvent, broadcastGlobalUiEvent }).catch((error) => {
       console.warn(`[spaces] could not follow the spaces: ${error?.message ?? error}`);
     });
   };
@@ -2500,18 +2500,18 @@ async function main(options = {}) {
     // the relay identity (serverId), so concurrent hosts evict each other at
     // the relay worker and devices land on a random local instance.
     hostLock: createRelayHostLock({
-      lockFilePath: path.join(OPENCHAMBER_DATA_DIR, 'relay-host.lock'),
+      lockFilePath: path.join(MAGIO_DATA_DIR, 'relay-host.lock'),
       fs,
       process,
     }),
     // Dev/debug instances share the data dir (and thus the relay identity) with
     // the production instance, so they must not host the relay on their own —
-    // paired devices would land on them. OPENCHAMBER_RELAY_HOST=off disables
+    // paired devices would land on them. MAGIO_RELAY_HOST=off disables
     // passive hosting explicitly (dev scripts set it); the Electron dev shell is
-    // covered via OPENCHAMBER_ELECTRON_DEV. OPENCHAMBER_RELAY_HOST=on overrides
+    // covered via MAGIO_ELECTRON_DEV. MAGIO_RELAY_HOST=on overrides
     // both. Explicit enable/pairing on the instance still hosts regardless.
-    allowPassiveHost: process.env.OPENCHAMBER_RELAY_HOST === 'on'
-      || (process.env.OPENCHAMBER_RELAY_HOST !== 'off' && process.env.OPENCHAMBER_ELECTRON_DEV !== '1'),
+    allowPassiveHost: process.env.MAGIO_RELAY_HOST === 'on'
+      || (process.env.MAGIO_RELAY_HOST !== 'off' && process.env.MAGIO_ELECTRON_DEV !== '1'),
     // Relay demand = any paired device or pending pairing session that uses the
     // relay transport. Drives the auto on/off lifecycle.
     hasRelayDemand: async () => {
@@ -2565,16 +2565,16 @@ async function main(options = {}) {
     spawn,
     resolveGitBinaryForSpawn,
     createFsSearchRuntime: createFsSearchRuntimeFactory,
-    openchamberDataDir: OPENCHAMBER_DATA_DIR,
-    openchamberVersion: OPENCHAMBER_VERSION,
+    magioDataDir: MAGIO_DATA_DIR,
+    magioVersion: MAGIO_VERSION,
     onGuestDeactivated: async (event) => {
       guestSurfaceRuntime?.endForGuest(event.guestId);
       return browserControlRouter.handleGuestDeactivated(event);
     },
     surfaceViewerHeaders: (guestId, viewerId) => guestSurfaceRuntime?.viewerHeaders(guestId, viewerId) ?? null,
     builtInExtensionsDir: options.builtInExtensionsDir,
-    openchamberUserConfigRoot: OPENCHAMBER_USER_CONFIG_ROOT,
-    managedChatsRoot: OPENCHAMBER_CHATS_DIR,
+    magioUserConfigRoot: MAGIO_USER_CONFIG_ROOT,
+    managedChatsRoot: MAGIO_CHATS_DIR,
     normalizeDirectoryPath,
     resolveProjectDirectory,
     resolveOptionalProjectDirectory,
@@ -2608,7 +2608,7 @@ async function main(options = {}) {
     buildOpenCodeUrl,
     getOpenCodeAuthHeaders,
     getOpenCodePort: () => openCodePort,
-    // Dev-server discovery must not offer OpenChamber's own listeners back to
+    // Dev-server discovery must not offer Magio's own listeners back to
     // the user as something to preview.
     getOwnPorts: () => [port, openCodePort].filter((value) => Number.isInteger(value) && value > 0),
     getActivePort: () => {
@@ -2626,11 +2626,11 @@ async function main(options = {}) {
     sessionKnowledgeRuntime,
     scheduledTasksRuntime,
     scheduledTaskService,
-    openChamberSessionService,
-    openChamberControlService,
+    magioSessionService,
+    magioControlService,
     waitForOpenCodeReady,
     emitSessionCreatedEvent,
-    getOpenChamberEventClients: () => uiOpenChamberEventClients,
+    getMagioEventClients: () => uiMagioEventClients,
     writeSseEvent,
     globalEventHub: globalMessageStreamHub,
     permissionAutoAcceptRuntime,
@@ -2645,8 +2645,8 @@ async function main(options = {}) {
     uiAuthController,
     isRequestOriginAllowed,
     rejectWebSocketUpgrade,
-    persistPath: extensionsPersistPath(OPENCHAMBER_DATA_DIR),
-    findGuest: (id) => findInstalledGuest(id, extensionsPersistPath(OPENCHAMBER_DATA_DIR)),
+    persistPath: extensionsPersistPath(MAGIO_DATA_DIR),
+    findGuest: (id) => findInstalledGuest(id, extensionsPersistPath(MAGIO_DATA_DIR)),
     idleStopMs: BROWSER_PROVIDER_IDLE_MS,
   });
 
@@ -2706,7 +2706,7 @@ async function main(options = {}) {
     tunnelRuntimeContext,
     attachSignals,
     apiOnly,
-    dictationModelsDir: path.join(OPENCHAMBER_USER_CONFIG_ROOT, 'speech-models'),
+    dictationModelsDir: path.join(MAGIO_USER_CONFIG_ROOT, 'speech-models'),
   });
   terminalRuntime = startupPipelineResult.terminalRuntime;
   dictationRuntime = startupPipelineResult.dictationRuntime;
@@ -2723,7 +2723,7 @@ async function main(options = {}) {
   // device/session exists, stop it (and clear a stale enabled flag) otherwise.
   void relayService.reconcile();
 
-  // Relay demand can change outside our routes: `openchamber connect-url
+  // Relay demand can change outside our routes: `magio connect-url
   // --relay` writes a pending relay session straight to the on-disk store, and
   // pending sessions expire without any request hitting us. Poll reconcile so a
   // headless instance picks the relay up (or drops it) within a minute.
@@ -2735,7 +2735,7 @@ async function main(options = {}) {
   // The server inside an isolated space stops itself after the user's idle hours, and the space's
   // container with it (decision 11). Only a space's environment names the setting's
   // file, so this never runs anywhere else. The exit code tells the host why it stopped.
-  const spaceIdleStopFile = process.env.OPENCHAMBER_SPACE_IDLE_STOP_FILE;
+  const spaceIdleStopFile = process.env.MAGIO_SPACE_IDLE_STOP_FILE;
   if (spaceIdleStopFile) {
     startIdleStop({
       settingsPath: spaceIdleStopFile,

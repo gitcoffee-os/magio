@@ -76,7 +76,7 @@ test('reports URLs as `git remote get-url [--push]` does when lines are missing 
 });
 
 test('reads a partial-clone remote as `git remote get-url` reports it', () => {
-  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'oc-vscode-remote-listing-'));
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'mg-vscode-remote-listing-'));
   try {
     git(dir, ['init', '-b', 'main']);
     git(dir, ['remote', 'add', 'origin', 'git@github.com:owner/repo.git']);

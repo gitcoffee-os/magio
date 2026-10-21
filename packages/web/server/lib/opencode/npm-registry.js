@@ -43,9 +43,9 @@ function _getUserAgent() {
 
   try {
     const pkg = JSON.parse(fs.readFileSync(_getPackageJsonPath(), 'utf8'));
-    _userAgent = `openchamber-server/${typeof pkg.version === 'string' ? pkg.version : '0.0.0'}`;
+    _userAgent = `magio-server/${typeof pkg.version === 'string' ? pkg.version : '0.0.0'}`;
   } catch {
-    _userAgent = 'openchamber-server/dev';
+    _userAgent = 'magio-server/dev';
   }
 
   return _userAgent;

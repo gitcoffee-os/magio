@@ -1,0 +1,16 @@
+<svg width="512" height="512" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="cSpark" x1="0.15" y1="0" x2="0.85" y2="1">
+      <stop offset="0" stop-color="#f7dc97"/>
+      <stop offset="0.55" stop-color="#edb449"/>
+      <stop offset="1" stop-color="#c9922c"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Magio logo - the C-spark app icon, readable on any background -->
+  <rect x="100" y="100" width="824" height="824" rx="185" fill="#151313"/>
+  <path d="M 512 168 C 528 380, 644 496, 856 512 C 644 528, 528 644, 512 856 C 496 644, 380 528, 168 512 C 380 496, 496 380, 512 168 Z"
+        fill="url(#cSpark)"/>
+  <path d="M 512 168 C 528 380, 644 496, 856 512 C 644 528, 528 644, 512 856 C 496 644, 380 528, 168 512 C 380 496, 496 380, 512 168 Z"
+        transform="translate(624.4,142.4) scale(0.3)" fill="url(#cSpark)"/>
+</svg>

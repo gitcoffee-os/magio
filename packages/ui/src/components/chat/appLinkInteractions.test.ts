@@ -59,7 +59,7 @@ const setup = (allowExternalHttp = true) => {
     openAppLink: (url) => appLinks.push(url),
     openExternalHttp: (url) => httpLinks.push(url),
     openSessionLink: (target) => sessionLinks.push(target),
-    ownOrigins: ['https://chamber.example'],
+    ownOrigins: ['https://magio.example'],
   });
   return { container, appLinks, httpLinks, sessionLinks, cleanup };
 };
@@ -98,8 +98,8 @@ describe('app link interactions', () => {
   test('opens session links in place', () => {
     const { container, sessionLinks, httpLinks } = setup();
 
-    expect(container.dispatch('click', 'openchamber://session/ses_a?message=msg_1').defaultPrevented).toBe(true);
-    expect(container.dispatch('click', 'https://chamber.example/?session=ses_b').defaultPrevented).toBe(true);
+    expect(container.dispatch('click', 'magio://session/ses_a?message=msg_1').defaultPrevented).toBe(true);
+    expect(container.dispatch('click', 'https://magio.example/?session=ses_b').defaultPrevented).toBe(true);
     expect(sessionLinks).toEqual([
       { sessionId: 'ses_a', messageId: 'msg_1' },
       { sessionId: 'ses_b', messageId: null },
@@ -121,7 +121,7 @@ describe('app link interactions', () => {
   test('leaves a modifier click on a web session link and other origins to the browser path', () => {
     const { container, sessionLinks, httpLinks } = setup();
 
-    expect(container.dispatch('click', 'https://chamber.example/?session=ses_b', { metaKey: true }).defaultPrevented).toBe(false);
+    expect(container.dispatch('click', 'https://magio.example/?session=ses_b', { metaKey: true }).defaultPrevented).toBe(false);
     container.dispatch('click', 'https://elsewhere.example/?session=ses_b');
     expect(sessionLinks).toEqual([]);
     expect(httpLinks).toEqual(['https://elsewhere.example/?session=ses_b']);

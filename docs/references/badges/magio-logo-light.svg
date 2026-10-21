@@ -1,0 +1,8 @@
+<svg width="100" height="100" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Magio mark - the C-spark, on light ground. Main spark spans 8.432..91.568
+       on both axes; the companion sits upper right. -->
+  <path d="M50 8.432 C51.934 34.048, 65.952 48.067, 91.568 50 C65.952 51.934, 51.934 65.952, 50 91.568 C48.067 65.952, 34.048 51.934, 8.432 50 C34.048 48.067, 48.067 34.048, 50 8.432 Z"
+        fill="black"/>
+  <path d="M82.144 11.427 C82.723 19.113, 86.928 23.319, 94.614 23.898 C86.928 24.478, 82.723 28.682, 82.144 36.369 C81.563 28.682, 77.358 24.478, 69.672 23.898 C77.358 23.319, 81.563 19.113, 82.144 11.427 Z"
+        fill="black" fill-opacity="0.55"/>
+</svg>

@@ -12,7 +12,7 @@ describe('html preview url', () => {
     const url = htmlPreviewUrl('grant-1', '/Users/me/my site/index.html');
     setRuntimeUrlResolver(previous);
     expect(url).toBe('http://127.0.0.1:3001/api/fs/preview/grant-1/Users/me/my%20site/index.html');
-    expect(url).not.toContain('oc_url_token');
+    expect(url).not.toContain('mg_url_token');
   });
 
   test('mints a grant for the page with the project directory', async () => {

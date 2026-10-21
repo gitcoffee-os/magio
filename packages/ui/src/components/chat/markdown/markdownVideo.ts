@@ -7,7 +7,7 @@ import { refreshRuntimeUrlAuthToken } from '@/lib/runtime-auth';
 
 const VIDEO_FILE_RE = /\.(?:mp4|m4v|mov|webm)$/i;
 // The query parameter the runtime signs asset URLs with (runtime-url.ts).
-const URL_TOKEN_PARAM = 'oc_url_token';
+const URL_TOKEN_PARAM = 'mg_url_token';
 // GitHub writes an uploaded picture as markup and a clip as this bare URL.
 const GITHUB_ASSET_RE = /^https:\/\/github\.com\/user-attachments\/assets\/[\w-]+$/i;
 
@@ -35,7 +35,7 @@ export const isBareVideoUrl = (url: string): boolean => (
 );
 
 /** Marks a player drawn for a file on this machine. */
-export const LOCAL_VIDEO_ATTR = 'data-openchamber-markdown-local-video';
+export const LOCAL_VIDEO_ATTR = 'data-magio-markdown-local-video';
 
 const escapeAttr = (value: string): string =>
   value.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');

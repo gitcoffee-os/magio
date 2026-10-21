@@ -227,7 +227,7 @@ const initializePerformanceDom = async (): Promise<void> => {
     set(value: string) {
       if (activeCounts) {
         activeCounts.innerHTMLWrites += 1;
-        if (value.includes('href="#oc-')) activeCounts.spriteIconInnerHTMLWrites += 1;
+        if (value.includes('href="#mg-')) activeCounts.spriteIconInnerHTMLWrites += 1;
       }
       innerHTMLDescriptor.set?.call(this, value);
     },
@@ -386,10 +386,10 @@ describe('MarkdownRenderer DOM mount performance contract', () => {
       const anchors = host.querySelectorAll('a');
       expect(Array.from(anchors).map((anchor) => anchor.getAttribute('href'))).toEqual(urls);
       for (const anchor of anchors) {
-        expect(anchor.hasAttribute('data-openchamber-file-link')).toBe(false);
+        expect(anchor.hasAttribute('data-magio-file-link')).toBe(false);
       }
       // The annotation pass really ran: a normal reference still opens internally.
-      expect(host.querySelector('[data-markdown="inline-code"]')?.getAttribute('data-openchamber-file-link')).toBe('true');
+      expect(host.querySelector('[data-markdown="inline-code"]')?.getAttribute('data-magio-file-link')).toBe('true');
     } finally {
       await act(async () => root.unmount());
       fileLinkTestDirectory = null;
@@ -405,7 +405,7 @@ describe('MarkdownRenderer DOM mount performance contract', () => {
     document.body.replaceChildren(host);
     const root = createRoot(host);
     const code = 'src/app.ts:12 failed: console.log(this.state.ts)';
-    const tokens = () => Array.from(host.querySelectorAll('pre code [data-openchamber-block-path-token]'));
+    const tokens = () => Array.from(host.querySelectorAll('pre code [data-magio-block-path-token]'));
     try {
       await act(async () => {
         root.render(<MarkdownRenderer
@@ -427,8 +427,8 @@ describe('MarkdownRenderer DOM mount performance contract', () => {
       // Every path-like token was probed, and only the real file became a link.
       expect([...new Set(statRequests)].sort()).toEqual(['/outside/console.log', '/outside/src/app.ts', '/outside/this.state.ts']);
       expect(tokens().map((token) => token.textContent)).toEqual(['src/app.ts:12']);
-      expect(tokens()[0]?.getAttribute('data-openchamber-file-link')).toBe('true');
-      expect(tokens()[0]?.getAttribute('data-openchamber-file-path')).toBe('/outside/src/app.ts');
+      expect(tokens()[0]?.getAttribute('data-magio-file-link')).toBe('true');
+      expect(tokens()[0]?.getAttribute('data-magio-file-path')).toBe('/outside/src/app.ts');
       expect(host.querySelector('pre code')?.textContent).toContain(code);
     } finally {
       await act(async () => root.unmount());
@@ -455,7 +455,7 @@ describe('MarkdownRenderer DOM mount performance contract', () => {
       const first = host.querySelector<HTMLDetailsElement>('details');
       expect(first).not.toBeNull();
       expect(first?.open).toBe(false);
-      expect(first?.querySelector('summary [data-md-disclosure-icon] use')?.getAttribute('href')).toBe('#oc-arrow-right-s');
+      expect(first?.querySelector('summary [data-md-disclosure-icon] use')?.getAttribute('href')).toBe('#mg-arrow-right-s');
       if (!first) throw new Error('Expected disclosure');
       first.open = true;
       for (let count = 1; count <= 5; count += 1) {
@@ -750,7 +750,7 @@ describe('MarkdownRenderer DOM mount performance contract', () => {
   test('builds Markdown sprite controls without parsing SVG markup', async () => {
     const mounted = await mountFixture(1);
 
-    const spriteControlCount = mounted.host.querySelectorAll('[data-md-action] use[href^="#oc-"]').length;
+    const spriteControlCount = mounted.host.querySelectorAll('[data-md-action] use[href^="#mg-"]').length;
     const spriteIconInnerHTMLWrites = mounted.operations.spriteIconInnerHTMLWrites;
     await act(async () => mounted.root.unmount());
 

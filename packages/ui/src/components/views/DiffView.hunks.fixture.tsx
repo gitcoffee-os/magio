@@ -187,7 +187,7 @@ export async function exerciseDiffHunkActions(snapshotCase?: 'cold' | 'cached' |
           expect(slot?.closest('[data-line-annotation]')).not.toBeNull();
           if (layout === 'side-by-side') expect(slot?.closest('[data-additions]')).not.toBeNull();
           // The control floats 4px below its marker, unclamped mid-file.
-          expect(target?.style.getPropertyValue('--oc-hunk-action-offset')).toBe('4px');
+          expect(target?.style.getPropertyValue('--mg-hunk-action-offset')).toBe('4px');
         }
         return;
       }
@@ -333,8 +333,8 @@ export async function exerciseTrailingContextExpansion(layout: 'inline' | 'side-
   try {
     await render('middle');
     await waitFor('the partial diff', () => shadowText().includes('changed49'));
-    await waitFor('the trailing row', () => container.querySelector('[data-oc-trailing-expand]') !== null);
-    const row = container.querySelector<HTMLElement>('[data-oc-trailing-expand]');
+    await waitFor('the trailing row', () => container.querySelector('[data-mg-trailing-expand]') !== null);
+    const row = container.querySelector<HTMLElement>('[data-mg-trailing-expand]');
     expect(row?.textContent).toBe('Show lines below');
     const slots = container.querySelector('diffs-container')?.shadowRoot?.querySelectorAll('slot') ?? [];
     const wrapper = row?.closest('[slot]');
@@ -349,13 +349,13 @@ export async function exerciseTrailingContextExpansion(layout: 'inline' | 'side-
     // Pierre's own separator now sizes what is left after the 20 expanded lines.
     expect(shadowText()).not.toContain('line73');
     expect(shadowText()).toContain('77 unmodified lines');
-    expect(container.querySelector('[data-oc-trailing-expand]')).toBeNull();
+    expect(container.querySelector('[data-mg-trailing-expand]')).toBeNull();
 
     // Two trailing context lines: git reached the end of the file.
     changedIndex = lineCount - 3;
     await render('end');
     await waitFor('the partial diff at the end', () => shadowText().includes(`changed${changedIndex}`));
-    expect(container.querySelector('[data-oc-trailing-expand]')).toBeNull();
+    expect(container.querySelector('[data-mg-trailing-expand]')).toBeNull();
   } finally {
     await act(async () => root.unmount());
     await restore();
@@ -454,21 +454,21 @@ export async function exerciseMobileComparisonContextExpansion() {
     const fileButton = container.querySelector('[title="file.txt"]')?.closest('button');
     await act(async () => { fileButton?.click(); });
     await waitFor('the partial diff', () => shadowText().includes('changed49'));
-    await waitFor('the trailing row', () => container.querySelector('[data-oc-trailing-expand]') !== null);
+    await waitFor('the trailing row', () => container.querySelector('[data-mg-trailing-expand]') !== null);
     expect(shadowText()).not.toContain('line53');
 
     // A failed read leaves the patch on screen and the row available again.
-    await act(async () => container.querySelector<HTMLElement>('[data-oc-trailing-expand]')?.click());
-    await waitFor('the failed full read', () => fullReads === 1 && container.querySelector('[data-oc-trailing-expand]') !== null);
+    await act(async () => container.querySelector<HTMLElement>('[data-mg-trailing-expand]')?.click());
+    await waitFor('the failed full read', () => fullReads === 1 && container.querySelector('[data-mg-trailing-expand]') !== null);
     expect(shadowText()).toContain('changed49');
     expect(shadowText()).not.toContain('line53');
 
     failFullRead = false;
-    await act(async () => container.querySelector<HTMLElement>('[data-oc-trailing-expand]')?.click());
+    await act(async () => container.querySelector<HTMLElement>('[data-mg-trailing-expand]')?.click());
     await waitFor('the expanded tail', () => shadowText().includes('line72'));
     expect(fullReads).toBe(2);
     expect(shadowText()).not.toContain('line73');
-    expect(container.querySelector('[data-oc-trailing-expand]')).toBeNull();
+    expect(container.querySelector('[data-mg-trailing-expand]')).toBeNull();
   } finally {
     await act(async () => root.unmount());
     await restore();

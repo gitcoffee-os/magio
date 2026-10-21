@@ -23,7 +23,7 @@ const writeJson = async (filePath, value) => {
 };
 
 beforeEach(async () => {
-  rootDir = await fsPromises.mkdtemp(path.join(os.tmpdir(), 'oc-agent-memory-'));
+  rootDir = await fsPromises.mkdtemp(path.join(os.tmpdir(), 'mg-agent-memory-'));
   idCounter = 0;
   runtime = createAgentMemoryRuntime({
     fsPromises,

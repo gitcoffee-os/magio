@@ -23,7 +23,7 @@ import {
 } from './shared.js';
 
 const createTempProject = () => {
-  const projectRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'oc-skill-routes-'));
+  const projectRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'mg-skill-routes-'));
   fs.mkdirSync(path.join(projectRoot, '.git'));
   return projectRoot;
 };
@@ -175,7 +175,7 @@ describe('skill-routes directory soft fallback', () => {
       'utf8',
     );
 
-    const cacheStamp = `oc-skill-routes-${Date.now()}`;
+    const cacheStamp = `mg-skill-routes-${Date.now()}`;
     const cacheDir = path.join(os.homedir(), '.cache', 'opencode', 'skills', cacheStamp, 'cache-list-skill');
     fs.mkdirSync(cacheDir, { recursive: true });
     fs.writeFileSync(
@@ -321,9 +321,9 @@ describe('skill-routes directory soft fallback', () => {
     fs.mkdirSync(skillDir, { recursive: true });
     fs.writeFileSync(path.join(skillDir, 'SKILL.md'), '---\nname: skill-creator\ndescription: Creates skills\n---\nBody\n');
 
-    const dataDir = fs.mkdtempSync(path.join(os.tmpdir(), 'oc-skills-data-'));
-    const previousDataDir = process.env.OPENCHAMBER_DATA_DIR;
-    process.env.OPENCHAMBER_DATA_DIR = dataDir;
+    const dataDir = fs.mkdtempSync(path.join(os.tmpdir(), 'mg-skills-data-'));
+    const previousDataDir = process.env.MAGIO_DATA_DIR;
+    process.env.MAGIO_DATA_DIR = dataDir;
     try {
       fs.mkdirSync(dataDir, { recursive: true });
       fs.writeFileSync(path.join(dataDir, 'skills-installed-sources.json'), JSON.stringify({
@@ -363,17 +363,17 @@ describe('skill-routes directory soft fallback', () => {
       )).json();
       expect(legacy.items[0].installed).toMatchObject({ isInstalled: true });
     } finally {
-      if (previousDataDir === undefined) delete process.env.OPENCHAMBER_DATA_DIR;
-      else process.env.OPENCHAMBER_DATA_DIR = previousDataDir;
+      if (previousDataDir === undefined) delete process.env.MAGIO_DATA_DIR;
+      else process.env.MAGIO_DATA_DIR = previousDataDir;
       fs.rmSync(dataDir, { recursive: true, force: true });
     }
   });
 
   it('records install provenance for what an install returned', async () => {
     projectRoot = createTempProject();
-    const dataDir = fs.mkdtempSync(path.join(os.tmpdir(), 'oc-skills-data-'));
-    const previousDataDir = process.env.OPENCHAMBER_DATA_DIR;
-    process.env.OPENCHAMBER_DATA_DIR = dataDir;
+    const dataDir = fs.mkdtempSync(path.join(os.tmpdir(), 'mg-skills-data-'));
+    const previousDataDir = process.env.MAGIO_DATA_DIR;
+    process.env.MAGIO_DATA_DIR = dataDir;
     try {
       appHandle = startSkillsApp({
         projectRoot,
@@ -408,8 +408,8 @@ describe('skill-routes directory soft fallback', () => {
         sourceRef: 'owner/repo',
       }));
     } finally {
-      if (previousDataDir === undefined) delete process.env.OPENCHAMBER_DATA_DIR;
-      else process.env.OPENCHAMBER_DATA_DIR = previousDataDir;
+      if (previousDataDir === undefined) delete process.env.MAGIO_DATA_DIR;
+      else process.env.MAGIO_DATA_DIR = previousDataDir;
       fs.rmSync(dataDir, { recursive: true, force: true });
     }
   });

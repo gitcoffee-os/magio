@@ -4,8 +4,8 @@
 
 import { MIN_QUERY_TERM_LENGTH } from '@/lib/messageSearch';
 
-const SEARCH_HIGHLIGHT = 'oc-chat-search';
-const SEARCH_CURRENT_HIGHLIGHT = 'oc-chat-search-current';
+const SEARCH_HIGHLIGHT = 'mg-chat-search';
+const SEARCH_CURRENT_HIGHLIGHT = 'mg-chat-search-current';
 
 // What the index holds: the user's bubble and the agent's text replies.
 const SEARCHABLE_TEXT_SELECTOR = '[data-user-message-bubble], [data-markdown-content]';

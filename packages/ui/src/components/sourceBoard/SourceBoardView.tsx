@@ -129,7 +129,7 @@ const MobileBoardHeader: React.FC<{ onClose?: () => void; onBack?: () => void; c
     const { t } = useI18n();
     const action = onBack ?? onClose;
     return (
-        <header className="flex h-[var(--oc-header-height,56px)] shrink-0 items-center gap-2 border-b border-border/70 px-3">
+        <header className="flex h-[var(--mg-header-height,56px)] shrink-0 items-center gap-2 border-b border-border/70 px-3">
             {action ? (
                 <button
                     type="button"
@@ -755,7 +755,7 @@ const SourceBoardBody: React.FC<{
                     {listDropdown ? (
                         <>
                             <div className="absolute inset-0 z-10" aria-hidden onClick={() => setListOpen(false)} />
-                            <div className="oc-glass-popover oc-glass-floating absolute inset-x-2 top-1 z-20 flex h-[min(28rem,75%)] flex-col overflow-hidden rounded-xl">
+                            <div className="mg-glass-popover mg-glass-floating absolute inset-x-2 top-1 z-20 flex h-[min(28rem,75%)] flex-col overflow-hidden rounded-xl">
                                 <ScrollableOverlay outerClassName="min-h-0 flex-1" disableHorizontal>
                                     {list}
                                 </ScrollableOverlay>

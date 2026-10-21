@@ -369,7 +369,7 @@ export const WorkStatusContextSection: React.FC<Props> = ({ sessionId, directory
     return (
       <Icon
         name={isLinkedChange(entry) ? 'git-pull-request' : entry.kind === 'linear' ? 'linear' : 'record-circle'}
-        className={cn('size-3.5 shrink-0', color ? 'oc-ref-tint' : 'text-muted-foreground')}
+        className={cn('size-3.5 shrink-0', color ? 'mg-ref-tint' : 'text-muted-foreground')}
         style={color ? refTintStyle(color) : undefined}
       />
     );
@@ -379,7 +379,7 @@ export const WorkStatusContextSection: React.FC<Props> = ({ sessionId, directory
     const identifier = renderedIdentifier(entry);
     return (
       <>
-        <span className={cn('tabular-nums', look && 'oc-ref-tint')} style={look ? refTintStyle(look.color) : undefined}>{look ? look.text : identifier}</span>
+        <span className={cn('tabular-nums', look && 'mg-ref-tint')} style={look ? refTintStyle(look.color) : undefined}>{look ? look.text : identifier}</span>
         {entry.title ? <> · {entry.title}</> : null}
       </>
     );

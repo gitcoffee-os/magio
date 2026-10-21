@@ -64,11 +64,11 @@ beforeEach(async () => {
   useDirectoryStore.setState({ currentDirectory: directory });
   useUIStore.setState({ isMobile: false });
   useCommandsStore.setState({
-    commandsByDirectory: { [directory]: [{ name: 'oc-scroll', description: 'First details', scope: 'project' }] },
+    commandsByDirectory: { [directory]: [{ name: 'mg-scroll', description: 'First details', scope: 'project' }] },
     loadCommands: async () => true,
   });
   useSkillsStore.setState({
-    skillsByDirectory: { [directory]: [{ name: 'oc-scroll', description: 'First details', scope: 'project', source: 'agents', path: `${directory}/skills/oc-scroll/SKILL.md` }] },
+    skillsByDirectory: { [directory]: [{ name: 'mg-scroll', description: 'First details', scope: 'project', source: 'agents', path: `${directory}/skills/mg-scroll/SKILL.md` }] },
     loadSkills: async () => true,
   });
   selections = [];
@@ -117,8 +117,8 @@ async function mountPicker(kind: 'command' | 'skill') {
     return <>
       <input defaultValue={draft} onKeyDown={(event) => handle.current?.handleKeyDown(event.key)} />
       {open && (kind === 'command'
-        ? <CommandAutocomplete ref={handle} searchQuery="oc-scroll" onClose={close} onCommandSelect={(item) => selections.push(item.name)} />
-        : <SkillAutocomplete ref={handle} searchQuery="oc-scroll" onClose={close} onSkillSelect={(name) => selections.push(name)} />)}
+        ? <CommandAutocomplete ref={handle} searchQuery="mg-scroll" onClose={close} onCommandSelect={(item) => selections.push(item.name)} />
+        : <SkillAutocomplete ref={handle} searchQuery="mg-scroll" onClose={close} onSkillSelect={(name) => selections.push(name)} />)}
     </>;
   }
   await act(async () => root.render(
@@ -167,7 +167,7 @@ for (const kind of ['command', 'skill'] as const) {
     expect(selections).toEqual([]);
     await press('Enter');
     await press('Tab');
-    expect(selections).toEqual(['oc-scroll', 'oc-scroll']);
+    expect(selections).toEqual(['mg-scroll', 'mg-scroll']);
     await press('Escape');
     expect(closes()).toBe(1);
     expect(host.querySelector('.overlay-scrollbar-target') === null).toBe(true);
@@ -205,8 +205,8 @@ for (const kind of ['command', 'skill'] as const) {
     const firstCommand = commands?.[0];
     const firstSkill = skills?.[0];
     if (!firstCommand || !firstSkill) throw new Error('Missing autocomplete fixtures');
-    useCommandsStore.setState({ commandsByDirectory: { [directory]: [firstCommand, { ...firstCommand, name: 'oc-scroll-next', description: 'Next details' }] } });
-    useSkillsStore.setState({ skillsByDirectory: { [directory]: [firstSkill, { ...firstSkill, name: 'oc-scroll-next', description: 'Next details' }] } });
+    useCommandsStore.setState({ commandsByDirectory: { [directory]: [firstCommand, { ...firstCommand, name: 'mg-scroll-next', description: 'Next details' }] } });
+    useSkillsStore.setState({ skillsByDirectory: { [directory]: [firstSkill, { ...firstSkill, name: 'mg-scroll-next', description: 'Next details' }] } });
     const { scroller, input, press } = await mountPicker(kind);
     await waitForDetails();
     await scrollList(scroller, 50);
@@ -217,7 +217,7 @@ for (const kind of ['command', 'skill'] as const) {
     expect(details()?.textContent).toBe('Next details');
     expect(row(1).classList.contains('bg-interactive-selection')).toBe(true);
     await press('Enter');
-    expect(selections).toEqual(['oc-scroll-next']);
+    expect(selections).toEqual(['mg-scroll-next']);
     modelScrollIntoView(row(), scroller, 0);
     await press('ArrowDown');
     await waitForDetails();
@@ -230,7 +230,7 @@ for (const kind of ['command', 'skill'] as const) {
     await waitForDetails();
     expect(details()?.textContent).toBe('Next details');
     await act(async () => row(1).click());
-    expect(selections).toEqual(['oc-scroll-next', 'oc-scroll-next']);
+    expect(selections).toEqual(['mg-scroll-next', 'mg-scroll-next']);
     expect(input.value).toBe(draft);
   });
 

@@ -2,7 +2,7 @@ import { describe, expect, test } from 'bun:test';
 import { resolveProjectForSessionDirectory } from './projectResolution';
 
 const projects = [
-  { id: 'openchamber', path: '/workspace/openchamber', label: 'OpenChamber' },
+  { id: 'magio', path: '/workspace/magio', label: 'Magio' },
 ];
 
 describe('resolveProjectForSessionDirectory', () => {
@@ -15,15 +15,15 @@ describe('resolveProjectForSessionDirectory', () => {
 
   test('resolves a sibling worktree to its registered project', () => {
     const worktrees = new Map([
-      ['/workspace/openchamber', [{
-        path: '/workspace/openchamber-feature',
-        projectDirectory: '/workspace/openchamber',
+      ['/workspace/magio', [{
+        path: '/workspace/magio-feature',
+        projectDirectory: '/workspace/magio',
         branch: 'feature',
         label: 'feature',
       }]],
     ]);
 
-    expect(resolveProjectForSessionDirectory(projects, worktrees, '/workspace/openchamber-feature')).toEqual(projects[0]);
+    expect(resolveProjectForSessionDirectory(projects, worktrees, '/workspace/magio-feature')).toEqual(projects[0]);
   });
 
   test('prefers registered worktree ownership over a containing project', () => {

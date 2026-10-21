@@ -594,7 +594,7 @@ export function SettingsChipGroup<T extends string>({
       role="group"
       aria-label={ariaLabel}
       className={cn(
-        'oc-recessed inline-flex max-w-full flex-wrap items-center gap-0.5 rounded-lg bg-[color-mix(in_srgb,var(--foreground)_4%,transparent)] p-0.5',
+        'mg-recessed inline-flex max-w-full flex-wrap items-center gap-0.5 rounded-lg bg-[color-mix(in_srgb,var(--foreground)_4%,transparent)] p-0.5',
         className,
       )}
     >
@@ -613,7 +613,7 @@ export function SettingsChipGroup<T extends string>({
               selected
                 // Light themes paint elevated darker than the canvas, so the
                 // raised option takes the canvas colour there, like the tab pill.
-                ? 'oc-raised bg-[var(--surface-background)] text-foreground hover:bg-[var(--surface-background)] dark:bg-[var(--surface-elevated)] dark:hover:bg-[var(--surface-elevated)]'
+                ? 'mg-raised bg-[var(--surface-background)] text-foreground hover:bg-[var(--surface-background)] dark:bg-[var(--surface-elevated)] dark:hover:bg-[var(--surface-elevated)]'
                 : 'text-muted-foreground hover:bg-transparent hover:text-foreground',
             )}
             onClick={() => onChange(option.value)}

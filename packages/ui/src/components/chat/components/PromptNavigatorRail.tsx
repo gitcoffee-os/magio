@@ -656,7 +656,7 @@ export function PromptNavigatorRail({
                                 'pointer-events-auto absolute inset-e-full top-1/2 z-30 me-3 -translate-y-1/2',
                                 'w-[min(20rem,calc(100vw-6rem))] overflow-hidden rounded-xl',
                                 // Reads as a dropdown: the menus' glass and light, plain rows.
-                                'oc-glass-popover oc-glass-floating py-1',
+                                'mg-glass-popover mg-glass-floating py-1',
                             )}
                             onMouseEnter={cancelScheduledHide}
                             onMouseLeave={scheduleHide}
