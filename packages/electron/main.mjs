@@ -2820,7 +2820,14 @@ const createBrowserWindow = ({ label, restoreGeometry, url, runtimeConfig = {}, 
 
   // The app scales itself (View > Zoom changes the interface scale), so
   // Chromium's page zoom from pinch or Ctrl+wheel stays off.
-  browserWindow.webContents.setZoomMode('disabled');
+  if (typeof browserWindow.webContents.setZoomMode === 'function') {
+    browserWindow.webContents.setZoomMode('disabled');
+  } else {
+    // Electron 43 is the last release that runs on macOS 12 and predates
+    // setZoomMode. Disable visual zoom and pin the page zoom factor instead.
+    browserWindow.webContents.setVisualZoomLevelLimits(1, 1).catch(() => {});
+    browserWindow.webContents.setZoomFactor(1);
+  }
   attachRendererRecovery(browserWindow, { log, label: 'window' });
   attachDevWindowTape(app, browserWindow);
 
