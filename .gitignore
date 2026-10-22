@@ -84,6 +84,9 @@ artifacts/
 packages/ui/.tsbuild/
 *.tsbuildinfo
 
+# Local agent workspace: probes, screenshots, backups, scratch files
+.gitcoffee/
+
 # rebrand: 上游源码下载件（内容已搬至仓库根，副本不入库）
 .gitcoffee/magio-*
 
