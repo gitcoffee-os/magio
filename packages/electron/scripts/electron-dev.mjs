@@ -5,6 +5,8 @@ import net from 'node:net';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import { prepareDevAppBundle } from './dev-app-bundle.mjs';
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const repoRoot = path.resolve(__dirname, '../../..');
@@ -219,9 +221,20 @@ async function main() {
   let devServer = null;
   let hmrApiPort = '';
   let hmrUiPort = '';
+  let devAppBundle = null;
 
   ensureElectronInstalled();
   const bundledOpenCodeCliEnv = resolveBundledOpenCodeCliEnv();
+
+  // On macOS the menu bar title comes from the app bundle, not from
+  // `app.setName()`. Launch a Magio-named copy so the dev app is not labelled
+  // "Electron" and uses Magio's icon in the dock and app switcher.
+  if (process.platform === 'darwin') {
+    devAppBundle = prepareDevAppBundle({
+      electronDir,
+      log: (message) => console.log(message),
+    });
+  }
 
   if (useBundledUi) {
     await runProcess('bun', ['run', '--cwd', 'packages/electron', 'build:web-assets']);
@@ -240,7 +253,9 @@ async function main() {
     });
   }
 
-  const electron = spawnProcess('bun', ['x', 'electron', './entry.mjs'], {
+  const electronCommand = devAppBundle ? devAppBundle.executablePath : 'bun';
+  const electronArgs = devAppBundle ? ['./entry.mjs'] : ['x', 'electron', './entry.mjs'];
+  const electron = spawnProcess(electronCommand, electronArgs, {
     cwd: electronDir,
     env: {
       ...process.env,

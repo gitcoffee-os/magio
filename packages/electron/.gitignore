@@ -4,6 +4,7 @@ node_modules/
 # Electron build output
 dist/
 dist-bundle/
+.dev/
 
 # Generated packaging resources
 resources/web-dist/
