@@ -1,6 +1,9 @@
 # Agent memory
 .graymatter/
 
+# Local agent workspace (probes, screenshots, backups)
+.gitcoffee/
+
 # Logs
 logs
 *.log
