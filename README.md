@@ -1,4 +1,4 @@
-# <picture><source media="(prefers-color-scheme: dark)" srcset="docs/references/badges/magio-logo-dark.svg"><img src="docs/references/badges/magio-logo-light.svg" width="32" height="32" align="absmiddle" /></picture> Magio
+# <img src="docs/references/badges/magio-logo-color.svg" width="32" height="32" align="absmiddle" alt="Magio" /> Magio
 
 [![GitHub stars](https://img.shields.io/github/stars/gitcoffee-os/magio?style=flat&labelColor=100F0F&color=66800B)](https://github.com/gitcoffee-os/magio/stargazers)
 [![GitHub release](https://img.shields.io/github/v/release/gitcoffee-os/magio?style=flat&labelColor=100F0F&color=205EA6)](https://github.com/gitcoffee-os/magio/releases/latest)

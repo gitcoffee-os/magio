@@ -122,8 +122,8 @@ export function getWebviewHtml(options: WebviewHtmlOptions): string {
       opacity: 0;
       pointer-events: none;
     }
-    /* The OpenCode mark on the cube's top face glows on and off once a second
-       (the script below) to signal loading without text. */
+    /* The Magio mark glows on and off once a second (the script below) to
+       signal loading without text. */
     #initial-loading .logo-inner.glow-on {
       filter: drop-shadow(0 0 4px var(--vscode-foreground));
     }
@@ -131,19 +131,12 @@ export function getWebviewHtml(options: WebviewHtmlOptions): string {
       #initial-loading .logo-inner.glow-on { filter: none; }
     }
     /* Logo colors use VS Code foreground color */
-    #initial-loading .logo-stroke {
-      stroke: var(--vscode-foreground);
-    }
-    #initial-loading .logo-fill {
-      fill: var(--vscode-foreground);
-      opacity: 0.15;
-    }
-    #initial-loading .logo-fill-solid {
+    #initial-loading .logo-mark {
       fill: var(--vscode-foreground);
     }
-    #initial-loading .logo-fill-dim {
+    #initial-loading .logo-spark {
       fill: var(--vscode-foreground);
-      opacity: 0.4;
+      fill-opacity: 0.55;
     }
     #initial-loading .status-text {
       font-size: 13px;
@@ -160,20 +153,14 @@ export function getWebviewHtml(options: WebviewHtmlOptions): string {
   <title>Magio</title>
 </head>
 <body>
-  <!-- Initial loading screen with simplified Magio logo -->
+  <!-- Initial loading screen with Magio's mark -->
   <div id="initial-loading">
-    <svg class="logo" width="70" height="70" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <!-- Left face -->
-      <path class="logo-fill logo-stroke" d="M50 50 L8.432 26 L8.432 74 L50 98 Z" stroke-width="2" stroke-linejoin="round"/>
-      <!-- Right face -->
-      <path class="logo-fill logo-stroke" d="M50 50 L91.568 26 L91.568 74 L50 98 Z" stroke-width="2" stroke-linejoin="round"/>
-      <!-- Top face (no fill, stroke only) -->
-      <path class="logo-stroke" d="M50 2 L8.432 26 L50 50 L91.568 26 Z" fill="none" stroke-width="2" stroke-linejoin="round"/>
-      
-      <!-- OpenCode logo on top face -->
-      <g class="logo-inner" transform="matrix(0.866, 0.5, -0.866, 0.5, 50, 26) scale(0.75)">
-        <path class="logo-fill-solid" fill-rule="evenodd" clip-rule="evenodd" d="M-16 -20 L16 -20 L16 20 L-16 20 Z M-8 -12 L-8 12 L8 12 L8 -12 Z"/>
-        <path class="logo-fill-dim" d="M-8 -4 L8 -4 L8 12 L-8 12 Z"/>
+    <svg class="logo" width="70" height="70" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Magio loading icon">
+      <!-- Magio mark, the C-spark with its companion spark; the same artwork
+           the desktop and web splashes draw. -->
+      <g class="logo-inner">
+        <path class="logo-mark" d="M50 8.432 C51.934 34.048 65.952 48.067 91.568 50 C65.952 51.934 51.934 65.952 50 91.568 C48.067 65.952 34.048 51.934 8.432 50 C34.048 48.067 48.067 34.048 50 8.432 Z"/>
+        <path class="logo-spark" d="M82.144 11.427 C82.723 19.113 86.928 23.319 94.614 23.898 C86.928 24.478 82.723 28.682 82.144 36.369 C81.563 28.682 77.358 24.478 69.672 23.898 C77.358 23.319 81.563 19.113 82.144 11.427 Z"/>
       </g>
     </svg>
     <!-- Status text stays empty while things are fine; populated only on error. -->
