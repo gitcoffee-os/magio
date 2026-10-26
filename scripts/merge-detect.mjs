@@ -76,6 +76,12 @@ export const TOKEN_RULES = [
   's/\\bocTheme\\b/mgTheme/g;',
   's/\\bOCLogoSymbol\\b/MGLogoSymbol/g;',
   's/oclogo-symbol/mglogo-symbol/g;',
+  // Hast property names, not literals: `data-oc-*` is caught by the prefix
+  // rules above, but `dataOcMediaSource` and friends carry no hyphen.
+  's/\\bdataOc/dataMg/g;',
+  // DOM dataset properties: `dataset.ocTrailingExpand` writes the attribute
+  // `data-oc-trailing-expand` without ever spelling `data-oc-` in the source.
+  's/dataset\\.oc/dataset.mg/g;',
 ];
 
 const BINARY_EXT =

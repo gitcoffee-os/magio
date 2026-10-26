@@ -1,7 +1,7 @@
 import React from 'react';
 import { MagioVisualSettings } from './MagioVisualSettings';
 import { SessionRetentionSettings } from './SessionRetentionSettings';
-import { MergedWorktreeCleanupSettings } from './MergedWorktreeCleanupSettings';
+import { FinishedWorktreesSettings } from './FinishedWorktreesSettings';
 import { SessionWorkSettings } from './SessionWorkSettings';
 import { PasskeySettings } from './PasskeySettings';
 import { AppLinkSecuritySettings } from './AppLinkSecuritySettings';
@@ -173,7 +173,7 @@ const SessionsSectionContent: React.FC<{ runtimeEndpointEpoch: number }> = ({ ru
             <DefaultsSettings key={runtimeEndpointEpoch} />
             <SessionWorkSettings />
             <SessionRetentionSettings />
-            {!isVSCodeRuntime() && <MergedWorktreeCleanupSettings />}
+            {!isVSCodeRuntime() && <FinishedWorktreesSettings />}
         </>
     );
 };

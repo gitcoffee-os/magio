@@ -58,15 +58,15 @@ export const guestGenerate = async (
   directory: string | null,
   composer: { providerID: string | null; modelID: string | null },
 ): Promise<GuestGenerateProxyResult> => {
-  const headers = new Headers({ 'Content-Type': 'application/json' });
-  if (directory) {
-    headers.set('x-opencode-directory', directory);
-  }
-  if (composer.providerID) {
-    headers.set('x-magio-provider', composer.providerID);
-    if (composer.modelID) headers.set('x-magio-model', composer.modelID);
-  }
   try {
+    // A plain object, built inside the try: runtimeFetch percent-encodes a
+    // directory outside Latin-1, which `Headers.set` would throw on.
+    const headers = {
+      'Content-Type': 'application/json',
+      ...(directory ? { 'x-opencode-directory': directory } : undefined),
+      ...(composer.providerID ? { 'x-magio-provider': composer.providerID } : undefined),
+      ...(composer.providerID && composer.modelID ? { 'x-magio-model': composer.modelID } : undefined),
+    };
     const response = await runtimeFetch(`/api/guests/${guestId}/generate`, {
       method: 'POST',
       headers,

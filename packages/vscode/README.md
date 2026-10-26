@@ -31,7 +31,7 @@ Plus everything from the shared Magio UI: branchable timeline, smart tool UIs, v
 | `Magio: Open Sidebar` | Open the Magio sidebar |
 | `Magio: Run on Several Models` | Open a new tab set up to run one prompt on several models |
 | `Magio: Open Session in Editor` | Open current or new session in an editor tab |
-| `Magio: Settings` | Open extension settings |
+| `Magio: Settings` | Open Settings in an editor tab. Repeat invocations reveal the same tab and leave the chat sidebar unchanged. |
 | `Magio: Restart API Connection` | Restart the OpenCode API process |
 | `Magio: Show OpenCode Status` | Debug info for development or bug reports |
 | `Magio: Generate Commit Message` | Fill VS Code's Source Control commit box from staged changes, or unstaged if nothing is staged |

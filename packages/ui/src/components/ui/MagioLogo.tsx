@@ -54,6 +54,7 @@ export const MagioLogo: React.FC<MagioLogoProps> = ({
       if (fromVars) {
         return fromVars;
       }
+      return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'white' : 'black';
     }
     return isDark ? 'white' : 'black';
   })();

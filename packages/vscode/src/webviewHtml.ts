@@ -15,6 +15,7 @@ export interface WebviewHtmlOptions {
   /** A new-session editor tab that opens its draft in "Run on several models" mode. */
   initialComposer?: 'parallel';
   viewMode?: 'sidebar' | 'editor';
+  panelType?: 'chat' | 'settings';
   devServerUrl?: string | null;
   extensionVersion?: string;
 }
@@ -62,9 +63,11 @@ export function getWebviewHtml(options: WebviewHtmlOptions): string {
     initialSessionId,
     initialComposer,
     viewMode = 'sidebar',
+    panelType = 'chat',
     devServerUrl,
     extensionVersion = '',
   } = options;
+  const workspaceFolderJson = JSON.stringify(workspaceFolder).replace(/</g, '\\u003c');
   const workspaceFoldersJson = JSON.stringify(workspaceFolders).replace(/</g, '\\u003c');
 
   const scriptPath = vscode.Uri.joinPath(extensionUri, 'dist', 'webview', 'assets', 'index.js');
@@ -84,12 +87,9 @@ export function getWebviewHtml(options: WebviewHtmlOptions): string {
 
   // Use VS Code CSS variables for proper theme integration
   // These variables are automatically provided by VS Code to webviews
-  // 
-  // Logo geometry matches MagioLogo.tsx:
-  // edge=48, cos30=0.866, sin30=0.5, centerY=50
-  // top=(50, 2), left=(8.432, 26), right=(91.568, 26), center=(50, 50)
-  // bottomLeft=(8.432, 74), bottomRight=(91.568, 74), bottom=(50, 98)
-  // topFaceCenterY = (2 + 26 + 50 + 26) / 4 = 26
+  //
+  // The logo markup is the same drawing as MagioLogo.tsx and the startup
+  // splashes; keep them in step by hand.
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -170,7 +170,6 @@ export function getWebviewHtml(options: WebviewHtmlOptions): string {
   
   <div id="root"></div>
   <script>
-    // Polyfill process for Node.js modules running in browser
     // The splash glow steps once a second until the splash fades; a smooth CSS
     // glow repainted the logo on every frame.
     (function () {
@@ -182,10 +181,11 @@ export function getWebviewHtml(options: WebviewHtmlOptions): string {
       }, 1000);
     })();
 
+    // Polyfill process for Node.js modules running in browser
     window.process = window.process || { env: { NODE_ENV: 'production' }, platform: '', version: '', browser: true };
 
     window.__VSCODE_CONFIG__ = {
-      workspaceFolder: "${workspaceFolder.replace(/\\/g, '\\\\')}",
+      workspaceFolder: ${workspaceFolderJson},
       workspaceFolders: ${workspaceFoldersJson},
       theme: "${themeKind}",
       connectionStatus: "${initialStatus}",
@@ -194,10 +194,11 @@ export function getWebviewHtml(options: WebviewHtmlOptions): string {
       platform: "${os.platform()}",
       arch: "${os.arch()}",
       viewMode: "${viewMode}",
+      panelType: "${panelType}",
       initialSessionId: ${initialSessionId ? `"${initialSessionId.replace(/\\/g, '\\\\').replace(/"/g, '\\"')}"` : 'null'},
       initialComposer: ${initialComposer ? `"${initialComposer}"` : 'null'},
     };
-    window.__MAGIO_HOME__ = "${workspaceFolder.replace(/\\/g, '\\\\')}";
+    window.__MAGIO_HOME__ = ${workspaceFolderJson};
     // VS Code's display language. The UI bundle uses it as the default locale
     // until the user picks one; the splash below picks its strings from it too.
     window.__MAGIO_HOST_LANGUAGE__ = ${JSON.stringify(vscode.env.language)};

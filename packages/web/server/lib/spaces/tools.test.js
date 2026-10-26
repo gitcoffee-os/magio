@@ -53,7 +53,7 @@ describe('createRegistryToolsSource', () => {
       name: 'magio-space-tools',
       private: true,
       // bun and pnpm ride along at exact versions, the runtimes setup commands reach for.
-      dependencies: { '@magio/web': '1.24.2', '@opencode/cli': '1.18.31', '@opencode/plugin': '1.18.31', bun: '1.4.3', pnpm: '12.11.2' },
+      dependencies: { '@magio/web': '1.24.2', '@opencode/cli': '1.18.31', '@opencode/plugin': '1.18.31', bun: '1.4.4', pnpm: '12.11.2' },
     });
   });
 
@@ -84,7 +84,7 @@ describe('createPackedToolsSource', () => {
         '@magio/sdk': 'file:/tmp/magio-fill/magio-sdk.tgz',
         '@opencode/cli': '1.18.31',
         '@opencode/plugin': '1.18.31',
-        bun: '1.4.3',
+        bun: '1.4.4',
         pnpm: '12.11.2',
       },
       overrides: { '@magio/sdk': '$@magio/sdk' },

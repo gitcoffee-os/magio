@@ -5,7 +5,7 @@ description: Bezpiecznie udostępnij Magio do dostępu zdalnego i mobilnego.
 
 # Tunele
 
-Tunel to publiczny link do Twojego Magio, dzięki któremu możesz dotrzeć do niego ze zwykłej przeglądarki w innej sieci. Użyj `magio tunnel`, aby utworzyć go dla działającej instancji.
+Tunel to link do Twojego Magio, dzięki któremu możesz dotrzeć do niego ze zwykłej przeglądarki w innej sieci albo, z Tailscale Serve, z każdego urządzenia w Twoim tailnecie. Użyj `magio tunnel`, aby utworzyć go dla działającej instancji.
 
 > Łączenie **własnych urządzeń** (aplikacja mobilna, drugi komputer) zwykle nie wymaga tunelu — zamiast tego [sparuj je](/pl/connect-devices/) i pozwól, by szyfrowany end-to-end [Private Relay](/pl/private-relay/) zajął się dostępem spoza domu bez żadnej konfiguracji.
 
@@ -17,6 +17,8 @@ Magio uruchamia CLI dostawcy tunelu na Twoim komputerze. Najpierw zainstaluj dos
 brew install cloudflared
 brew install ngrok
 ```
+
+Dla Tailscale zainstaluj [aplikację Tailscale](https://tailscale.com/download) i zaloguj się. Na Macu sama aplikacja wystarczy: Magio znajduje jej narzędzie wiersza poleceń w środku aplikacji.
 
 Szybkie tunele Cloudflare działają przez `cloudflared`. Ngrok wymaga konta ngrok i authtokena z panelu ngrok:
 
@@ -46,6 +48,12 @@ Albo uruchom tunel Ngrok:
 magio tunnel start --provider ngrok --mode quick
 ```
 
+Albo udostępnij go urządzeniom z Twojego tailnetu przez Tailscale Serve:
+
+```bash
+magio tunnel start --provider tailscale --mode serve
+```
+
 3. Sprawdź status:
 
 ```bash
@@ -60,6 +68,15 @@ Domyślnie Magio wypisuje kod QR w interaktywnych sesjach TTY. Użyj `--qr`, aby
 
 - `cloudflare`: tryby quick, managed remote i managed local
 - `ngrok`: tryb quick
+- `tailscale`: tryb serve, dostępny tylko z urządzeń w Twoim tailnecie, i tryb funnel, dostępny z całego internetu
+
+## Tailscale
+
+Oba tryby używają adresu Twojego komputera w tailnecie, na przykład `https://laptop.example.ts.net`. Port wybierasz przez `--https-port`: 443 (domyślny), 8443 albo 10000. Zmień go, jeśli Tailscale udostępnia już coś innego na 443.
+
+Za pierwszym razem Tailscale prosi o włączenie HTTPS (dla Serve) albo Funnel w Twoim tailnecie. Magio zatrzymuje się i pokazuje link od Tailscale: otwórz go, zatwierdź i uruchom tunel ponownie. Na Linuksie porty może udostępniać tylko root albo operator Tailscale; ustaw się jako operator raz poleceniem `sudo tailscale set --operator=$USER`.
+
+Zatrzymanie tunelu usuwa to, co Magio udostępnił przez Tailscale, a resztę ustawień Tailscale zostawia bez zmian.
 
 ## Tryby zarządzane
 
@@ -101,6 +118,7 @@ magio tunnel ready --provider cloudflare
 magio tunnel ready --provider ngrok
 magio tunnel doctor --provider cloudflare
 magio tunnel doctor --provider ngrok
+magio tunnel doctor --provider tailscale
 magio tunnel stop --port 3000
 ```
 

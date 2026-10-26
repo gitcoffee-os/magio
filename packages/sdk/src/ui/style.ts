@@ -71,9 +71,14 @@ const focusFill = `background-image: linear-gradient(${hover}, ${hover});`;
  * top line and one short shadow, and wash a field halfway toward the page so it
  * sits a tone below the buttons beside it. Without the attribute (a preview
  * outside the host) the light form applies.
+ *
+ * Buttons, triggers, tabs and popups keep a 1px border in their geometry so a
+ * tinted variant, whose border is coloured, has the same size. Their hairline
+ * is that border: an inset ring would paint inside it, 1px in from the edge,
+ * with a strip of fill around it. Fields have no border and keep the ring.
  */
 const field = (edge: string): string => `box-shadow: inset 0 0 0 1px ${edge}, var(--mg-sdk-field-lift);`;
-const raised = 'box-shadow: inset 0 0 0 1px var(--mg-sdk-edge), var(--mg-sdk-raised-lift);';
+const raised = 'border-color: var(--mg-sdk-edge); box-shadow: var(--mg-sdk-raised-lift);';
 const litButton = 'box-shadow: var(--mg-sdk-lit);';
 
 const darkLift = `inset 0 1px 0 0 ${mix(fg, 1.5)}, 0 1px 1px 0 rgb(0 0 0 / 0.28), 0 2px 3px -2px rgb(0 0 0 / 0.2)`;
@@ -85,7 +90,8 @@ const THEME_VARS = `
   --mg-sdk-field-lift: inset 0 1px 2px 0 rgb(0 0 0 / 0.04);
   --mg-sdk-raised-lift: 0 1px 2px 0 rgb(0 0 0 / 0.06);
   --mg-sdk-lit: inset 0 1px 0 0 rgb(255 255 255 / 0.45), 0 1px 2px 0 rgb(0 0 0 / 0.08);
-  --mg-sdk-float: inset 0 1px 0 0 rgb(255 255 255 / 0.8), inset 0 0 0 1px rgb(0 0 0 / 0.04), 0 0 0 1px rgb(0 0 0 / 0.1), 0 1px 2px -0.5px rgb(0 0 0 / 0.08), 0 4px 8px -2px rgb(0 0 0 / 0.08), 0 12px 20px -4px rgb(0 0 0 / 0.08);
+  --mg-sdk-float-edge: rgb(0 0 0 / 0.1);
+  --mg-sdk-float: inset 0 1px 0 0 rgb(255 255 255 / 0.8), inset 0 0 0 1px rgb(0 0 0 / 0.04), 0 1px 2px -0.5px rgb(0 0 0 / 0.08), 0 4px 8px -2px rgb(0 0 0 / 0.08), 0 12px 20px -4px rgb(0 0 0 / 0.08);
 }
 :root[data-mg-theme="dark"] {
   --mg-sdk-edge: ${mix(fg, 6)};
@@ -94,7 +100,8 @@ const THEME_VARS = `
   --mg-sdk-field-lift: ${darkLift};
   --mg-sdk-raised-lift: ${darkLift};
   --mg-sdk-lit: inset 0 1px 0 0 ${mix(fg, 1.5)}, 0 1px 1px 0 rgb(0 0 0 / 0.28), 0 2px 3px -2px rgb(0 0 0 / 0.2);
-  --mg-sdk-float: inset 0 1px 0 0 rgb(255 255 255 / 0.06), inset 0 0 0 1px rgb(255 255 255 / 0.08), 0 0 0 1px rgb(0 0 0 / 0.36), 0 1px 1px -0.5px rgb(0 0 0 / 0.22), 0 3px 3px -1.5px rgb(0 0 0 / 0.2), 0 6px 6px -3px rgb(0 0 0 / 0.16);
+  --mg-sdk-float-edge: rgb(0 0 0 / 0.36);
+  --mg-sdk-float: inset 0 1px 0 0 rgb(255 255 255 / 0.06), inset 0 0 0 1px rgb(255 255 255 / 0.08), 0 1px 1px -0.5px rgb(0 0 0 / 0.22), 0 3px 3px -1.5px rgb(0 0 0 / 0.2), 0 6px 6px -3px rgb(0 0 0 / 0.16);
 }`;
 
 const tone = (name: 'success' | 'warning' | 'error' | 'info'): string => {
@@ -230,9 +237,9 @@ ${tone('success')}${tone('warning')}${tone('error')}${tone('info')}
 .mg-sdk-btn[data-variant="secondary"] { background: ${secondary}; color: var(--mg-fg); }
 .mg-sdk-btn[data-variant="secondary"]:hover { background-image: linear-gradient(${hover}, ${hover}); }
 .mg-sdk-btn[data-variant="secondary"]:active { background-image: linear-gradient(${active}, ${active}); }
-.mg-sdk-btn[data-variant="outline"] { background: var(--mg-sdk-raised-bg); color: ${elevatedFg}; border-color: transparent; ${raised} }
+.mg-sdk-btn[data-variant="outline"] { background: var(--mg-sdk-raised-bg); color: ${elevatedFg}; ${raised} }
 .mg-sdk-btn[data-variant="outline"]:hover { background-image: linear-gradient(${hover}, ${hover}); }
-.mg-sdk-btn[data-variant="outline"]:active { background-image: linear-gradient(${active}, ${active}); box-shadow: inset 0 0 0 1px var(--mg-sdk-edge); }
+.mg-sdk-btn[data-variant="outline"]:active { background-image: linear-gradient(${active}, ${active}); box-shadow: none; }
 .mg-sdk-btn[data-variant="ghost"] { background: transparent; }
 .mg-sdk-btn[data-variant="ghost"]:hover { background: ${hover}; }
 .mg-sdk-btn[data-variant="ghost"]:active { background: ${active}; }
@@ -254,13 +261,13 @@ ${tone('success')}${tone('warning')}${tone('error')}${tone('info')}
 .mg-sdk-search-clear { border-radius: ${smallRadius}; color: ${muted}; }
 .mg-sdk-search-clear:hover { background: ${hover}; color: ${fg}; }
 
-.mg-sdk-trigger { border-color: transparent; border-radius: ${controlRadius}; background: var(--mg-sdk-raised-bg); color: ${elevatedFg}; ${raised} transition: background 150ms ease-out; }
+.mg-sdk-trigger { border-radius: ${controlRadius}; background: var(--mg-sdk-raised-bg); color: ${elevatedFg}; ${raised} transition: background 150ms ease-out; }
 .mg-sdk-trigger:hover { background-image: linear-gradient(${hover}, ${hover}); }
 .mg-sdk-trigger[aria-expanded="true"] { background-image: linear-gradient(${active}, ${active}); }
 .mg-sdk-trigger-value[data-empty="true"] { color: ${muted}; }
 .mg-sdk-trigger-chevron { color: ${muted}; }
-/* The app's dropdown light: lit top, hairline rings and a layered shadow, no border. */
-.mg-sdk-popup { --surface-foreground: ${elevatedFg}; border-color: transparent; border-radius: 12px; background: ${elevated}; color: ${elevatedFg}; box-shadow: var(--mg-sdk-float); }
+/* The app's dropdown light: lit top, hairline rings and a layered shadow. Its outer ring is the border, over the page like the app's. */
+.mg-sdk-popup { --surface-foreground: ${elevatedFg}; border-color: var(--mg-sdk-float-edge); border-radius: 12px; background: ${elevated}; background-clip: padding-box; color: ${elevatedFg}; box-shadow: var(--mg-sdk-float); }
 .mg-sdk-option { border-radius: 8px; }
 .mg-sdk-option[data-active="true"] { background: ${hover}; }
 /* A selected option shows a check mark in the text colour, like the app's own pickers. Options without the mark come
@@ -288,7 +295,7 @@ ${tone('success')}${tone('warning')}${tone('error')}${tone('info')}
 .mg-sdk-tab { border-radius: 8px; color: ${muted}; transition: color 150ms ease-out, background 150ms ease-out; }
 .mg-sdk-tab:hover { color: ${fg}; }
 .mg-sdk-tab[aria-selected="true"] { color: ${selectionFg}; background: ${selection}; border-color: ${border}; }
-.mg-sdk-tabs[data-track="true"] .mg-sdk-tab[aria-selected="true"] { color: ${elevatedFg}; background: var(--mg-sdk-raised-bg); border-color: transparent; ${raised} }
+.mg-sdk-tabs[data-track="true"] .mg-sdk-tab[aria-selected="true"] { color: ${elevatedFg}; background: var(--mg-sdk-raised-bg); ${raised} }
 .mg-sdk-tab-count { color: ${muted}; }
 
 .mg-sdk-badge { border-radius: 9999px; background: ${hover}; color: ${muted}; }
