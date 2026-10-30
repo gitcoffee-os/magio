@@ -1442,7 +1442,7 @@ export const TunnelSettings: React.FC = () => {
 
                         <CollapsibleContent className="pt-1.5">
                           <div className="space-y-1 px-3 pb-2">
-                            <p className="typography-meta text-muted-foreground/70">{t('settings.magio.tunnel.field.hostnameLabel')} <code>{preset.hostname}</code></p>
+                            <p className="typography-meta text-muted-foreground">{t('settings.magio.tunnel.field.hostnameLabel')} <code>{preset.hostname}</code></p>
                             <Input
                               type="password"
                               value={rowToken}
@@ -1493,7 +1493,7 @@ export const TunnelSettings: React.FC = () => {
                 })}
               </div>
             ) : (
-              <p className="typography-meta text-muted-foreground/70">{t('settings.magio.tunnel.empty.noManagedRemoteTunnels')}</p>
+              <p className="typography-meta text-muted-foreground">{t('settings.magio.tunnel.empty.noManagedRemoteTunnels')}</p>
             )}
 
             {isAddingPreset && (
@@ -1521,7 +1521,7 @@ export const TunnelSettings: React.FC = () => {
                   disabled={isSavingMode || state === 'starting' || state === 'stopping'}
                 />
                 {typeof suggestedConnectorPort === 'number' && (
-                  <p className="typography-meta text-muted-foreground/70">
+                  <p className="typography-meta text-muted-foreground">
                     {t('settings.magio.tunnel.note.cloudflareConnectorTargetUse')} <code>http://localhost:{suggestedConnectorPort}</code>.
                   </p>
                 )}
@@ -1556,7 +1556,7 @@ export const TunnelSettings: React.FC = () => {
             )}
 
             <div className="flex items-center gap-1.5">
-              <p className="typography-meta text-muted-foreground/80">{t('settings.magio.tunnel.note.tokensSavedPerTunnel')}</p>
+              <p className="typography-meta text-muted-foreground">{t('settings.magio.tunnel.note.tokensSavedPerTunnel')}</p>
               <SettingsInfoHint>
                 {t('settings.magio.tunnel.tooltip.tokensSavedPath')}
               </SettingsInfoHint>
@@ -1621,7 +1621,7 @@ export const TunnelSettings: React.FC = () => {
                   </Button>
                 )}
               </div>
-              <p className="typography-meta text-muted-foreground/70">
+              <p className="typography-meta text-muted-foreground">
                 {managedLocalConfigPath
                   ? t('settings.magio.tunnel.note.customConfigUsed')
                   : t('settings.magio.tunnel.note.defaultConfigUsed')}

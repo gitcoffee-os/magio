@@ -215,6 +215,7 @@ const MAGIO_PHRASES = new Map(Object.entries<ToolActionPhrases>({
     },
     magio_notify: { fallback: 'sending a notification' },
     magio_render: { fallback: 'drawing a page' },
+    magio_image: { fallback: 'generating an image' },
 }));
 
 /**

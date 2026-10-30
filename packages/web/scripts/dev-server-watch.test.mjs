@@ -57,4 +57,25 @@ describe('createDevServerWatchCommand', () => {
       'bun server/index.js --port 4200',
     ]);
   });
+
+  it('drops what an Magio app put into the shell and keeps the user\'s own exports', () => {
+    const command = createDevServerWatchCommand({
+      platform: 'linux',
+      env: {
+        PATH: '/usr/bin',
+        MAGIO_PORT: '4200',
+        MAGIO_UI_PASSWORD: 'desktop-secret',
+        MAGIO_RUNTIME: 'desktop',
+        OPENCODE_PASSWORD: 'theirs',
+        MAGIO_INJECTED_ENV: 'MAGIO_UI_PASSWORD,MAGIO_RUNTIME',
+      },
+      bunExecutable: 'bun',
+    });
+
+    const { env } = command.spawnOptions;
+    expect(env).not.toHaveProperty('MAGIO_UI_PASSWORD');
+    expect(env).not.toHaveProperty('MAGIO_RUNTIME');
+    expect(env).not.toHaveProperty('MAGIO_INJECTED_ENV');
+    expect(env).toMatchObject({ PATH: '/usr/bin', MAGIO_PORT: '4200', OPENCODE_PASSWORD: 'theirs' });
+  });
 });

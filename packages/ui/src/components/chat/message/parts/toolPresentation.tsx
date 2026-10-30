@@ -99,6 +99,9 @@ export const getToolIcon = (toolName: string, presentation?: GuestToolRule | nul
     if (tool === 'magio_render') {
         return <Icon name="bar-chart-box" className={iconClass} />;
     }
+    if (tool === 'magio_image') {
+        return <Icon name="image" className={iconClass} />;
+    }
     if (tool === 'magio_knowledge') {
         return <Icon name="sticky-note" className={iconClass} />;
     }

@@ -2,11 +2,9 @@
 
 ## Reporting a Vulnerability
 
-If you discover a security vulnerability in Magio, please report it responsibly.
+If you discover a security vulnerability in Magio, please report it privately through [GitHub](https://github.com/gitcoffee-os/magio/security/advisories/new). The form asks for everything needed to assess the report, and an accepted report becomes the security advisory.
 
-**Email:** [security@magio.exmay.com](mailto:security@magio.exmay.com)
-
-Please include:
+If you can't use GitHub, email [security@magio.exmay.com](mailto:security@magio.exmay.com) and include:
 - Description of the vulnerability
 - Steps to reproduce
 - Affected version(s)

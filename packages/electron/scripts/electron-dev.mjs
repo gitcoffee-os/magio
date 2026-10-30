@@ -253,21 +253,29 @@ async function main() {
     });
   }
 
-  const electronCommand = devAppBundle ? devAppBundle.executablePath : 'bun';
-  const electronArgs = devAppBundle ? ['./entry.mjs'] : ['x', 'electron', './entry.mjs'];
-  const electron = spawnProcess(electronCommand, electronArgs, {
-    cwd: electronDir,
-    env: {
-      ...process.env,
-      ...bundledOpenCodeCliEnv,
-      MAGIO_ELECTRON_DEV: '1',
-      ...(useBundledUi ? { MAGIO_ELECTRON_USE_BUNDLED_UI: '1' } : {}),
-      MAGIO_HMR_UI_PORT: hmrUiPort,
-      MAGIO_HMR_API_PORT: hmrApiPort,
-      MAGIO_DISABLE_PWA_DEV: '1',
-    },
-  });
+  // Electron exits with this code when the app asks to relaunch (the
+  // first-launch chooser, a settings change); the dev server keeps running and
+  // Electron starts again.
+  const relaunchExitCode = 75;
+  const startElectron = () => {
+    const electronCommand = devAppBundle ? devAppBundle.executablePath : 'bun';
+    const electronArgs = devAppBundle ? ['./entry.mjs'] : ['x', 'electron', './entry.mjs'];
+    return spawnProcess(electronCommand, electronArgs, {
+      cwd: electronDir,
+      env: {
+        ...process.env,
+        ...bundledOpenCodeCliEnv,
+        MAGIO_ELECTRON_DEV: '1',
+        MAGIO_ELECTRON_DEV_RELAUNCH_EXIT_CODE: String(relaunchExitCode),
+        ...(useBundledUi ? { MAGIO_ELECTRON_USE_BUNDLED_UI: '1' } : {}),
+        MAGIO_HMR_UI_PORT: hmrUiPort,
+        MAGIO_HMR_API_PORT: hmrApiPort,
+        MAGIO_DISABLE_PWA_DEV: '1',
+      },
+    });
+  };
 
+  let electron = null;
   let cleaning = false;
   const teardown = async (code) => {
     if (cleaning) {
@@ -286,16 +294,29 @@ async function main() {
     void teardown(code ?? 1);
   };
 
+  const onElectronExit = onChildExit('electron');
+  const launchElectron = () => {
+    electron = startElectron();
+    electron.on('exit', (code, signal) => {
+      if (code === relaunchExitCode && !cleaning) {
+        console.log('[electron:dev] relaunching electron.');
+        launchElectron();
+        return;
+      }
+      onElectronExit(code, signal);
+    });
+    electron.on('error', (error) => {
+      console.error('[electron:dev] failed to start electron:', error);
+      void teardown(1);
+    });
+  };
+
   devServer?.on('exit', onChildExit('dev server'));
-  electron.on('exit', onChildExit('electron'));
   devServer?.on('error', (error) => {
     console.error('[electron:dev] failed to start dev server:', error);
     void teardown(1);
   });
-  electron.on('error', (error) => {
-    console.error('[electron:dev] failed to start electron:', error);
-    void teardown(1);
-  });
+  launchElectron();
 
   for (const [signal, exitCode] of Object.entries({ SIGINT: 130, SIGTERM: 143, SIGQUIT: 131, SIGHUP: 129 })) {
     process.on(signal, () => {

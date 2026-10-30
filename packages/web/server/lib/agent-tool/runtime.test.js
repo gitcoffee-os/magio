@@ -404,7 +404,9 @@ describe('managed agent tool runtime', () => {
     expect(Object.keys(tool.magio_web.input.properties.parameters.properties)).toContain('url');
     expect(Object.keys(tool.magio_web.input.properties.parameters.properties)).toContain('label');
     expect(Object.keys(tool.magio_web.input.properties.parameters.properties)).toContain('value');
-    expect(Object.keys(tool.magio.input.properties.parameters.properties)).not.toContain('url');
+    expect(Object.keys(tool.magio.input.properties.parameters.properties)).not.toContain('selector');
+    // The control tool's own `url` names the pull request pr.watch follows, not a page.
+    expect(tool.magio.input.properties.parameters.properties.url.description).toContain('pr.watch');
     expect(Object.keys(tool.magio.input.properties.parameters.properties)).toContain('sessionId');
     expect(Object.keys(tool.magio.input.properties.parameters.properties)).toContain('path');
     expect(Object.keys(tool.magio_web.input.properties.parameters.properties)).not.toContain('path');
@@ -651,6 +653,18 @@ describe('managed agent tool runtime', () => {
     const { runtime: plain, dataDir: plainDir } = await createRuntime();
     await prepareManagedEnv(plain, { includeControl: true, includeWeb: false, includeMemory: false });
     expect(Object.keys(await loadTools(plainDir, 'nonotify'))).toEqual(['magio']);
+  });
+
+  it('exposes image generation as its own tool only when switched on, never behind Code Mode', async () => {
+    const { runtime, dataDir } = await createRuntime();
+    await prepareManagedEnv(runtime, { includeControl: true, includeWeb: false, includeMemory: false, includeImage: true, codeMode: true });
+    const tool = await loadTools(dataDir, 'image');
+
+    expect(Object.keys(tool)).toEqual(['magio', 'magio_image']);
+    expect(Object.keys(tool.magio_image.input.properties.parameters.properties).sort())
+      .toEqual(['aspect', 'count', 'images', 'path', 'prompt', 'resolution']);
+    expect(tool.magio_image.options).toEqual({ codemode: false });
+    expect(tool.magio_image.description.length).toBeLessThanOrEqual(2048);
   });
 
   it('exposes render as its own tool carrying only the page and its title', async () => {

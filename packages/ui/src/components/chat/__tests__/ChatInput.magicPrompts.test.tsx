@@ -14,8 +14,9 @@ import type { RuntimeAPIs } from '@/lib/api/types';
 
 const browser = new Window({ url: 'http://localhost/' });
 Object.assign(globalThis, {
-  window: browser,
+  // CodeMirror's coordsAtPos tests `instanceof Window` on its scroll targets.
   Window,
+  window: browser,
   document: browser.document,
   navigator: browser.navigator,
   localStorage: browser.localStorage,

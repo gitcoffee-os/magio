@@ -3,6 +3,7 @@ import type { RuntimeAPIs } from '@magio/ui/lib/api/types';
 import '@magio/ui/index.css';
 import '@magio/ui/styles/fonts';
 import '@magio/ui/styles/katex-css';
+import { importWithChunkRecovery } from '@magio/ui/lib/chunkLoadRecovery';
 
 declare global {
   interface Window {
@@ -12,7 +13,8 @@ declare global {
 
 window.__MAGIO_RUNTIME_APIS__ = createConfiguredWebAPIs();
 
-void import('@magio/ui/apps/renderElectronMiniChatApp')
+// Tried again, then reloaded once, when a module fails to load.
+void importWithChunkRecovery(() => import('@magio/ui/apps/renderElectronMiniChatApp'))
   .then(({ renderElectronMiniChatApp }) => {
     renderElectronMiniChatApp(window.__MAGIO_RUNTIME_APIS__ ?? createConfiguredWebAPIs());
   });

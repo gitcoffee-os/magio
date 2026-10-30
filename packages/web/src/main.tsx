@@ -3,6 +3,7 @@ import { registerSW } from 'virtual:pwa-register';
 
 import type { RuntimeAPIs } from '@magio/ui/lib/api/types';
 import { resolveHostedSurface, watchHostedSurfaceViewport, type HostedSurface } from '@magio/ui/lib/runtimeSurface';
+import { importWithChunkRecovery } from '@magio/ui/lib/chunkLoadRecovery';
 import '@magio/ui/index.css';
 import '@magio/ui/styles/fonts';
 import '@magio/ui/styles/katex-css';
@@ -89,14 +90,17 @@ const start = async (): Promise<void> => {
   watchHostedSurfaceViewport();
 
   if (hostedSurface === 'mobile') {
-    const { renderMobileApp } = await import('@magio/ui/apps/renderMobileApp');
+    const { renderMobileApp } = await importWithChunkRecovery(() => import('@magio/ui/apps/renderMobileApp'));
     renderMobileApp(window.__MAGIO_RUNTIME_APIS__);
     return;
   }
 
   // Hold the render until a desktop relay-host restore has picked its transport.
   await getDesktopRelayRestoreReady();
-  await import('@magio/ui/main');
+  // A module of the app that failed to load (a dropped connection while the
+  // dev server compiles, a chunk replaced by an update) left an empty page
+  // for good; it is tried again, then the page reloads once.
+  await importWithChunkRecovery(() => import('@magio/ui/main'));
 };
 
 void start();

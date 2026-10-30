@@ -150,6 +150,14 @@ const SETTINGS_SEARCH_ITEMS: readonly SettingsSearchItem[] = [
     isAvailable: (ctx) => !ctx.isMobile,
   },
   {
+    id: 'appearance.interface-font-weight',
+    page: 'appearance',
+    titleKey: 'settings.magio.visual.field.interfaceFontWeight',
+    descriptionKey: 'settings.magio.visual.field.interfaceFontWeightInfo',
+    keywords: ['font', 'weight', 'bold', 'medium', 'thickness', 'text'],
+    isAvailable: (ctx) => !ctx.isMobile,
+  },
+  {
     id: 'appearance.terminal-font-size',
     page: 'appearance',
     titleKey: 'settings.magio.visual.field.terminalFontSize',
@@ -161,6 +169,14 @@ const SETTINGS_SEARCH_ITEMS: readonly SettingsSearchItem[] = [
     titleKey: 'settings.magio.visual.field.terminalShell',
     descriptionKey: 'settings.magio.visual.field.terminalShellHint',
     keywords: ['terminal', 'shell', 'bash', 'zsh', 'fish', 'pwsh', 'powershell'],
+    isAvailable: (ctx) => !ctx.isVSCode,
+  },
+  {
+    id: 'appearance.terminal-close-on-exit',
+    page: 'general',
+    titleKey: 'settings.magio.visual.field.terminalCloseOnExit',
+    descriptionKey: 'settings.magio.visual.field.terminalCloseOnExitInfo',
+    keywords: ['terminal', 'exit', 'close', 'tab', 'shell'],
     isAvailable: (ctx) => !ctx.isVSCode,
   },
   {
@@ -838,6 +854,22 @@ const SETTINGS_SEARCH_ITEMS: readonly SettingsSearchItem[] = [
     isAvailable: (ctx) => !ctx.isVSCode,
   },
   {
+    id: 'sessions.agent-image-tool',
+    page: 'general',
+    titleKey: 'settings.magio.tools.field.agentImageTool',
+    descriptionKey: 'settings.magio.tools.field.agentImageToolInfo',
+    keywords: ['agent', 'tool', 'image', 'picture', 'generate', 'draw', 'magio'],
+    isAvailable: (ctx) => !ctx.isVSCode,
+  },
+  {
+    id: 'sessions.agent-image-model',
+    page: 'general',
+    titleKey: 'settings.magio.tools.imageModel.label',
+    descriptionKey: 'settings.magio.tools.imageModel.info',
+    keywords: ['agent', 'image', 'model', 'picture', 'generate', 'draw'],
+    isAvailable: (ctx) => !ctx.isVSCode,
+  },
+  {
     id: 'sessions.agent-render-tool',
     page: 'general',
     titleKey: 'settings.magio.tools.field.agentRenderTool',
@@ -1433,7 +1465,7 @@ const SETTINGS_SEARCH_ITEMS: readonly SettingsSearchItem[] = [
     id: 'voice.speech-recognition',
     page: 'voice',
     titleKey: 'settings.voice.page.section.speechRecognition',
-    keywords: ['stt', 'dictation', 'voice input', 'transcribe', 'whisper', 'parakeet', 'microphone'],
+    keywords: ['stt', 'dictation', 'voice input', 'transcribe', 'whisper', 'parakeet', 'qwen', 'microphone', 'misheard', 'correct', 'fix', 'small model'],
   },
   {
     id: 'tunnel.provider',

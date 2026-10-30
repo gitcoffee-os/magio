@@ -375,7 +375,7 @@ export function PromptNavigatorRail({
                                             ? 'bg-interactive-selection text-interactive-selection-foreground'
                                             : isHighlighted
                                                 ? 'text-foreground'
-                                                : 'text-foreground/70',
+                                                : 'mg-title-rest',
                                     )}
                                     onMouseMove={() => {
                                         if (highlightedIndex !== index) {

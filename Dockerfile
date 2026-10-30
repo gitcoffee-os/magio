@@ -53,7 +53,7 @@ ENV PATH=${NPM_CONFIG_PREFIX}/bin:${PATH}
 
 RUN npm config set prefix /home/magio/.npm-global && mkdir -p /home/magio/.npm-global && \
   mkdir -p /home/magio/.local /home/magio/.config /home/magio/.ssh && \
-  npm install -g @opencode/cli@2.1.4
+  npm install -g @opencode/cli@2.2.0
 
 # cloudflared 2026.3.0 - update digest explicitly when upgrading
 COPY --from=cloudflare/cloudflared@sha256:6d91c121b803126f7a5344005d17a9324788fc09d305b6e2560ec6040a7ae283 /usr/local/bin/cloudflared /usr/local/bin/cloudflared

@@ -6,6 +6,8 @@ import { subscribeRuntimeEndpointChanged } from './runtime-switch';
 import { isVSCodeRuntime } from './desktop';
 import { canDriveBrowserPage } from './browser/hostCapability';
 import { messageQueueUpdatedEventSchema, type MessageQueueUpdatedEvent } from '@/stores/messageQueueStore';
+import { autoReviewUpdatedEventSchema, type AutoReviewUpdatedEvent } from '@/stores/useAutoReviewStore';
+import { prWatchUpdatedEventSchema, type PrWatchUpdatedEvent } from '@/sync/pr-watch';
 import { sessionWarmingSnapshotSchema, type SessionWarmingSnapshot } from '@/stores/useSessionWarmingStore';
 import { z } from 'zod';
 import { trackedItemRecordsSchema } from './trackedItems/model';
@@ -238,6 +240,8 @@ type MagioEvent =
   | RoutingPermissionHeldEvent
   | RoutingSafetySkippedEvent
   | MessageQueueUpdatedEvent
+  | AutoReviewUpdatedEvent
+  | PrWatchUpdatedEvent
   | PermissionPolicyEvent
   /** Which sessions the server keeps warm, as a full snapshot. */
   | { type: 'session-warming'; snapshot: SessionWarmingSnapshot }
@@ -450,6 +454,22 @@ const dispatchFromEnvelope = (envelope: { type: string; properties: unknown }) =
 
   if (envelope.type === 'magio:message-queue.updated') {
     const parsed = messageQueueUpdatedEventSchema.safeParse(envelope);
+    if (parsed.success) {
+      for (const listener of listeners) listener(parsed.data);
+    }
+    return;
+  }
+
+  if (envelope.type === 'magio:pr-watch.updated') {
+    const parsed = prWatchUpdatedEventSchema.safeParse(envelope);
+    if (parsed.success) {
+      for (const listener of listeners) listener(parsed.data);
+    }
+    return;
+  }
+
+  if (envelope.type === 'magio:auto-review.updated') {
+    const parsed = autoReviewUpdatedEventSchema.safeParse(envelope);
     if (parsed.success) {
       for (const listener of listeners) listener(parsed.data);
     }

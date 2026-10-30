@@ -443,9 +443,10 @@ const MAX_TEXT_LENGTH = 120
 
 const MAGIO_RENDER_TOOL = "magio_render"
 const MAGIO_WORKFLOW_TOOL = "magio_workflow"
+const MAGIO_IMAGE_TOOL = "magio_image"
 
-/** The control, schedule, browser, memory, knowledge, notify, render and workflow tools Magio gives a session. */
-const MAGIO_TOOLS = new Set(["magio", "magio_schedule", "magio_web", "magio_memory", "magio_knowledge", "magio_notify", MAGIO_RENDER_TOOL, MAGIO_WORKFLOW_TOOL])
+/** The control, schedule, browser, memory, knowledge, notify, render, image and workflow tools Magio gives a session. */
+const MAGIO_TOOLS = new Set(["magio", "magio_schedule", "magio_web", "magio_memory", "magio_knowledge", "magio_notify", MAGIO_RENDER_TOOL, MAGIO_IMAGE_TOOL, MAGIO_WORKFLOW_TOOL])
 
 // The result envelope the agent tool returns as text (`agent-tool/runtime.js`).
 const proposedWorkflowResultSchema = z.object({
@@ -471,14 +472,36 @@ export function proposedWorkflowRunId(toolName: ToolName, state: ToolState): str
   return result.success ? result.data.data.runId : null
 }
 
+// The result envelope of a finished `image.generate` call (`magio-control/generate-image.js`).
+const generatedImagesResultSchema = z.object({
+  ok: z.literal(true),
+  action: z.literal("image.generate"),
+  data: z.object({ images: z.array(z.object({ path: z.string().min(1) })).min(1) }),
+})
+
+/** The files an `magio_image` call saved, in order; none for any other part. */
+export function generatedImagePaths(toolName: ToolName, state: ToolState): string[] {
+  if (toolName !== MAGIO_IMAGE_TOOL || state.status !== "completed") return []
+  let parsed: unknown
+  try {
+    parsed = JSON.parse(state.output)
+  } catch {
+    return []
+  }
+  const result = generatedImagesResultSchema.safeParse(parsed)
+  return result.success ? result.data.data.images.map((image) => image.path) : []
+}
+
 /**
  * Whether the chat draws what a call showed instead of its tool row: a page
- * from `magio_render`, or the run a `workflow.run` call proposed. Both
- * ask something of the user, so both are hoisted to the answer when Activity
- * is collapsed.
+ * from `magio_render`, the run a `workflow.run` call proposed, or the
+ * images `image.generate` made. The user is meant to see all three, so they
+ * are hoisted to the answer when Activity is collapsed.
  */
 export const isShownInPlace = (toolName: ToolName, state: ToolState): boolean => (
-  renderedPage(toolName, state) !== null || proposedWorkflowRunId(toolName, state) !== null
+  renderedPage(toolName, state) !== null
+  || proposedWorkflowRunId(toolName, state) !== null
+  || generatedImagePaths(toolName, state).length > 0
 )
 
 const magioCallSchema = z
