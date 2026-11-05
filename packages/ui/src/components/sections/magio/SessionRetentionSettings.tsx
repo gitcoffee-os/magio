@@ -112,7 +112,11 @@ export const SessionRetentionSettings: React.FC = () => {
         <SettingsFieldRow
           settingsItem="sessions.retention-only-archived"
           label={t('settings.layout.sessions.retention.target')}
-          info={t('settings.magio.sessionRetention.field.onlyArchivedDescription')}
+          info={t(onlyArchived
+            ? 'settings.magio.sessionRetention.field.archivedDescription'
+            : action === 'archive'
+              ? 'settings.magio.sessionRetention.field.unarchivedArchiveDescription'
+              : 'settings.magio.sessionRetention.field.unarchivedDeleteDescription')}
         >
           <SettingsChipGroup
             value={onlyArchived ? 'archived' : 'unarchived'}

@@ -68,6 +68,11 @@ describe('agent tool action allowlist', () => {
     expect(MAGIO_CONTROL_ACTION_DEFINITIONS.every(({ action, title, description }) => action && title && description)).toBe(true);
   });
 
+  it('asks for the task name in the language of the user', () => {
+    const workName = MAGIO_CONTROL_ACTION_DEFINITIONS.find(({ action }) => action === 'work.name');
+    expect(workName.description).toContain("in the language of the user's latest message");
+  });
+
   it.each([
     'projects.list',
     'models.list',
@@ -667,17 +672,35 @@ describe('managed agent tool runtime', () => {
     expect(tool.magio_image.description.length).toBeLessThanOrEqual(2048);
   });
 
-  it('exposes render as its own tool carrying only the page and its title', async () => {
+  it('exposes render as its own tool carrying only the page (html or ui) and its title', async () => {
     const { runtime, dataDir } = await createRuntime();
     await prepareManagedEnv(runtime, { includeControl: true, includeWeb: false, includeMemory: false, includeRender: true });
     const tool = await loadTools(dataDir, 'render');
 
     expect(Object.keys(tool)).toEqual(['magio', 'magio_render']);
-    expect(Object.keys(tool.magio_render.input.properties.parameters.properties).sort()).toEqual(['awaitAnswer', 'html', 'title']);
+    expect(Object.keys(tool.magio_render.input.properties.parameters.properties).sort()).toEqual(['awaitAnswer', 'html', 'title', 'ui']);
     expect(Object.keys(tool.magio.input.properties.parameters.properties)).not.toContain('html');
     // How to write the page rides on its input, which no client cuts short.
     expect(tool.magio_render.input.properties.parameters.properties.html.description).toContain('--chart-1');
+    expect(tool.magio_render.input.properties.parameters.properties.html.description)
+      .toContain('do not build paths from directory and filename fragments');
+    expect(tool.magio_render.input.properties.parameters.properties.html.description)
+      .toContain("image.src = images[key]");
     expect(tool.magio_render.description).toContain('add no outer card, border or banner title');
+  });
+
+  it('exposes secret as its own direct tool whose every call waits for the user', async () => {
+    const { runtime, dataDir } = await createRuntime();
+    await prepareManagedEnv(runtime, { includeControl: false, includeWeb: false, includeMemory: false, includeSecret: true, codeMode: true });
+    const hooks = {};
+    const tools = await loadTools(dataDir, 'secret', hooks);
+
+    expect(Object.keys(tools)).toEqual(['magio_secret']);
+    expect(Object.keys(tools.magio_secret.input.properties.parameters.properties).sort()).toEqual(['label', 'placeholder', 'reason']);
+    expect(tools.magio_secret.options).toEqual({ codemode: false });
+    expect(tools.magio_secret.description.length).toBeLessThanOrEqual(2048);
+    // A chat message ends the wait, like a page's.
+    expect(hooks.prompt).toBeInstanceOf(Function);
   });
 
   it('takes away the OpenCode tools the control tool replaces, and only while it is on', async () => {
@@ -724,13 +747,31 @@ describe('managed agent tool runtime', () => {
 
   it('keeps every tool description within the length Claude Code passes on whole', async () => {
     const { runtime, dataDir } = await createRuntime();
-    await prepareManagedEnv(runtime, { includeSchedule: true, includeKnowledge: true, includeNotify: true, includeRender: true });
+    await prepareManagedEnv(runtime, {
+      includeSchedule: true,
+      includeKnowledge: true,
+      includeNotify: true,
+      includeRender: true,
+      includeWorkflow: true,
+      includeImage: true,
+    });
     const tools = await loadTools(dataDir, 'description-length');
 
-    expect(Object.keys(tools).sort()).toEqual(['magio', 'magio_knowledge', 'magio_memory', 'magio_notify', 'magio_render', 'magio_schedule', 'magio_web']);
+    expect(Object.keys(tools).sort()).toEqual([
+      'magio',
+      'magio_image',
+      'magio_knowledge',
+      'magio_memory',
+      'magio_notify',
+      'magio_render',
+      'magio_schedule',
+      'magio_web',
+      'magio_workflow',
+      'magio_workflow_answer',
+    ]);
     for (const tool of Object.values(tools)) {
       // Claude Code before 2.1.296 cuts an MCP tool description at 2048
-      // characters, and the plugin runs whichever CLI the user installed.
+      // characters, and OpenCode's Claude Agent provider cuts at 2048 itself.
       expect(tool.description.length).toBeLessThanOrEqual(2048);
     }
   });
@@ -1121,7 +1162,7 @@ describe('managed agent tool runtime', () => {
 
   it('executes through the materialized plugin and authenticated callback', async () => {
     let activePort = null;
-    const { runtime, dataDir } = await createRuntime({ getActivePort: () => activePort });
+    const { runtime, dataDir, executeAction } = await createRuntime({ getActivePort: () => activePort });
     const app = express();
     runtime.registerRoutes(app, express);
     const server = await new Promise((resolve) => {
@@ -1151,10 +1192,21 @@ describe('managed agent tool runtime', () => {
         action: 'projects.list',
         data: { projects: [] },
       });
-      expect(result.metadata.magio.description).toBe('List configured projects');
+      expect(result.metadata.magio.description).toBe('List session destinations');
       expect(progress).toHaveBeenCalledWith(expect.objectContaining({
-        magio: expect.objectContaining({ description: 'List configured projects' }),
+        magio: expect.objectContaining({ description: 'List session destinations' }),
       }));
+      const created = await tool.magio.execute(
+        { action: 'session.create', parameters: { projectId: 'magio:chats', prompt: 'Plan the week' } },
+        { sessionID: 'ses_1', agent: 'build', messageID: 'msg_1', id: 'call_2', progress },
+      );
+      expect(JSON.parse(created.content).ok).toBe(true);
+      expect(executeAction).toHaveBeenLastCalledWith(
+        'session.create',
+        expect.objectContaining({ projectId: 'magio:chats', prompt: 'Plan the week' }),
+        undefined,
+        expect.objectContaining({ contextSessionId: 'ses_1' }),
+      );
     } finally {
       if (previousUrl === undefined) delete process.env.MAGIO_AGENT_TOOL_URL;
       else process.env.MAGIO_AGENT_TOOL_URL = previousUrl;

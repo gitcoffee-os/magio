@@ -24,6 +24,9 @@ Plus everything from the shared Magio UI: branchable timeline, smart tool UIs, v
 
 ## Commands
 
+With no folder open, new sessions start in Chats. Each chat has its own directory
+under `~/.config/magio/chats`. Open a workspace folder to use project sessions.
+
 | Command | Description |
 |---------|-------------|
 | `Magio: Focus Chat` | Focus the chat panel |

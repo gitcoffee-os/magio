@@ -1,5 +1,5 @@
 import type { RuntimeAPIs } from '@magio/ui/lib/api/types';
-import { createDesktopThemeFileAPI } from '@magio/ui/lib/desktop';
+import { createDesktopClipboardAPI, createDesktopThemeFileAPI } from '@magio/ui/lib/desktop';
 import {
   createRuntimeUrlResolver,
   getRuntimeUrlResolver,
@@ -39,7 +39,8 @@ export const createWebAPIs = (options: WebAPIsOptions = {}): RuntimeAPIs => {
   const activeUrls = createActiveRuntimeUrlResolver();
 
   return {
-   themeFiles: createDesktopThemeFileAPI(),
+    clipboard: createDesktopClipboardAPI(),
+    themeFiles: createDesktopThemeFileAPI(),
   runtime: { platform: 'web', isDesktop: false, isVSCode: false, label: 'web' },
   terminal: createWebTerminalAPI(),
   git: createWebGitAPI(),

@@ -355,8 +355,16 @@ export const resolveBrowserPanelPreloadPath = () => (
 // Arguments the preload reads from process.argv. They are fixed at window
 // creation: the main window is created before the backend resolves, so it
 // carries empty runtime values and receives them through the init script.
+// Dev renders from Vite, which is not the local API origin. Main.mjs trusts
+// this exact origin as a local sender in development; the preload needs the
+// same value to expose local-only bridges to the HMR page.
+const resolveDevUiOrigin = () => (
+  isDev ? `http://127.0.0.1:${process.env.MAGIO_HMR_UI_PORT || '5173'}` : ''
+);
+
 export const buildRendererAdditionalArguments = ({
   localOrigin = '',
+  devUiOrigin = resolveDevUiOrigin(),
   apiBaseUrl = '',
   clientToken = '',
   requestHeaders = {},
@@ -367,6 +375,7 @@ export const buildRendererAdditionalArguments = ({
   nativeFrame = usesLinuxNativeFrame(),
 } = {}) => [
   `--magio-local-origin=${localOrigin}`,
+  `--magio-dev-ui-origin=${devUiOrigin}`,
   `--magio-api-base-url=${apiBaseUrl}`,
   `--magio-client-token=${clientToken}`,
   `--magio-runtime-headers=${JSON.stringify(requestHeaders)}`,

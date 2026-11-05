@@ -77,31 +77,32 @@ const focusFill = `background-image: linear-gradient(${hover}, ${hover});`;
  * is that border: an inset ring would paint inside it, 1px in from the edge,
  * with a strip of fill around it. Fields have no border and keep the ring.
  */
-const field = (edge: string): string => `box-shadow: inset 0 0 0 1px ${edge}, var(--mg-sdk-field-lift);`;
+// Half a pixel at rest; a focused or invalid field takes a full one.
+const field = (edge: string, width = '0.5px'): string => `box-shadow: inset 0 0 0 ${width} ${edge}, var(--mg-sdk-field-lift);`;
 const raised = 'border-color: var(--mg-sdk-edge); box-shadow: var(--mg-sdk-raised-lift);';
 const litButton = 'box-shadow: var(--mg-sdk-lit);';
 
-const darkLift = `inset 0 1px 0 0 ${mix(fg, 1.5)}, 0 1px 1px 0 rgb(0 0 0 / 0.28), 0 2px 3px -2px rgb(0 0 0 / 0.2)`;
+const darkLift = `inset 0 0.5px 0 0 ${mix(fg, 8)}, 0 1px 2px 0 rgb(0 0 0 / 0.4)`;
 const THEME_VARS = `
 :root {
-  --mg-sdk-edge: ${mix(fg, 10)};
+  --mg-sdk-edge: ${mix(fg, 16)};
   --mg-sdk-field-bg: ${elevated};
   --mg-sdk-raised-bg: ${bg};
   --mg-sdk-field-lift: inset 0 1px 2px 0 rgb(0 0 0 / 0.04);
-  --mg-sdk-raised-lift: 0 1px 2px 0 rgb(0 0 0 / 0.06);
-  --mg-sdk-lit: inset 0 1px 0 0 rgb(255 255 255 / 0.45), 0 1px 2px 0 rgb(0 0 0 / 0.08);
-  --mg-sdk-float-edge: rgb(0 0 0 / 0.1);
-  --mg-sdk-float: inset 0 1px 0 0 rgb(255 255 255 / 0.8), inset 0 0 0 1px rgb(0 0 0 / 0.04), 0 1px 2px -0.5px rgb(0 0 0 / 0.08), 0 4px 8px -2px rgb(0 0 0 / 0.08), 0 12px 20px -4px rgb(0 0 0 / 0.08);
+  --mg-sdk-raised-lift: 0 1px 1.5px 0 rgb(0 0 0 / 0.08);
+  --mg-sdk-lit: inset 0 1px 0 0 rgb(255 255 255 / 0.2), 0 1px 1.5px 0 rgb(0 0 0 / 0.1);
+  --mg-sdk-float-edge: rgb(0 0 0 / 0.14);
+  --mg-sdk-float: inset 0 1px 0 0 rgb(255 255 255 / 0.7), 0 1px 2px -0.5px rgb(0 0 0 / 0.06), 0 4px 8px -2px rgb(0 0 0 / 0.08), 0 12px 20px -4px rgb(0 0 0 / 0.06);
 }
 :root[data-mg-theme="dark"] {
-  --mg-sdk-edge: ${mix(fg, 6)};
+  --mg-sdk-edge: ${mix(fg, 14)};
   --mg-sdk-field-bg: ${mix(bg, 50, elevated)};
   --mg-sdk-raised-bg: ${elevated};
   --mg-sdk-field-lift: ${darkLift};
   --mg-sdk-raised-lift: ${darkLift};
-  --mg-sdk-lit: inset 0 1px 0 0 ${mix(fg, 1.5)}, 0 1px 1px 0 rgb(0 0 0 / 0.28), 0 2px 3px -2px rgb(0 0 0 / 0.2);
-  --mg-sdk-float-edge: rgb(0 0 0 / 0.36);
-  --mg-sdk-float: inset 0 1px 0 0 rgb(255 255 255 / 0.06), inset 0 0 0 1px rgb(255 255 255 / 0.08), 0 1px 1px -0.5px rgb(0 0 0 / 0.22), 0 3px 3px -1.5px rgb(0 0 0 / 0.2), 0 6px 6px -3px rgb(0 0 0 / 0.16);
+  --mg-sdk-lit: ${darkLift};
+  --mg-sdk-float-edge: rgb(0 0 0 / 0.55);
+  --mg-sdk-float: inset 0 1px 0 0 rgb(255 255 255 / 0.04), inset 0 0 0 0.5px rgb(255 255 255 / 0.08), 0 8px 16px 0 rgb(0 0 0 / 0.25), 0 4px 8px 0 rgb(0 0 0 / 0.25);
 }`;
 
 const tone = (name: 'success' | 'warning' | 'error' | 'info'): string => {
@@ -205,6 +206,8 @@ textarea.mg-sdk-input { height: auto; padding: 8px 10px; resize: vertical; }
 .mg-sdk-progress-label { display: flex; justify-content: space-between; font-size: 0.75rem; font-variant-numeric: tabular-nums; }
 .mg-sdk-progress-track { height: 6px; overflow: hidden; }
 .mg-sdk-progress-fill { height: 100%; transform-origin: left; transition: transform 200ms ease-out; }
+.mg-sdk-progress-value { display: inline-flex; align-items: center; gap: 2px; }
+.mg-sdk-progress[data-done="true"] .mg-sdk-progress-value { font-weight: 600; }
 
 .mg-sdk-menu { position: relative; display: inline-flex; }
 
@@ -252,8 +255,8 @@ ${tone('success')}${tone('warning')}${tone('error')}${tone('info')}
 .mg-sdk-input { border-radius: ${controlRadius}; background: var(--mg-sdk-field-bg); color: ${elevatedFg}; ${field('var(--mg-sdk-edge)')} transition: background 150ms ease-out; }
 .mg-sdk-input::placeholder { color: ${muted}; }
 .mg-sdk-input:hover:not(:focus) { background-image: linear-gradient(${hover}, ${hover}); }
-.mg-sdk-input:focus, .mg-sdk-input:focus-visible { ${field(mix(fg, 26))} }
-.mg-sdk-field[data-invalid="true"] .mg-sdk-input, .mg-sdk-field[data-invalid="true"] .mg-sdk-input:focus { ${field(v('status-error', 'red'))} }
+.mg-sdk-input:focus, .mg-sdk-input:focus-visible { ${field(mix(fg, 26), '1px')} }
+.mg-sdk-field[data-invalid="true"] .mg-sdk-input, .mg-sdk-field[data-invalid="true"] .mg-sdk-input:focus { ${field(v('status-error', 'red'), '1px')} }
 .mg-sdk-input[data-mono="true"] { font-family: ${mono}; }
 
 .mg-sdk-search-icon { color: ${muted}; }
@@ -266,7 +269,7 @@ ${tone('success')}${tone('warning')}${tone('error')}${tone('info')}
 .mg-sdk-trigger[aria-expanded="true"] { background-image: linear-gradient(${active}, ${active}); }
 .mg-sdk-trigger-value[data-empty="true"] { color: ${muted}; }
 .mg-sdk-trigger-chevron { color: ${muted}; }
-/* The app's dropdown light: lit top, hairline rings and a layered shadow. Its outer ring is the border, over the page like the app's. */
+/* The app's floating level: the glass edge (a hairline ring and a lit top line, dark outside and light inside in dark themes) over soft shadows. The outer ring is the border, over the page like the app's. */
 .mg-sdk-popup { --surface-foreground: ${elevatedFg}; border-color: var(--mg-sdk-float-edge); border-radius: 12px; background: ${elevated}; background-clip: padding-box; color: ${elevatedFg}; box-shadow: var(--mg-sdk-float); }
 .mg-sdk-option { border-radius: 8px; }
 .mg-sdk-option[data-active="true"] { background: ${hover}; }
@@ -298,7 +301,8 @@ ${tone('success')}${tone('warning')}${tone('error')}${tone('info')}
 .mg-sdk-tabs[data-track="true"] .mg-sdk-tab[aria-selected="true"] { color: ${elevatedFg}; background: var(--mg-sdk-raised-bg); ${raised} }
 .mg-sdk-tab-count { color: ${muted}; }
 
-.mg-sdk-badge { border-radius: 9999px; background: ${hover}; color: ${muted}; }
+/* The app's neutral badge: a step of the text colour, the same in every theme. */
+.mg-sdk-badge { border-radius: 9999px; background: ${mix(fg, 6)}; color: ${muted}; }
 .mg-sdk-badge[data-tone] { color: var(--mg-sdk-tone-text, var(--mg-sdk-tone)); background: ${mix('var(--mg-sdk-tone)', 15)}; }
 
 .mg-sdk-row { border-radius: 6px; transition: background 120ms ease-out; }
@@ -324,8 +328,11 @@ ${tone('success')}${tone('warning')}${tone('error')}${tone('info')}
 .mg-sdk-separator::before, .mg-sdk-separator::after { background: ${mix(border, 40)}; }
 
 .mg-sdk-progress-label { color: ${muted}; }
-.mg-sdk-progress-track { border-radius: 9999px; background: ${border}; }
+/* The app's progress: a groove a step of the text colour, green once done. Older bundles mark done only through aria-valuenow. */
+.mg-sdk-progress-track { border-radius: 9999px; background: ${mix(fg, 6)}; }
 .mg-sdk-progress-fill { border-radius: 9999px; background: var(--mg-sdk-tone, ${primary}); }
+.mg-sdk-progress-track[aria-valuenow="100"] > .mg-sdk-progress-fill:not([data-tone]) { background: ${v('status-success', 'currentColor')}; }
+.mg-sdk-progress[data-done="true"] .mg-sdk-progress-value { color: ${v('success-text', 'inherit')}; }
 
 .mg-sdk-text a { color: ${primaryText}; text-decoration: underline; text-underline-offset: 2px; }
 .mg-sdk-text img { border-radius: 8px; border: 1px solid ${mix(border, 60)}; }

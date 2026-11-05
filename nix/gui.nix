@@ -132,20 +132,53 @@ stdenv.mkDerivation {
   '';
 
   installPhase = ''
-    tree="$out/share/magio"
-    mkdir -p "$tree/resources"
-
-    # Copy the nixpkgs Electron dist and rename the executable; the renamed
-    # binary is what makes Electron treat this as a packaged app
-    # (app.isPackaged, process.resourcesPath), matching the AppImage.
-    cp -a "${electron.dist}"/. "$tree/"
-    chmod -R u+w "$tree"
-    mv "$tree/electron" "$tree/magio"
+    ${if stdenv.hostPlatform.isDarwin then ''
+      mkdir -p "$out/Applications"
+      cp -a "${electron.dist}/Electron.app" "$out/Applications/Magio.app"
+      chmod -R u+w "$out/Applications/Magio.app"
+      tree="$out/Applications/Magio.app/Contents"
+      resources="$tree/Resources"
+      mv "$tree/MacOS/Electron" "$tree/MacOS/Magio"
+      executable="$tree/MacOS/Magio"
+      cp "${self}/packages/electron/resources/icons/icon.icns" "$resources/magio.icns"
+      python3 - "$tree/Info.plist" "${self}/packages/electron/package.json" <<'PY'
+    import json
+    import plistlib
+    import sys
+    path = sys.argv[1]
+    with open(sys.argv[2]) as handle:
+        package = json.load(handle)
+    with open(path, "rb") as handle:
+        info = plistlib.load(handle)
+    info.update(
+        CFBundleName="Magio",
+        CFBundleDisplayName="Magio",
+        CFBundleExecutable="Magio",
+        CFBundleIdentifier=package["build"]["appId"],
+        CFBundleIconFile="magio.icns",
+        CFBundleShortVersionString="${version}",
+        CFBundleVersion="${version}",
+        CFBundleURLTypes=[dict(CFBundleURLName="Magio", CFBundleURLSchemes=["magio"])],
+        NSLocalNetworkUsageDescription=package["build"]["mac"]["extendInfo"]["NSLocalNetworkUsageDescription"],
+    )
+    with open(path, "wb") as handle:
+        plistlib.dump(info, handle)
+    PY
+    '' else ''
+      tree="$out/share/magio"
+      mkdir -p "$tree"
+      cp -a "${electron.dist}"/. "$tree/"
+      chmod -R u+w "$tree"
+      mv "$tree/electron" "$tree/magio"
+      resources="$tree/resources"
+      executable="$tree/magio"
+    ''}
+    mkdir -p "$resources"
 
     # resources/app = the unpacked equivalent of app.asar: the electron
     # package.json (main: dist-bundle/entry.mjs), the bundled main process,
     # preload, and the production node_modules.
-    app="$tree/resources/app"
+    app="$resources/app"
     mkdir -p "$app"
     cp "${self}/packages/electron/package.json" "$app/package.json"
     cp -a ./app/packages/electron/dist-bundle "$app/dist-bundle"
@@ -163,21 +196,21 @@ stdenv.mkDerivation {
     ln -s ../../packages/sdk "$app/node_modules/@magio/sdk"
 
     # extraResources (same set as the electron-builder config).
-    cp -a ./app/packages/web/dist "$tree/resources/web-dist"
-    mkdir -p "$tree/resources/icons"
+    cp -a ./app/packages/web/dist "$resources/web-dist"
+    mkdir -p "$resources/icons"
     cp -a "${self}/packages/electron/resources/icons/icon.png" \
       "${self}/packages/electron/resources/icons/app-icon.png" \
-      "${self}/packages/electron/resources/icons/tray" "$tree/resources/icons/"
-    mkdir -p "$tree/resources/opencode-cli"
-    cp "${opencodeCli}/bin/opencode" "$tree/resources/opencode-cli/opencode"
-    chmod 0755 "$tree/resources/opencode-cli/opencode"
+      "${self}/packages/electron/resources/icons/tray" "$resources/icons/"
+    mkdir -p "$resources/opencode-cli"
+    cp "${opencodeCli}/bin/opencode" "$resources/opencode-cli/opencode"
+    chmod 0755 "$resources/opencode-cli/opencode"
 
     # Pin invariant: the bundled CLI must be the version
     # packages/electron/package.json asks for (upstream's flake appends the
     # git rev, hence the substring match). The CLI needs a writable HOME
     # even for --version.
     stagedVersion="$(
-      HOME="$(mktemp -d)" OPENCODE_DISABLE_MODELS_FETCH=1 "$tree/resources/opencode-cli/opencode" --version 2>/dev/null
+      HOME="$(mktemp -d)" OPENCODE_DISABLE_MODELS_FETCH=1 "$resources/opencode-cli/opencode" --version 2>/dev/null
     )"
     case "$stagedVersion" in
       *"v${opencodeCliVersion}"*) ;;
@@ -188,15 +221,22 @@ stdenv.mkDerivation {
     esac
 
     mkdir -p "$out/bin"
-    makeWrapper "$tree/magio" "$out/bin/magio-desktop" \
+    platformFlags=()
+    ${lib.optionalString stdenv.hostPlatform.isLinux ''
+    platformFlags=(
+      --set CHROME_DEVEL_SANDBOX "$tree/chrome-sandbox"
+      --set-default ELECTRON_OZONE_PLATFORM_HINT "${ozonePlatformHint}"
+    )
+    ''}
+    makeWrapper "$executable" "$out/bin/magio-desktop" \
       --prefix PATH : "${runtimePath}" \
-      --set CHROME_DEVEL_SANDBOX "$tree/chrome-sandbox" \
       --set NODE_ENV production \
-      --set-default ELECTRON_OZONE_PLATFORM_HINT "${ozonePlatformHint}" \
+      "''${platformFlags[@]}" \
       ${lib.strings.concatStringsSep " " (
         map (flag: "--add-flags ${lib.strings.escapeShellArg flag}") extraCommandLineFlags
       )}
 
+    ${lib.optionalString stdenv.hostPlatform.isLinux ''
     # Desktop identity, same as the AppImage: executable magio, desktop
     # entry magio.desktop, StartupWMClass=magio.
     install -Dm644 "${desktopItem}/share/applications/magio.desktop" \
@@ -205,6 +245,13 @@ stdenv.mkDerivation {
       "$out/share/icons/hicolor/512x512/apps/magio.png"
     install -Dm644 "${self}/packages/electron/resources/icons/app-icon.png" \
       "$out/share/pixmaps/magio.png"
+    ''}
+    ${lib.optionalString stdenv.hostPlatform.isDarwin ''
+    # Changing the app bundle invalidates Electron's resource seal.
+    /usr/bin/codesign --force --deep --sign - \
+      --entitlements "${self}/packages/electron/resources/entitlements.mac.plist" \
+      "$out/Applications/Magio.app"
+    ''}
   '';
 
   # Prebuilt Electron tree plus plain JS: keep everything pristine.
@@ -219,7 +266,10 @@ stdenv.mkDerivation {
     homepage = "https://github.com/gitcoffee-os/magio";
     license = lib.licenses.mit;
     mainProgram = "magio-desktop";
-    # x86_64-linux only: the aarch64 dependency hash is unverified.
-    platforms = [ "x86_64-linux" ];
+    platforms = [
+      "x86_64-linux"
+      "aarch64-linux"
+      "aarch64-darwin"
+    ];
   };
 }

@@ -1,6 +1,6 @@
 {
   "name": "@magio/electron",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "private": true,
   "description": "Electron desktop runtime for Magio",
   "author": "Magio",
@@ -8,7 +8,7 @@
   "type": "module",
   "main": "./dist-bundle/entry.mjs",
   "opencodeCli": {
-    "version": "2.2.0"
+    "version": "2.2.5"
   },
   "dependencies": {
     "@magio/web": "workspace:*",
@@ -61,6 +61,7 @@
     "appId": "dev.magio.desktop",
     "productName": "Magio",
     "asarUnpack": [
+      "node_modules/7zip-bin/win/**/*",
       "node_modules/@magio/web/server/built-in-extensions/**/*",
       "node_modules/@magio/web/server/lib/git/credential-helper.js",
       "node_modules/@magio/web/server/lib/git/ssh-wrapper.js",
@@ -80,6 +81,9 @@
       "!node_modules/@magio/web/*.{html,tgz}",
       "!node_modules/@magio/web/{tsconfig.json,tsconfig.tsbuildinfo}",
       "!node_modules/@magio/web/server/**/*.test.js",
+      "!**/node_modules/7zip-bin/{linux,mac}{,/**}",
+      "!**/node_modules/7zip-bin/!(${os})/**/*",
+      "!**/node_modules/7zip-bin/win/!(${arch}){,/**}",
       "!node_modules/node-pty/prebuilds/!(${platform}-${arch}){,/**}",
       "!**/node_modules/@vscode/ripgrep-*{,/**}"
     ],
