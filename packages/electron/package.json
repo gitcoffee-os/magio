@@ -1,6 +1,6 @@
 {
   "name": "@magio/electron",
-  "version": "1.4.0",
+  "version": "1.5.0",
   "private": true,
   "description": "Electron desktop runtime for Magio",
   "author": "Magio",
@@ -8,7 +8,7 @@
   "type": "module",
   "main": "./dist-bundle/entry.mjs",
   "opencodeCli": {
-    "version": "2.2.5"
+    "version": "2.2.6"
   },
   "dependencies": {
     "@magio/web": "workspace:*",
@@ -21,7 +21,7 @@
     "@electron/rebuild": "^4.2.0",
     "electron": "43.7.0",
     "electron-builder": "^26.0.0",
-    "node-abi": "^4.33.0"
+    "node-abi": "^4.40.0"
   },
   "trustedDependencies": [
     "electron"
@@ -125,7 +125,8 @@
       "icon": "resources/icons/icon.icns",
       "artifactName": "${productName}-${version}-mac-${arch}.${ext}",
       "extendInfo": {
-        "NSLocalNetworkUsageDescription": "Magio needs access to devices and services on your local network."
+        "NSLocalNetworkUsageDescription": "Magio needs access to devices and services on your local network.",
+        "NSAppleEventsUsageDescription": "Lets commands that you or an agent run in Magio control other apps."
       },
       "hardenedRuntime": true,
       "gatekeeperAssess": false,

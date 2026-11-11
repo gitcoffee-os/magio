@@ -27,6 +27,14 @@ describe('a namespace the tool name already implies', () => {
     expect(resolveAgentToolAction('knowledge.list', 'magio').error).toBeDefined();
   });
 
+  test('resolves read inside the usage tool', () => {
+    expect(resolveAgentToolAction('read', 'magio_usage')).toEqual({ action: 'usage.read' });
+    expect(resolveAgentToolAction('usage.read', 'magio_usage')).toEqual({ action: 'usage.read' });
+    expect(resolveAgentToolAction('get', 'magio_usage').error).toContain('usage.read');
+    // The memory tool's `read` stays its own.
+    expect(resolveAgentToolAction('read', 'magio_memory')).toEqual({ action: 'memory.read' });
+  });
+
   test('keeps a fully qualified action as it is', () => {
     expect(resolveAgentToolAction('memory.read', 'magio_memory')).toEqual({ action: 'memory.read' });
   });

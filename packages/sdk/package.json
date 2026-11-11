@@ -1,6 +1,6 @@
 {
   "name": "@magio/sdk",
-  "version": "1.4.0",
+  "version": "1.5.0",
   "description": "Contract for Magio guests: manifest parse and iframe host bridge.",
   "private": false,
   "license": "SEE LICENSE IN LICENSE",
@@ -27,7 +27,8 @@
     }
   },
   "bin": {
-    "magio-guest-bundle": "./scripts/bundle-guest.ts"
+    "magio-guest-bundle": "./scripts/bundle-guest.ts",
+    "magio-guest-check": "./scripts/check-guest.ts"
   },
   "publishConfig": {
     "access": "public"
@@ -43,6 +44,7 @@
   "files": [
     "dist",
     "scripts/bundle-guest.ts",
+    "scripts/check-guest.ts",
     "README.md",
     "API.md",
     "DOCUMENTATION.md",

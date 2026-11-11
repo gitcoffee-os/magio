@@ -25,7 +25,7 @@ import { useAuthSessionStore, waitForAuthSession } from "@/lib/runtime-auth-expi
 import { type RelayTunnelWebSocket } from "@/lib/relay/tunnel-client"
 import { openRuntimeWebSocket } from "@/lib/relay/runtime-socket"
 import { isVSCodeRuntime } from "@/lib/desktop"
-import { spaceCreationStepSchema } from "@/lib/spaces/spaces-api"
+import { spaceCreationStepSchema, spaceTaskTitleSchema, type SpaceTaskTitle } from "@/lib/spaces/spaces-api"
 import { workflowRunSchema } from "@/lib/workflows/model"
 import { syncDebug } from "./debug"
 import { countSyncPerformance } from "./performance-diagnostics"
@@ -83,6 +83,7 @@ export type EventPipelineInput = {
    * failure of the step that stopped it.
    */
   onSpaceProgress?: (details: SpaceProgress) => void
+  onSpaceTaskTitle?: (spaceId: string, taskTitle: SpaceTaskTitle | null) => void
   /** Called when the setup commands of an isolated space moved on: began, the next one, or ended. */
   onSpaceSetup?: (spaceId: string) => void
   /** Called when the host follows an isolated space's permission modes again, after a gap or at first. */
@@ -217,6 +218,11 @@ const magioSpaceProgressSchema = z.object({
     step: z.union([spaceCreationStepSchema, z.literal("failed")]),
     failure: z.object({ code: z.string(), message: z.string() }).nullable(),
   }),
+})
+
+const magioSpaceTaskTitleSchema = z.object({
+  type: z.literal("magio:space-task-title.updated"),
+  properties: z.object({ spaceId: z.string().regex(/^[0-9a-f]{12}$/), taskTitle: spaceTaskTitleSchema.nullable() }),
 })
 
 export type SpaceProgress = z.infer<typeof magioSpaceProgressSchema>["properties"]
@@ -365,6 +371,7 @@ function translateWirePayload(payload: unknown, frameDirectory: string | undefin
 type ClassifiedStreamPayload =
   | { kind: "space-stream"; properties: z.infer<typeof magioSpaceStreamSchema>["properties"] }
   | { kind: "space-progress"; properties: SpaceProgress }
+  | { kind: "space-task-title"; properties: z.infer<typeof magioSpaceTaskTitleSchema>["properties"] }
   | { kind: "space-setup"; spaceId: string }
   | { kind: "space-permission-stream"; spaceId: string }
   | { kind: "events"; events: Array<{ directory: string; event: SyncEvent }> }
@@ -390,6 +397,10 @@ export function classifyStreamPayload(payload: unknown, frameDirectory: string |
     case "magio:space-progress": {
       const parsed = magioSpaceProgressSchema.safeParse(payload)
       return parsed.success ? { kind: "space-progress", properties: parsed.data.properties } : NO_EVENTS
+    }
+    case "magio:space-task-title.updated": {
+      const parsed = magioSpaceTaskTitleSchema.safeParse(payload)
+      return parsed.success ? { kind: "space-task-title", properties: parsed.data.properties } : NO_EVENTS
     }
     case "magio:space-setup": {
       const parsed = magioSpaceSetupSchema.safeParse(payload)
@@ -501,6 +512,7 @@ export function createEventPipeline(input: EventPipelineInput): EventPipeline {
     onTransportSwitch,
     onSpaceStream,
     onSpaceProgress,
+    onSpaceTaskTitle,
     onSpaceSetup,
     onSpacePermissionStream,
     onStreamActivity,
@@ -757,6 +769,10 @@ export function createEventPipeline(input: EventPipelineInput): EventPipeline {
     }
     if (classified.kind === "space-progress") {
       onSpaceProgress?.(classified.properties)
+      return
+    }
+    if (classified.kind === "space-task-title") {
+      onSpaceTaskTitle?.(classified.properties.spaceId, classified.properties.taskTitle)
       return
     }
     if (classified.kind === "space-setup") {

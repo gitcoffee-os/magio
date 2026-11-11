@@ -26,9 +26,15 @@ test('the desktop app takes its icon from mac.icon, not from the asset catalog',
 
   // CFBundleIconName would point macOS at Assets.car, a compile of upstream's
   // cube artwork that was never rebuilt after our .icon sources changed. The
-  // plist must declare exactly one extendInfo entry: the local-network purpose
-  // string. Any other key means a merge reintroduced something unreviewed.
-  assert.deepEqual(Object.keys(mac.extendInfo ?? {}), ['NSLocalNetworkUsageDescription']);
+  // plist may declare only keys we reviewed: the local-network and Apple-events
+  // purpose strings. Anything else means a merge reintroduced something
+  // unreviewed.
+  const extendInfoKeys = Object.keys(mac.extendInfo ?? {}).sort();
+  assert.deepEqual(extendInfoKeys, [
+    'NSAppleEventsUsageDescription',
+    'NSLocalNetworkUsageDescription',
+  ]);
+  assert.ok(!extendInfoKeys.includes('CFBundleIconName'));
 });
 
 test('the startup splash draws the C-spark rather than the isometric cube', () => {

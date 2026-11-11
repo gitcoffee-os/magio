@@ -24,6 +24,13 @@ const customIconData = new Map([
     "magio",
     `<polygon points="12 2.5 3.5 7.4 3.5 17.2 12 22.1 20.5 17.2 20.5 7.4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><polyline points="3.5 7.4 12 12.3 20.5 7.4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><line x1="12" y1="12.3" x2="12" y2="22.1" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="m12 5.5 3.7 2.1L12 9.7 8.3 7.6 12 5.5Zm0 1.5-1 .6 1 .6 1-.6-1-.6Z" fill="currentColor" fill-rule="evenodd"/>`,
   ],
+  // OpenCode's mark (packages/identity/mark.svg in the OpenCode repository):
+  // a 4:5 frame with the lower half of its opening filled, drawn as a 2px line
+  // to sit beside Remixicon's line glyphs.
+  [
+    "opencode",
+    `<path fill="none" stroke="currentColor" stroke-width="2" d="M6 4.5h12v15H6Z"/><path fill="currentColor" d="M9 10.5h6v6H9Z"/>`,
+  ],
   // Command Code — corner squares + center square (official logo geometry).
   [
     "command-code",

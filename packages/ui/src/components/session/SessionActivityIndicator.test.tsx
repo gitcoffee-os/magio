@@ -62,13 +62,22 @@ describe('SessionActivityIndicator', () => {
     await renderIndicator({ state: 'running' });
     expect(iconHref('running')).toBe('#mg-circle');
     await renderIndicator({ state: 'subagent' });
-    expect(iconHref('subagent')).toBe('#mg-robot');
+    expect(iconHref('subagent')).toBe('#mg-robot-2');
     await renderIndicator({ state: 'shell' });
     expect(iconHref('shell')).toBe('#mg-terminal');
     await renderIndicator({ state: 'unread' });
     expect(iconHref('unread')).toBe('#mg-checkbox-circle');
     expect(host.querySelector('[data-session-activity-indicator]')?.classList).toContain('shrink-0');
     expect(host.querySelector('[data-spinner]')).toBeNull();
+  });
+
+  test('a session waiting on its pull request shows the running circle under its own label', async () => {
+    useSessionDisplayStore.setState({ animatedActivityIndicators: false });
+    await renderIndicator({ state: 'running' });
+    const runningLabel = host.querySelector('[data-session-activity-indicator]')?.getAttribute('aria-label');
+    await renderIndicator({ state: 'pullRequest' });
+    expect(iconHref('pullRequest')).toBe('#mg-circle');
+    expect(host.querySelector('[data-session-activity-indicator]')?.getAttribute('aria-label')).not.toBe(runningLabel);
   });
 
   test('labels the state for assistive technology and hover', async () => {

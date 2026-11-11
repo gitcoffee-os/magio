@@ -114,6 +114,12 @@ describe('Streamdown processing policy', () => {
     expect(render('<source srcset="a.png 1x, javascript:bad 2x">', true).querySelector('source')?.hasAttribute('srcset')).toBe(false);
   });
 
+  test('keeps an extension install link and drops other app links', () => {
+    const kept = 'magio://extensions/install?path=/Users/me/ext';
+    expect(render(`[Install](${kept})`).querySelector('a')?.getAttribute('href')).toBe(kept);
+    expect(render('[Install](magio://extensions/install?url=http://example.com/a)').querySelector('a')?.getAttribute('href')).toBeNull();
+  });
+
   test('preserves approved links before sanitation while rejecting privileged and network URLs', () => {
     const sources = ['obsidian://open?vault=Notes', 'file:///workspace/a.md', 'magio://session/ses_abc?message=msg_1', 'javascript:bad', 'data:text/html,bad', 'blob:https://test/a', 'file://server/share/a', '//server/share/a', 'magio://connect?p=secret', 'magio-ui://index.html'];
     const source = sources.map((url, i) => `[link${i}](${url})`).join('\n\n');

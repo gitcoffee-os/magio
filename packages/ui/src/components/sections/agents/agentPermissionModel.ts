@@ -43,7 +43,7 @@ export const BUILTIN_ACTIONS = [
 ] as const;
 
 /** Magio's own agent tools, shown so their rules are discoverable. */
-export const MAGIO_ACTIONS = ['magio', 'magio_schedule', 'magio_web', 'magio_memory', 'magio_knowledge', 'magio_notify', 'magio_render', 'magio_image', 'magio_secret'] as const;
+export const MAGIO_ACTIONS = ['magio', 'magio_schedule', 'magio_web', 'magio_memory', 'magio_knowledge', 'magio_notify', 'magio_usage', 'magio_render', 'magio_image', 'magio_secret'] as const;
 
 /**
  * v1 permission keys OpenCode 2 no longer checks. Rules on them are inert, so

@@ -25,7 +25,18 @@ export const PART_SHELLS_VERSION = "v1"
 
 const CONTENT_SHELL_METADATA_KEY = "magioContentShell"
 
-const contentShellMarker = z.object({ chars: z.number() })
+const contentShellMarker = z.object({
+  chars: z.number(),
+  // An Magio tool envelope the result was: what the collapsed row says about the call.
+  envelope: z.object({ ok: z.boolean(), action: z.string().min(1) }).optional().catch(undefined),
+})
+
+const readMarker = (part: Part) => {
+  if (part.type !== "tool") return null
+  if (part.state.status !== "completed" && part.state.status !== "error") return null
+  const marker = contentShellMarker.safeParse(part.state.metadata?.[CONTENT_SHELL_METADATA_KEY])
+  return marker.success ? marker.data : null
+}
 
 /**
  * Length of the result text the server left out of this call, or `null` when
@@ -33,10 +44,15 @@ const contentShellMarker = z.object({ chars: z.number() })
  * any server that does not shell pages.
  */
 export function toolContentShellChars(part: Part): number | null {
-  if (part.type !== "tool") return null
-  if (part.state.status !== "completed" && part.state.status !== "error") return null
-  const marker = contentShellMarker.safeParse(part.state.metadata?.[CONTENT_SHELL_METADATA_KEY])
-  return marker.success ? marker.data.chars : null
+  return readMarker(part)?.chars ?? null
+}
+
+/**
+ * The action and outcome of the Magio tool envelope the server left out
+ * of this call, or `null` when it left out none.
+ */
+export function toolContentShellEnvelope(part: Part): { ok: boolean; action: string } | null {
+  return readMarker(part)?.envelope ?? null
 }
 
 /**

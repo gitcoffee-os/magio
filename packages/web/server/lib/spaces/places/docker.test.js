@@ -244,6 +244,8 @@ describe('docker place: create', () => {
       '--env', 'MAGIO_RELAY_HOST=off',
       '--env', 'MAGIO_SPACE_IDLE_STOP_FILE=/home/space/.magio-space/idle-stop.json',
       '--env', 'MAGIO_SPACE_PERMISSION_DEFAULT_FILE=/home/space/.magio-space/permission-default.json',
+      '--env', 'MAGIO_SPACE_TASK_TITLE_FILE=/home/space/.magio-space/task-title.json',
+      '--env', 'MAGIO_SPACE_USER_TASK_TITLE_FILE=/home/space/.magio-space/user-task-title.json',
       SPACE_BASE_IMAGE,
       '/bin/sh', '-c',
       'while [ ! -s /home/space/.magio-space/token ]; do /bin/sleep 0.2; done; MAGIO_UI_PASSWORD="$(/bin/cat /home/space/.magio-space/token)"; export MAGIO_UI_PASSWORD; exec magio serve --foreground --api-only --host 127.0.0.1 --port 27600',

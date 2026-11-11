@@ -143,8 +143,13 @@ const inputSchema = z
     agent: optionalText,
     name: optionalText,
     // `skill` names the skill by `id`; `session_rename` carries `title`,
-    // `session_move` a `directory`, `models` a `search` and a `provider`.
+    // `session_move` a `directory`, `models` a `query` (`search` in older
+    // OpenCode) and a `provider`, the MCP resource tools a `server` and `uri`,
+    // `schedule_create` a `prompt`.
     id: optionalText,
+    server: optionalText,
+    uri: optionalText,
+    prompt: optionalText,
     title: optionalText,
     directory: optionalText,
     search: optionalText,
@@ -168,6 +173,8 @@ const inputSchema = z
         text: optionalText,
         selector: optionalText,
         taskId: optionalText,
+        providerId: optionalText,
+        body: optionalText,
         link: z.object({ identifier: optionalText, title: optionalText }).optional().catch(undefined),
       })
       .optional()
@@ -191,7 +198,7 @@ const fileDiffSchema = z.object({
 const executeToolCallSchema = z.object({
   tool: optionalText,
   status: optionalText,
-  input: z.unknown().optional().catch(undefined),
+  input: z.json().optional().catch(undefined),
 })
 
 /** A call's raw arguments before serialization: free-form JSON the script passed. */
@@ -269,6 +276,8 @@ export function toolFileDiffs(metadata: Metadata | undefined): ToolFileDiff[] {
 /** A tool an `execute` script called, as the row and the expanded body show it. */
 export type ExecuteToolCall = {
   tool: string
+  /** The action of an Magio tool call (`browser.open`). */
+  action?: string
   /** `completed`, `error`, or whatever else the runtime reported. */
   status?: string
   /** The call arguments as compact one-line JSON, absent when there were none. */
@@ -298,6 +307,8 @@ export function executeToolCalls(metadata: Metadata | undefined): ExecuteToolCal
   for (const call of calls) {
     if (!call?.tool) continue
     const entry: ExecuteToolCall = { tool: call.tool }
+    const action = magioToolCall(call.tool, call.input)?.action
+    if (action) entry.action = action
     if (call.status) entry.status = call.status
     const json = stringifyOrUndefined(call.input)
     // JSON.stringify never emits a raw newline, so the arguments are already
@@ -316,7 +327,7 @@ export function executeToolCalls(metadata: Metadata | undefined): ExecuteToolCal
 const executeRawCallSchema = z
   .object({
     toolCalls: z
-      .array(z.object({ tool: optionalText, input: z.json().optional().catch(undefined) }).nullable().catch(null))
+      .array(z.object({ tool: optionalText, status: optionalText, input: z.json().optional().catch(undefined) }).nullable().catch(null))
       .optional()
       .catch(undefined),
   })
@@ -330,6 +341,43 @@ export function lastExecuteToolCall(metadata: Metadata | undefined): { tool: str
     if (call?.tool) return { tool: call.tool, input: call.input }
   }
   return undefined
+}
+
+/**
+ * The one call an `execute` script made to Magio's own tools or to
+ * OpenCode's `opencode` namespace, or `undefined` when it made none, several,
+ * or called anything else. Both sit behind Code Mode, and a script almost
+ * always makes exactly this one call; the chat then shows the row as that
+ * tool's own, with its action, detail and icon. `status` is the call's own:
+ * a script can catch a failed call and still finish.
+ */
+export function soleNamedCall(metadata: Metadata | undefined): { tool: string; input: { [key: string]: JsonValue }; status: string | undefined } | undefined {
+  const calls = executeRawCallSchema.parse(metadata ?? {}).toolCalls ?? []
+  if (calls.length !== 1 || !calls[0]?.tool) return undefined
+  const { tool: called, input, status } = calls[0]
+  const opencodeTool = opencodeNamespaceTool(called)
+  const tool = magioToolCall(called, input)?.tool ?? (opencodeTool ? `opencode.${opencodeTool}` : undefined)
+  if (!tool) return undefined
+  return { tool, input: input && typeof input === "object" && !Array.isArray(input) ? input : {}, status }
+}
+
+/**
+ * The one namespace every call of an `execute` script went to, or `undefined`
+ * when the calls mix namespaces or name none. OpenCode's namespace is
+ * `opencode`, each Magio tool is a namespace of its own
+ * (`magio_web`), and any other call names its namespace before the dot
+ * (`linear.list_issues`). The row then carries that namespace's name in place
+ * of "Script".
+ */
+export function executeNamespace(metadata: Metadata | undefined): string | undefined {
+  const spaces = new Set(executeToolCalls(metadata).map(({ tool }) => {
+    if (opencodeNamespaceTool(tool)) return "opencode"
+    if (MAGIO_TOOLS.has(normalizeToolName(tool))) return normalizeToolName(tool)
+    const dot = tool.indexOf(".")
+    return dot > 0 ? tool.slice(0, dot).toLowerCase() : ""
+  }))
+  const [space] = spaces
+  return spaces.size === 1 && space ? space : undefined
 }
 
 /** `JSON.stringify` that answers `undefined` for anything it cannot serialize. */
@@ -371,6 +419,8 @@ export type RenderedPageAsk =
   | { kind: "chat-sent-earlier" }
   /** The chat could not draw the page's ui; the agent got the parser's errors. */
   | { kind: "not-drawn" }
+  /** The user declined to answer on the page. */
+  | { kind: "declined" }
   | { kind: "unanswered" }
 
 // A page sent without a title is named after its own <title>, else its first
@@ -421,7 +471,10 @@ export function renderedPage(
   const answer = result.answer
   if (answer?.answered === true) return { ...page, title, ask: { kind: "answered", summary: answer.summary, data: answer.data } }
   if (answer?.answered === false) {
-    const kind = answer.reason === "chat-sent-earlier" ? "chat-sent-earlier" : answer.reason === "ui-not-drawn" ? "not-drawn" : "answered-in-chat"
+    const kind = answer.reason === "chat-sent-earlier" ? "chat-sent-earlier"
+      : answer.reason === "ui-not-drawn" ? "not-drawn"
+        : answer.reason === "declined" ? "declined"
+          : "answered-in-chat"
     return { ...page, title, ask: { kind } }
   }
   return { ...page, title, ask: { kind: "show" } }
@@ -513,7 +566,11 @@ export type ToolDescription =
   /** Several files in one call; `files` are the raw paths, `count` their number. */
   | { kind: "files"; count: number; files: string[] }
   /** An `execute` script, described by the tools it called. */
-  | { kind: "tools"; calls: Array<{ name: string; count: number }>; overflow: number }
+  /**
+   * `completed`: every call of that tool reported completed. `actions`: the
+   * actions its Magio calls ran, in first-seen order with a count.
+   */
+  | { kind: "tools"; calls: Array<{ name: string; count: number; completed: boolean; actions: Array<{ action: string; count: number }> }>; overflow: number }
 
 const MAX_COMMAND_LENGTH = 100
 /** How many distinct tools an `execute` row names before it counts the rest. */
@@ -525,8 +582,11 @@ const MAGIO_SECRET_TOOL = "magio_secret"
 const MAGIO_WORKFLOW_TOOL = "magio_workflow"
 const MAGIO_IMAGE_TOOL = "magio_image"
 
-/** The control, schedule, browser, memory, knowledge, notify, render, image, secret and workflow tools Magio gives a session. */
-const MAGIO_TOOLS = new Set(["magio", "magio_schedule", "magio_web", "magio_memory", "magio_knowledge", "magio_notify", MAGIO_RENDER_TOOL, MAGIO_IMAGE_TOOL, MAGIO_SECRET_TOOL, MAGIO_WORKFLOW_TOOL])
+/** The control, schedule, browser, memory, knowledge, notify, usage, render, image, secret and workflow tools Magio gives a session. */
+const MAGIO_TOOLS = new Set(["magio", "magio_schedule", "magio_web", "magio_memory", "magio_knowledge", "magio_notify", "magio_usage", MAGIO_RENDER_TOOL, MAGIO_IMAGE_TOOL, MAGIO_SECRET_TOOL, MAGIO_WORKFLOW_TOOL])
+
+/** Whether a tool is one of Magio's own. */
+export const isMagioTool = (toolName: ToolName): boolean => MAGIO_TOOLS.has(normalizeToolName(toolName))
 
 // The result envelope the agent tool returns as text (`agent-tool/runtime.js`).
 const proposedWorkflowResultSchema = z.object({
@@ -612,6 +672,15 @@ const OPENCODE_NAMESPACE_TOOLS = new Set([
   "models",
   "list_mcp_resources",
   "read_mcp_resource",
+  "schedule_create",
+  "schedule_list",
+  "schedule_pause",
+  "schedule_resume",
+  "schedule_delete",
+  "artifact_create",
+  "artifact_read",
+  "artifact_update",
+  "artifact_delete",
 ])
 const OPENCODE_NAMESPACE_PREFIX = "opencode_"
 
@@ -650,11 +719,10 @@ export function magioToolCall(toolName: ToolName, input: JsonValue | undefined):
 }
 
 /**
- * The action an Magio tool call ran and the one detail that tells calls
- * apart: what was linked, created, saved, opened or asked. Notifications have
- * no action, so their title stands alone.
+ * The one detail of an Magio tool call that tells calls apart: what was
+ * linked, created, saved, opened, asked or read.
  */
-function describeMagioTool(parsed: ParsedInput): ToolDescription | null {
+function magioDetail(parsed: ParsedInput): string | undefined {
   const parameters = parsed.parameters
   const link = parameters?.link
   const linked = link ? [link.identifier, link.title].filter(Boolean).join(" ") : undefined
@@ -668,9 +736,63 @@ function describeMagioTool(parsed: ParsedInput): ToolDescription | null {
     || parameters?.selector
     || parameters?.prompt?.split("\n")[0]
     || parameters?.taskId
+    || parameters?.providerId
+    || parameters?.body?.split("\n")[0]
     || parsed.title
-  const label = [parsed.action, detail].filter(Boolean).join(" · ")
+  return detail || undefined
+}
+
+/**
+ * The detail of a call in OpenCode's `opencode` namespace beyond the ones
+ * `toolDescription` names itself: the worktree, resource, schedule or artifact
+ * it worked on.
+ */
+function describeOpencodeNamespaceTool(parsed: ParsedInput): ToolDescription | null {
+  const resource = parsed.uri ?? parsed.server
+  return text(parsed.name)
+    ?? text(parsed.title)
+    ?? text(parsed.prompt?.split("\n")[0])
+    ?? text(resource)
+    ?? asPath(parsed.directory)
+    ?? text(parsed.id)
+}
+
+/**
+ * The action an Magio tool call ran and its detail. Notifications have
+ * no action, so their title stands alone.
+ */
+function describeMagioTool(parsed: ParsedInput): ToolDescription | null {
+  const label = [parsed.action, magioDetail(parsed)].filter(Boolean).join(" · ")
   return label ? { kind: "text", value: label.slice(0, MAX_COMMAND_LENGTH) } : null
+}
+
+// A tool that names its own kind of action takes a bare one (`save` on the
+// memory tool), as the server does (`resolveAgentToolAction`).
+const ACTION_PREFIX_BY_TOOL = new Map<string, string>(Object.entries({
+  magio_memory: "memory",
+  magio_knowledge: "knowledge",
+  magio_schedule: "schedule",
+  magio_notify: "notify",
+  magio_usage: "usage",
+  magio_web: "browser",
+  magio_render: "render",
+  magio_image: "image",
+  magio_secret: "secret",
+  magio_workflow: "workflow",
+}))
+
+/**
+ * The full action an Magio tool call ran (`memory.save`) and its detail,
+ * or `null` for any other tool. A notification without an action is `notify.send`.
+ */
+export function magioCallSummary(toolName: ToolName, input: ToolInput | undefined): { action: string | undefined; detail: string | undefined } | null {
+  const tool = normalizeToolName(toolName)
+  if (!MAGIO_TOOLS.has(tool)) return null
+  const parsed = readInput(input)
+  const prefix = ACTION_PREFIX_BY_TOOL.get(tool)
+  const raw = parsed.action ?? (tool === "magio_notify" ? "send" : undefined)
+  const action = raw && prefix && !raw.includes(".") ? `${prefix}.${raw}` : raw
+  return { action, detail: magioDetail(parsed) }
 }
 
 const text = (value: string | undefined): ToolDescription | null =>
@@ -744,14 +866,22 @@ export function toolListingChanges(
  * runs — or when it called nothing — the row falls back to its first line.
  */
 function describeExecute(calls: ExecuteToolCall[], code: string | undefined): ToolDescription | null {
-  const counts = new Map<string, number>()
+  const counts = new Map<string, { name: string; count: number; completed: boolean; actions: Array<{ action: string; count: number }> }>()
   for (const call of calls) {
-    counts.set(call.tool, (counts.get(call.tool) ?? 0) + 1)
+    const entry = counts.get(call.tool) ?? { name: call.tool, count: 0, completed: true, actions: [] }
+    entry.count += 1
+    entry.completed &&= call.status === "completed"
+    if (call.action) {
+      const seen = entry.actions.find(({ action }) => action === call.action)
+      if (seen) seen.count += 1
+      else entry.actions.push({ action: call.action, count: 1 })
+    }
+    counts.set(call.tool, entry)
   }
   if (counts.size === 0) {
     return code ? { kind: "text", value: code.split("\n")[0].slice(0, MAX_COMMAND_LENGTH) } : null
   }
-  const named = [...counts].slice(0, MAX_DESCRIBED_TOOL_CALLS).map(([name, count]) => ({ name, count }))
+  const named = [...counts.values()].slice(0, MAX_DESCRIBED_TOOL_CALLS)
   return { kind: "tools", calls: named, overflow: counts.size - named.length }
 }
 
@@ -811,7 +941,7 @@ export function toolDescription(
       return asPath(parsed.directory)
 
     case OPENCODE_TOOLS.models:
-      return text(parsed.search) ?? text(parsed.provider)
+      return text(parsed.query) ?? text(parsed.search) ?? text(parsed.provider)
 
     case OPENCODE_TOOLS.question: {
       const count = parsed.questions?.length ?? 0
@@ -821,6 +951,7 @@ export function toolDescription(
     // MCP and plugin tools: anything they call a description, then a path.
     default:
       if (MAGIO_TOOLS.has(name)) return describeMagioTool(parsed)
+      if (opencodeNamespaceTool(toolName)) return describeOpencodeNamespaceTool(parsed)
       return text(parsed.description) ?? asPath(parsed.path ?? parsed.filePath ?? parsed.file_path)
   }
 }

@@ -160,6 +160,7 @@ stdenv.mkDerivation {
         CFBundleVersion="${version}",
         CFBundleURLTypes=[dict(CFBundleURLName="Magio", CFBundleURLSchemes=["magio"])],
         NSLocalNetworkUsageDescription=package["build"]["mac"]["extendInfo"]["NSLocalNetworkUsageDescription"],
+        NSAppleEventsUsageDescription=package["build"]["mac"]["extendInfo"]["NSAppleEventsUsageDescription"],
     )
     with open(path, "wb") as handle:
         plistlib.dump(info, handle)

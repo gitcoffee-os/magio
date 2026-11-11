@@ -188,6 +188,29 @@ describe('magio events', () => {
     }
   });
 
+  test('a listener that subscribes after the stream is ready still gets its connection, and not after a drop', async () => {
+    const { subscribemagioEvents } = await import('./magioEvents');
+    const unsubscribeEarly = subscribemagioEvents(() => {});
+    const source = MockEventSource.instances[0];
+    source.onmessage?.({ data: JSON.stringify({ type: 'magio:event-stream-ready', properties: { connectionId: 'conn_1' } }) });
+
+    const late: unknown[] = [];
+    const unsubscribeLate = subscribemagioEvents((event) => late.push(event));
+    await Promise.resolve();
+    expect(late).toEqual([{ type: 'event-stream-ready', connectionId: 'conn_1' }]);
+    expect(MockEventSource.instances).toHaveLength(1);
+
+    source.onerror?.();
+    const afterDrop: unknown[] = [];
+    const unsubscribeAfterDrop = subscribemagioEvents((event) => afterDrop.push(event));
+    await Promise.resolve();
+    expect(afterDrop).toEqual([]);
+
+    unsubscribeAfterDrop();
+    unsubscribeLate();
+    unsubscribeEarly();
+  });
+
   test('dispatches externally created session events', async () => {
     const { subscribemagioEvents } = await import('./magioEvents');
     const events: unknown[] = [];
@@ -399,6 +422,43 @@ describe('magio events', () => {
       { type: 'worktree-changed', directories: ['/repo', '/repo-linked'], changedAt: 456 },
     ]);
     unsubscribe();
+  });
+
+  test('dispatches the session announcements an SSE main stream never carries', async () => {
+    const { subscribemagioEvents } = await import('./magioEvents');
+    const events: unknown[] = [];
+    const unsubscribe = subscribemagioEvents((event) => {
+      if (event.type === 'control-sync') events.push(event.event);
+    });
+    const run = {
+      id: 'wf_one', parentSessionId: 'ses_1', directory: '/repo', name: 'audit', description: '', state: 'running',
+      attempt: 1, createdAt: 1, currentPhase: null, phases: [], agents: [], logs: [],
+    };
+    try {
+      for (const payload of [
+        { type: 'magio:workflow-run', properties: { run } },
+        { type: 'magio:workflow-run', properties: { run: { ...run, state: 'exploded' } } },
+        { type: 'magio:workflow-run-removed', properties: { runId: 'wf_one', parentSessionId: 'ses_1' } },
+        { type: 'magio:page-waiting', properties: { sessionID: 'ses_1', directory: '/repo', page: { id: 'call_1', title: 'Pick' } } },
+        { type: 'magio:page-settled', properties: { sessionID: 'ses_1', pageID: 'call_1' } },
+        { type: 'magio:session-assist', properties: { sessionID: 'ses_1', directory: null, pending: true } },
+        { type: 'magio:session-archived', properties: { sessionID: 'ses_1', archivedAt: 42 } },
+        // OpenCode announces metadata itself on every transport.
+        { type: 'magio:session-metadata', properties: { sessionID: 'ses_1', metadata: { pinned: true } } },
+      ]) {
+        MockEventSource.instances[0].onmessage?.({ data: JSON.stringify(payload) });
+      }
+      expect(events).toEqual([
+        { type: 'magio.workflow-run', properties: { run } },
+        { type: 'magio.workflow-run-removed', properties: { runId: 'wf_one', parentSessionId: 'ses_1' } },
+        { type: 'magio.page-waiting', properties: { sessionID: 'ses_1', directory: '/repo', page: { id: 'call_1', title: 'Pick' } } },
+        { type: 'magio.page-settled', properties: { sessionID: 'ses_1', pageID: 'call_1' } },
+        { type: 'magio.session-assist', properties: { sessionID: 'ses_1', directory: null, pending: true } },
+        { type: 'session.patched', properties: { sessionID: 'ses_1', patch: { time: { archived: 42 } } } },
+      ]);
+    } finally {
+      unsubscribe();
+    }
   });
 
   test('dispatches a project-context invalidation only with a valid owner id', async () => {

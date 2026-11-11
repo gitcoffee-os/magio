@@ -2,10 +2,7 @@ import * as React from 'react';
 
 import { Icon } from '@/components/icon/Icon';
 import type { IconName } from '@/components/icon/icons';
-import {
-  SettingsSection,
-  SettingsCheckboxRow,
-} from '@/components/sections/shared/SettingsSection';
+import { SettingsSection } from '@/components/sections/shared/SettingsSection';
 import { SettingsInfoHint } from '@/components/sections/shared/SettingsInfoHint';
 import { Switch } from '@/components/ui/switch';
 import {
@@ -92,6 +89,8 @@ export const MagioToolsSettings: React.FC = () => {
   const setAgentKnowledgeToolEnabled = useUIStore((state) => state.setAgentKnowledgeToolEnabled);
   const agentNotifyToolEnabled = useUIStore((state) => state.agentNotifyToolEnabled);
   const setAgentNotifyToolEnabled = useUIStore((state) => state.setAgentNotifyToolEnabled);
+  const agentUsageToolEnabled = useUIStore((state) => state.agentUsageToolEnabled);
+  const setAgentUsageToolEnabled = useUIStore((state) => state.setAgentUsageToolEnabled);
   const agentRenderToolEnabled = useUIStore((state) => state.agentRenderToolEnabled);
   const setAgentRenderToolEnabled = useUIStore((state) => state.setAgentRenderToolEnabled);
   const agentImageToolEnabled = useUIStore((state) => state.agentImageToolEnabled);
@@ -104,8 +103,6 @@ export const MagioToolsSettings: React.FC = () => {
   const agentWorkflowAvailable = useUIStore((state) => state.agentWorkflowFeatureAvailable);
   const agentWorkflowToolEnabled = useUIStore((state) => state.agentWorkflowToolEnabled);
   const setAgentWorkflowToolEnabled = useUIStore((state) => state.setAgentWorkflowToolEnabled);
-  const agentToolsCodeMode = useUIStore((state) => state.agentToolsCodeMode);
-  const setAgentToolsCodeMode = useUIStore((state) => state.setAgentToolsCodeMode);
 
   const handleAgentControlToolChange = React.useCallback((enabled: boolean) => {
     setAgentControlToolEnabled(enabled);
@@ -126,6 +123,11 @@ export const MagioToolsSettings: React.FC = () => {
     setAgentNotifyToolEnabled(enabled);
     void updateDesktopSettings({ agentNotifyToolEnabled: enabled });
   }, [setAgentNotifyToolEnabled]);
+
+  const handleAgentUsageToolChange = React.useCallback((enabled: boolean) => {
+    setAgentUsageToolEnabled(enabled);
+    void updateDesktopSettings({ agentUsageToolEnabled: enabled });
+  }, [setAgentUsageToolEnabled]);
 
   const handleAgentRenderToolChange = React.useCallback((enabled: boolean) => {
     setAgentRenderToolEnabled(enabled);
@@ -171,11 +173,6 @@ export const MagioToolsSettings: React.FC = () => {
     setAgentWorkflowToolEnabled(enabled);
     void updateDesktopSettings({ agentWorkflowToolEnabled: enabled });
   }, [setAgentWorkflowToolEnabled]);
-
-  const handleAgentToolsCodeModeChange = React.useCallback((enabled: boolean) => {
-    setAgentToolsCodeMode(enabled);
-    void updateDesktopSettings({ agentToolsCodeMode: enabled });
-  }, [setAgentToolsCodeMode]);
 
   // The dropdown lists installed extensions, so the catalog has to be loaded
   // here too: this page can be the first thing opened after a fresh start.
@@ -301,6 +298,17 @@ export const MagioToolsSettings: React.FC = () => {
         />
 
         <ToolRow
+          icon="bar-chart-2"
+          settingsItem="sessions.agent-usage-tool"
+          checked={agentUsageToolEnabled}
+          onChange={handleAgentUsageToolChange}
+          title={t('settings.magio.tools.field.agentUsageTool')}
+          summary={t('settings.magio.tools.field.agentUsageToolSummary')}
+          info={t('settings.magio.tools.field.agentUsageToolInfo')}
+          ariaLabel={t('settings.magio.tools.field.agentUsageToolAria')}
+        />
+
+        <ToolRow
           icon="bar-chart-box"
           settingsItem="sessions.agent-render-tool"
           checked={agentRenderToolEnabled}
@@ -420,16 +428,6 @@ export const MagioToolsSettings: React.FC = () => {
           />
         ) : null}
       </div>
-
-      <SettingsCheckboxRow
-        className="mt-4"
-        settingsItem="sessions.agent-tools-code-mode"
-        checked={agentToolsCodeMode}
-        onChange={handleAgentToolsCodeModeChange}
-        label={t('settings.magio.tools.field.agentToolsCodeMode')}
-        ariaLabel={t('settings.magio.tools.field.agentToolsCodeModeAria')}
-        info={t('settings.magio.tools.field.agentToolsCodeModeInfo')}
-      />
     </SettingsSection>
   );
 };

@@ -259,6 +259,7 @@ describe('createParsedStatus', () => {
             expect(english(statusOf([call('magio_memory', { action: 'memory.save', parameters: { title: 'x' } })]).status)).toBe('saving to memory');
             expect(english(statusOf([call('magio', { action: 'session.create' })]).status)).toBe('starting a session');
             expect(english(statusOf([call('magio_notify', { title: 'Done' })]).status)).toBe('sending a notification');
+            expect(english(statusOf([call('magio_usage', { action: 'usage.read', parameters: {} })]).status)).toBe('checking usage limits');
         });
 
         test('fall back to the tool phrase for an action without its own', () => {
